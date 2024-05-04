@@ -1,3 +1,4 @@
+const EslingPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const postCssPresetEnv = require('postcss-preset-env');
@@ -29,6 +30,9 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: 'style.[contenthash].css'
+    }),
+    new EslingPlugin({
+      extensions: 'ts'
     })
   ],
   module: {
@@ -55,7 +59,14 @@ module.exports = {
       {
         test: /\.(jpe?g|png|webp|gif|svg)$/i,
         type: 'asset/resource'
+      },
+      {
+        test: /\.ts$/i,
+        use: 'ts-loader'
       }
     ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js']
   }
 }
