@@ -1,0 +1,11 @@
+body {
+    background-color: red;
+    user-select: none;
+}
+
+.image {
+    width: 400px;
+    height: 468px;
+    background-size: cover;
+    background-image: url('./assets/images/1.png');
+}
