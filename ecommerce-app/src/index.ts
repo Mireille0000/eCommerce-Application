@@ -1,4 +1,3 @@
-// import './index.html';
 import './global.css';
 
 const mult = (a: number, b: number) => a * b;
