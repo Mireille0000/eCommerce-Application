@@ -7,7 +7,12 @@
     "start": "set NODE_ENV=development&&webpack serve",
     "build:dev": "set NODE_ENV=development&&webpack",
     "build:prod": "set NODE_ENV=production&&webpack",
-    "clear": "rd /s /q dist"
+    "clear": "rd /s /q dist",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"__tests__/**/*.ts\"",
+    "ci:format": "prettier --check \"src/**/*.ts\" \"__tests__/**/*.ts\"",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
