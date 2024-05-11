@@ -16,6 +16,20 @@
     "@typescript-eslint/no-explicit-any": 2,
     "class-methods-use-this": "off",
     "no-debugger": "off",
-    "no-console": 0
+    "no-console": 0,
+    "import/extensions": [
+      "off",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+    "import/no-unresolved": [
+        0, 
+        { "caseSensitive": false }
+    ]
   }
 }
