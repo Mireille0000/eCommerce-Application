@@ -13,6 +13,17 @@ body {
     margin: 0 auto;
 }
 
+.wrapper-header {
+    width: 100vw;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+h1 {
+    margin: auto 0;
+    font-size: 30px;
+}
+
 main {
     height: 100%;
     display: flex;
@@ -51,4 +62,13 @@ button {
     height: 30px;
     border-radius: 20px;
     cursor: pointer;
+}
+
+ul {
+    display: flex;
+    gap: 15px;
+}
+
+li {
+    list-style-type: none;
 }
