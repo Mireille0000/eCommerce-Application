@@ -10,6 +10,8 @@ export default class LogInPage extends Page {
 
   loginButton: HTMLButtonElement;
 
+  regButton: HTMLButtonElement;
+
   constructor() {
     super();
     this.form = document.createElement('form');
@@ -18,6 +20,7 @@ export default class LogInPage extends Page {
     this.password = document.createElement('input');
     this.password.className = 'password-input';
     this.loginButton = document.createElement('button');
+    this.regButton = document.createElement('button');
   }
 
   renderPage() {
@@ -27,26 +30,23 @@ export default class LogInPage extends Page {
     const headerComponent = new HeaderComponent();
     const headerComponentItems = [
       headerComponent.appName,
+      headerComponent.navBar,
       headerComponent.navigation,
-      headerComponent.linksList,
+      headerComponent.navItem,
       headerComponent.link,
     ];
-    const [name, navigation, list, link] = headerComponentItems;
+    const [name, navigation, list, listItem, link] = headerComponentItems;
     this.addElemsToHeader(name, navigation);
     navigation.append(list);
-    list.append(link);
-    list.appendChild(link.cloneNode(true)); // to refactor
-    const linksArr = Array.from(document.querySelectorAll('li'));
-    const links = ['Back to Main', 'Registration'];
-    for (let i = 0; i < linksArr.length; i += 1) {
-      linksArr[i].innerHTML = links[i];
-    }
+    list.append(listItem);
+    listItem.append(link);
+    link.innerHTML = 'Back to Main';
     name.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
     const fieldset = document.createElement('fieldset');
     const legend = document.createElement('legend');
-    this.form.append(fieldset, this.loginButton);
+    this.form.append(fieldset, this.loginButton, this.regButton);
     const emailContainer = document.createElement('div');
     const passwordContainer = document.createElement('div');
     const emailHint = document.createElement('span');
@@ -58,6 +58,9 @@ export default class LogInPage extends Page {
     this.email.placeholder = 'Email';
     this.password.placeholder = 'Password';
     this.loginButton.innerHTML = 'Log in';
+    this.loginButton.className = 'log-in';
+    this.regButton.innerHTML = 'Sign up';
+    this.regButton.className = 'sign-up';
     return this.pageWrapper;
   }
 }
