@@ -1,3 +1,6 @@
+import { pageElements } from '../../app/utils/types';
+import createHtmlElement from '../../app/utils/functions';
+
 export default abstract class Page {
   pageWrapper: HTMLDivElement;
 
@@ -16,30 +19,27 @@ export default abstract class Page {
   footerWrapper: HTMLDivElement;
 
   constructor() {
-    this.pageWrapper = document.createElement('div');
-    this.pageWrapper.className = 'wrapper';
-    this.header = document.createElement('header');
-    this.headerWrapper = document.createElement('div');
-    this.headerWrapper.className = 'wrapper-header';
-    this.appName = document.createElement('h1');
-    this.main = document.createElement('main');
-    this.mainWrapper = document.createElement('div');
-    this.mainWrapper.className = 'wrapper-main';
-    this.footer = document.createElement('footer');
-    this.footerWrapper = document.createElement('div');
+    this.pageWrapper = createHtmlElement('div', 'wrapper');
+    this.header = createHtmlElement('header');
+    this.headerWrapper = createHtmlElement('div', 'wrapper-header');
+    this.appName = createHtmlElement('h1');
+    this.main = createHtmlElement('main', 'log-in-main');
+    this.mainWrapper = createHtmlElement('div', 'wrapper-main');
+    this.footer = createHtmlElement('footer');
+    this.footerWrapper = createHtmlElement('div');
   }
 
-  addElemsToHeader(...elems: Array<HTMLElement>) {
+  addElemsToHeader(...elems: pageElements) {
     this.header.append(this.headerWrapper);
     return this.headerWrapper.append(...elems);
   }
 
-  addElemsToMain(...elems: Array<HTMLElement>) {
+  addElemsToMain(...elems: pageElements) {
     this.main.append(this.mainWrapper);
     return this.mainWrapper.append(...elems);
   }
 
-  addElemsToFooter(...elems: Array<HTMLElement>) {
+  addElemsToFooter(...elems: pageElements) {
     this.footer.append(this.footerWrapper);
     return this.footerWrapper.append(...elems);
   }

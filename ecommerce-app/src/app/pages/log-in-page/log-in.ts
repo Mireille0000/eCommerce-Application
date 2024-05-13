@@ -1,5 +1,6 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
+import createHtmlElement from '../../utils/functions';
 
 export default class LogInPage extends Page {
   form: HTMLFormElement;
@@ -14,13 +15,12 @@ export default class LogInPage extends Page {
 
   constructor() {
     super();
-    this.form = document.createElement('form');
-    this.email = document.createElement('input');
-    this.email.className = 'email-input';
-    this.password = document.createElement('input');
-    this.password.className = 'password-input';
-    this.loginButton = document.createElement('button');
-    this.regButton = document.createElement('button');
+    this.appName.className = 'log-in-heading';
+    this.form = createHtmlElement('form', 'log-in-form');
+    this.email = createHtmlElement('input', 'email-input');
+    this.password = createHtmlElement('input', 'password-input');
+    this.loginButton = createHtmlElement('button', 'log-in', 'Log in');
+    this.regButton = createHtmlElement('button', 'sign-up', 'Sign up');
   }
 
   renderPage() {
@@ -35,6 +35,7 @@ export default class LogInPage extends Page {
       headerComponent.navItem,
       headerComponent.link,
     ];
+    headerComponent.navBar.className = 'nav-bar';
     const [name, navigation, list, listItem, link] = headerComponentItems;
     this.addElemsToHeader(name, navigation);
     navigation.append(list);
@@ -44,23 +45,18 @@ export default class LogInPage extends Page {
     name.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
-    const fieldset = document.createElement('fieldset');
-    const legend = document.createElement('legend');
+    const fieldset = createHtmlElement('fieldset', 'log-in-fieldset');
+    const legend = createHtmlElement('legend', 'log-in-legend', 'Authentication form');
     this.form.append(fieldset, this.loginButton, this.regButton);
-    const emailContainer = document.createElement('div');
-    const passwordContainer = document.createElement('div');
-    const emailHint = document.createElement('span');
-    const passwordHint = document.createElement('span');
+    const emailContainer = createHtmlElement('div');
+    const passwordContainer = createHtmlElement('div');
+    const emailHint = createHtmlElement('span');
+    const passwordHint = createHtmlElement('span');
     fieldset.append(legend, emailContainer, passwordContainer);
     emailContainer.append(this.email, emailHint);
     passwordContainer.append(this.password, passwordHint);
-    legend.innerHTML = 'Authentication form';
     this.email.placeholder = 'Email';
     this.password.placeholder = 'Password';
-    this.loginButton.innerHTML = 'Log in';
-    this.loginButton.className = 'log-in';
-    this.regButton.innerHTML = 'Sign up';
-    this.regButton.className = 'sign-up';
     return this.pageWrapper;
   }
 }
