@@ -1,1 +1,1 @@
-export type pageElements = Array<HTMLElement>;
+export type PageElements = Array<HTMLElement>;

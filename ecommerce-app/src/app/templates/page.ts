@@ -1,4 +1,4 @@
-import { pageElements } from '../../app/utils/types';
+import { PageElements } from '../../app/utils/types';
 import createHtmlElement from '../../app/utils/functions';
 
 export default abstract class Page {
@@ -29,17 +29,17 @@ export default abstract class Page {
     this.footerWrapper = createHtmlElement('div');
   }
 
-  addElemsToHeader(...elems: pageElements) {
+  addElemsToHeader(...elems: PageElements) {
     this.header.append(this.headerWrapper);
     return this.headerWrapper.append(...elems);
   }
 
-  addElemsToMain(...elems: pageElements) {
+  addElemsToMain(...elems: PageElements) {
     this.main.append(this.mainWrapper);
     return this.mainWrapper.append(...elems);
   }
 
-  addElemsToFooter(...elems: pageElements) {
+  addElemsToFooter(...elems: PageElements) {
     this.footer.append(this.footerWrapper);
     return this.footerWrapper.append(...elems);
   }

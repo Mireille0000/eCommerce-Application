@@ -17,8 +17,8 @@ export default class LogInPage extends Page {
     super();
     this.appName.className = 'log-in-heading';
     this.form = createHtmlElement('form', 'log-in-form');
-    this.email = createHtmlElement('input', 'email-input');
-    this.password = createHtmlElement('input', 'password-input');
+    this.email = createHtmlElement('input', 'email-input', '', [{ name: 'placeholder', value: 'Email' }]);
+    this.password = createHtmlElement('input', 'password-input', '', [{ name: 'placeholder', value: 'Password' }]);
     this.loginButton = createHtmlElement('button', 'log-in', 'Log in');
     this.regButton = createHtmlElement('button', 'sign-up', 'Sign up');
   }
@@ -55,8 +55,6 @@ export default class LogInPage extends Page {
     fieldset.append(legend, emailContainer, passwordContainer);
     emailContainer.append(this.email, emailHint);
     passwordContainer.append(this.password, passwordHint);
-    this.email.placeholder = 'Email';
-    this.password.placeholder = 'Password';
     return this.pageWrapper;
   }
 }
