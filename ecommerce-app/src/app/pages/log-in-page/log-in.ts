@@ -1,12 +1,12 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import createHtmlElement, {
+import createHtmlElement, { addEventHandler, createImage } from '../../utils/functions';
+
+import {
   emailInputEventHandler,
   logInBtnEventHandler,
   passwordInputEventHandler,
-  addEventHandler,
-  createImage,
-} from '../../utils/functions';
+} from '../log-in-page/utils-log-in/functions-log-in';
 
 import openedeye from '../../../assets/images/eye.png';
 import closedEye from '../../../assets/images/close-eye.png';
