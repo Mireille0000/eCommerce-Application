@@ -1,13 +1,17 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import createHtmlElement from '../../utils/functions';
+import createHtmlElement, { emailInputEventHandler, logInBtnEventHandler } from '../../utils/functions';
 
 export default class LogInPage extends Page {
   form: HTMLFormElement;
 
   email: HTMLInputElement;
 
+  emailHint: HTMLSpanElement;
+
   password: HTMLInputElement;
+
+  passwordHint: HTMLSpanElement;
 
   loginButton: HTMLButtonElement;
 
@@ -18,6 +22,8 @@ export default class LogInPage extends Page {
     this.appName.className = 'log-in-heading';
     this.form = createHtmlElement('form', 'log-in-form');
     this.email = createHtmlElement('input', 'email-input', '', [{ name: 'placeholder', value: 'Email' }]);
+    this.emailHint = createHtmlElement('span', 'email-hint');
+    this.passwordHint = createHtmlElement('span', 'password-hint');
     this.password = createHtmlElement('input', 'password-input', '', [{ name: 'placeholder', value: 'Password' }]);
     this.loginButton = createHtmlElement('button', 'log-in', 'Log in');
     this.regButton = createHtmlElement('button', 'sign-up', 'Sign up');
@@ -48,13 +54,19 @@ export default class LogInPage extends Page {
     const fieldset = createHtmlElement('fieldset', 'log-in-fieldset');
     const legend = createHtmlElement('legend', 'log-in-legend', 'Authentication form');
     this.form.append(fieldset, this.loginButton, this.regButton);
-    const emailContainer = createHtmlElement('div');
-    const passwordContainer = createHtmlElement('div');
-    const emailHint = createHtmlElement('span');
-    const passwordHint = createHtmlElement('span');
+    const emailContainer = createHtmlElement('div', 'email-container');
+    const passwordContainer = createHtmlElement('div', 'password-container');
     fieldset.append(legend, emailContainer, passwordContainer);
-    emailContainer.append(this.email, emailHint);
-    passwordContainer.append(this.password, passwordHint);
+    const hintsContainerEmail = createHtmlElement('div', 'hints');
+    hintsContainerEmail.append(this.emailHint);
+    emailContainer.append(this.email, hintsContainerEmail);
+    for (let i = 0; i < 2; i += 1) {
+      hintsContainerEmail.appendChild(this.emailHint.cloneNode(true));
+    }
+    passwordContainer.append(this.password, this.passwordHint);
+
+    logInBtnEventHandler(this.email, 'email-hint', 'log-in');
+    emailInputEventHandler(this.email, 'email-input', 'email-hint');
     return this.pageWrapper;
   }
 }
