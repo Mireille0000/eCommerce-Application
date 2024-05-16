@@ -67,7 +67,8 @@ body {
     text-align: center;
 }
 
-.hints {
+.hints-email, .hints-password {
+    width: 323px;
     display: flex;
     flex-direction: column;
     gap: 5px;

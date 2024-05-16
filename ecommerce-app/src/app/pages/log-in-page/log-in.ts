@@ -1,6 +1,10 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import createHtmlElement, { emailInputEventHandler, logInBtnEventHandler } from '../../utils/functions';
+import createHtmlElement, {
+  emailInputEventHandler,
+  logInBtnEventHandler,
+  passwordInputEventHandler,
+} from '../../utils/functions';
 
 export default class LogInPage extends Page {
   form: HTMLFormElement;
@@ -57,16 +61,24 @@ export default class LogInPage extends Page {
     const emailContainer = createHtmlElement('div', 'email-container');
     const passwordContainer = createHtmlElement('div', 'password-container');
     fieldset.append(legend, emailContainer, passwordContainer);
-    const hintsContainerEmail = createHtmlElement('div', 'hints');
+    const hintsContainerEmail = createHtmlElement('div', 'hints-email');
+    const hintsContainerPassword = createHtmlElement('div', 'hints-password');
     hintsContainerEmail.append(this.emailHint);
+    hintsContainerPassword.append(this.passwordHint);
     emailContainer.append(this.email, hintsContainerEmail);
     for (let i = 0; i < 2; i += 1) {
       hintsContainerEmail.appendChild(this.emailHint.cloneNode(true));
     }
-    passwordContainer.append(this.password, this.passwordHint);
+
+    for (let i = 0; i < 5; i += 1) {
+      hintsContainerPassword.appendChild(this.passwordHint.cloneNode(true));
+    }
+    passwordContainer.append(this.password, hintsContainerPassword);
 
     logInBtnEventHandler(this.email, 'email-hint', 'log-in');
     emailInputEventHandler(this.email, 'email-input', 'email-hint');
+
+    passwordInputEventHandler(this.password, 'password-input', 'password-hint');
     return this.pageWrapper;
   }
 }
