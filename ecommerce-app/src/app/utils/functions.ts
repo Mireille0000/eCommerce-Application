@@ -137,3 +137,20 @@ export function passwordInputEventHandler(input: HTMLInputElement, inputClass: s
     }
   });
 }
+
+// add event listener
+
+export function addEventHandler(element: string, e: string, callback = () => {}) {
+  const target = document.querySelector(`.${element}`);
+  target?.addEventListener(`${e}`, callback);
+}
+
+// create image
+
+export function createImage(source: File, alt: string, classImg: string, image = new Image()) {
+  const newImage = image;
+  newImage.src = `${source}`;
+  newImage.alt = `${alt}`;
+  newImage.className = `.${classImg}`;
+  return newImage;
+}
