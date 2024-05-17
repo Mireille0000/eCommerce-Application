@@ -30,20 +30,6 @@ function validateEmailInput(input: HTMLInputElement, hint: string) {
   }
 }
 
-export function emailInputEventHandler(input: HTMLInputElement, inputClass: string, hint: string) {
-  const inputField = document.querySelector(`.${inputClass}`);
-  const errorFields = Array.from(document.querySelectorAll(`.${hint}`));
-  inputField?.addEventListener('input', () => {
-    validateEmailInput(input, hint);
-    if (input.value.length === 0) {
-      errorFields.forEach((field) => {
-        const errField = field;
-        errField.innerHTML = '';
-      });
-    }
-  });
-}
-
 // Password validation
 
 const errorMessagesPassword = [
@@ -94,11 +80,28 @@ function validatePasswordInput(input: HTMLInputElement, hint: string) {
   }
 }
 
-export function passwordInputEventHandler(input: HTMLInputElement, inputClass: string, hint: string) {
+export function logInBtnEventHandler(input: HTMLInputElement, hint: string, buttonClass: string) {
+  const logInButton = document.querySelector(`.${buttonClass}`);
+  logInButton?.addEventListener('click', (e) => {
+    validateEmailInput(input, hint);
+    e.preventDefault();
+  });
+}
+
+// Input Event Handler
+
+type ValidateInputFn = (input: HTMLInputElement, hint: string) => void;
+
+export function inputEventHandler(
+  validateFunc: ValidateInputFn,
+  input: HTMLInputElement,
+  inputClass: string,
+  hint: string
+) {
   const inputField = document.querySelector(`.${inputClass}`);
   const errorFields = Array.from(document.querySelectorAll(`.${hint}`));
   inputField?.addEventListener('input', () => {
-    validatePasswordInput(input, hint);
+    validateFunc(input, hint);
     if (input.value.length === 0) {
       errorFields.forEach((field) => {
         const errField = field;
@@ -108,10 +111,10 @@ export function passwordInputEventHandler(input: HTMLInputElement, inputClass: s
   });
 }
 
-export function logInBtnEventHandler(input: HTMLInputElement, hint: string, buttonClass: string) {
-  const logInButton = document.querySelector(`.${buttonClass}`);
-  logInButton?.addEventListener('click', (e) => {
-    validateEmailInput(input, hint);
-    e.preventDefault();
-  });
+export function passwordInputEventHandler(input: HTMLInputElement, inputClass: string, hint: string) {
+  inputEventHandler(validatePasswordInput, input, inputClass, hint);
+}
+
+export function emailInputEventHandler(input: HTMLInputElement, inputClass: string, hint: string) {
+  inputEventHandler(validateEmailInput, input, inputClass, hint);
 }
