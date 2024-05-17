@@ -1,6 +1,6 @@
 body {
     margin: 0 auto;
-    background-color: rgb(113, 166, 214);
+    background-color: rgb(145 193 236);
 }
 
 .wrapper {
@@ -53,11 +53,47 @@ body {
     text-align: center;
 }
 
+.email-container, .password-container
+{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .email-input, .password-input {
     width: 250px;
     height: 40px;
     border-radius: 20px;
     text-align: center;
+}
+
+.hints-email, .hints-password {
+    width: 323px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.email-hint, .password-hint {
+    display: flex;
+    font-size: 12px;
+    color: rgb(204 70 70);
+}
+
+.show-password {
+    position: absolute;
+    transform: translateY(50%);
+    top: 5%;
+    right: 15%;
+    cursor: pointer;
+    transition: 1s;
+}
+
+.show-password:hover {
+    background-color: rgb(210, 187, 15);
+    border-radius: 20px;
+    box-shadow: 1px 1px 10px 4px rgb(210, 187, 15);
 }
 
 .log-in, .sign-up {

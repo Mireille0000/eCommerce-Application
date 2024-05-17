@@ -19,3 +19,16 @@ export default function createHtmlElement<T = HTMLElement>(
   }
   return newElem as T;
 }
+
+export function addEventHandler(element: string, e: string, callback = () => {}) {
+  const target = document.querySelector(`.${element}`);
+  target?.addEventListener(`${e}`, callback);
+}
+
+export function createImage(source: File, alt: string, classImg: string, image = new Image()) {
+  const newImage = image;
+  newImage.src = `${source}`;
+  newImage.alt = `${alt}`;
+  newImage.className = `.${classImg}`;
+  return newImage;
+}
