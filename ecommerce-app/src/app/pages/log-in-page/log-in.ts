@@ -1,11 +1,14 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement, { addEventHandler, createImage } from '../../utils/functions';
+import checkCustomer from '../../server-requests/login-form-requests';
 
 import {
   emailInputEventHandler,
   logInBtnEventHandler,
   passwordInputEventHandler,
+  isEmailFormat,
+  isPasswordFormat,
 } from '../log-in-page/utils-log-in/functions-log-in';
 
 import openedeye from '../../../assets/images/eye.png';
@@ -44,6 +47,7 @@ export default class LogInPage extends Page {
   renderPage() {
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.header, this.main, this.footer);
+    this.main.className = 'log-in-main';
     // header
     const headerComponent = new HeaderComponent();
     const headerComponentItems = [
@@ -100,6 +104,15 @@ export default class LogInPage extends Page {
       }
     });
 
+    this.loginButton.addEventListener('click', (e) => {
+      if (isEmailFormat.test(this.email.value) && isPasswordFormat.test(this.password.value)) {
+        checkCustomer(this.email.value, this.password.value);
+      } else {
+        console.log('invalid cridentials');
+      } // TEST
+
+      e.preventDefault();
+    });
     passwordEye.append(closedEyeImage);
 
     logInBtnEventHandler(this.email, 'email-hint', 'log-in');
