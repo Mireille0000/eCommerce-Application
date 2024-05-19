@@ -1,6 +1,6 @@
 // Email validation
 
-const isEmailFormat = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*([.]\w{2,3})+$/;
+export const isEmailFormat = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*([.]\w{2,3})+$/;
 const hasArobase = /[@]{1}/g;
 const hasWhitespaces = /\s/;
 const errorMessages: Array<string> = [
@@ -41,7 +41,7 @@ const errorMessagesPassword = [
   'Password must contain at least one special character (e.g., !@#$%^&*)',
 ];
 
-const passwordRegEx = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
+export const isPasswordFormat = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
 const hasUppercaseLetter = /(?=.*[A-Z])/;
 const hasLowercaseLetter = /(?=.*[a-z])/;
 const hasDigit = /(?=.*\d)/;
@@ -49,7 +49,7 @@ const hasNotWhitespaces = /^\S*$/;
 const hasSpecialChar = /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/;
 
 const passwordReExs = [
-  passwordRegEx,
+  isPasswordFormat,
   hasUppercaseLetter,
   hasLowercaseLetter,
   hasDigit,
@@ -60,7 +60,7 @@ const passwordReExs = [
 function validatePasswordInput(input: HTMLInputElement, hint: string) {
   const passwordHintsArr = Array.from(document.querySelectorAll(`.${hint}`));
   const errorFields = Array.from(document.querySelectorAll(`.${hint}`));
-  if (!passwordRegEx.test(input.value)) {
+  if (!isPasswordFormat.test(input.value)) {
     passwordHintsArr.forEach((field, i) => {
       const errField = field;
       errField.innerHTML = errorMessagesPassword[i];
