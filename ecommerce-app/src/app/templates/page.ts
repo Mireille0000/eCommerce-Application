@@ -23,7 +23,7 @@ export default abstract class Page {
     this.header = createHtmlElement('header');
     this.headerWrapper = createHtmlElement('div', 'wrapper-header');
     this.appName = createHtmlElement('h1');
-    this.main = createHtmlElement('main', 'log-in-main');
+    this.main = createHtmlElement('main');
     this.mainWrapper = createHtmlElement('div', 'wrapper-main');
     this.footer = createHtmlElement('footer');
     this.footerWrapper = createHtmlElement('div');
