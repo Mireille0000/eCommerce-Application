@@ -22,15 +22,37 @@ const ProcessEnv = {
 
 // verify user
 
-interface PasswordFlow {
-  access_token: string;
-  expires_in: number;
-  refresh_token: string;
-  scope: string;
-  token_type: string;
+// interface PasswordFlow {
+//   access_token: string;
+//   expires_in: number;
+//   refresh_token: string;
+//   scope: string;
+//   token_type: string;
+// }
+
+async function getCustomerToken(passwordFlowDataParam: string) {
+  try {
+    const response = await fetch(`https://api.europe-west1.gcp.commercetools.com/${ProcessEnv.PROJECT_KEY}/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Bearer ${`${passwordFlowDataParam}`}`,
+      },
+    });
+
+    if (response.status === 401) {
+      throw new Error('Sign up');
+    } else {
+      const customerTokenData = await response.json();
+      console.log(customerTokenData);
+    }
+  } catch (err) {
+    const mute = err;
+    console.log('Invalid access token', mute);
+  }
 }
 
-export default async function checkCustomer(email: string, password: string) {
+async function getPasswordFlow(email: string, password: string) {
   const response1 = await fetch(
     `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnv.PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
     {
@@ -41,19 +63,24 @@ export default async function checkCustomer(email: string, password: string) {
       },
     }
   );
-  const passwordFlowData = (await response1.json()) as PasswordFlow;
-
-  async function customerToken(passwordFlowDataParam: string) {
-    const response = await fetch(`https://api.europe-west1.gcp.commercetools.com/${ProcessEnv.PROJECT_KEY}/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Bearer ${`${passwordFlowDataParam}`}`,
-      },
-    });
-    const customerTokenData = await response.json();
-    console.log(customerTokenData);
+  const passwordFlowData = await response1.json();
+  if (response1.status === 400) {
+    const error = new Error(`${passwordFlowData.message}`);
+    // const errorElem = document.querySelector(`.${errorMessageElem}`) as HTMLElement;
+    // errorElem.innerHTML = passwordFlowData.message;
+    throw error.message;
+  } else {
+    return passwordFlowData;
   }
+}
 
-  customerToken(passwordFlowData.access_token);
+export default async function checkCustomer(email: string, password: string) {
+  try {
+    const passwordFlowData = await getPasswordFlow(email, password);
+    getCustomerToken(passwordFlowData.access_token);
+  } catch (err) {
+    const mute = err;
+    console.error(mute);
+    console.log('Invalid email and password');
+  }
 }

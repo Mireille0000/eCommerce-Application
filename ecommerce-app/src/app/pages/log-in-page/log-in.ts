@@ -29,8 +29,9 @@ export default class LogInPage extends Page {
 
   regButton: HTMLButtonElement;
 
-  constructor() {
-    super();
+  constructor(id: string) {
+    super(id);
+    this.pageWrapper.id = 'log-in-page';
     this.appName.className = 'log-in-heading';
     this.form = createHtmlElement('form', 'log-in-form');
     this.email = createHtmlElement('input', 'email-input', '', [{ name: 'placeholder', value: 'Email' }]);
@@ -79,6 +80,8 @@ export default class LogInPage extends Page {
     hintsContainerPassword.append(this.passwordHint);
     emailContainer.append(this.email, hintsContainerEmail);
     const passwordEye = createHtmlElement('span', 'show-password');
+
+    // const authErrorMessage = createHtmlElement('span', 'auth-error-message');
     for (let i = 0; i < 2; i += 1) {
       hintsContainerEmail.appendChild(this.emailHint.cloneNode(true));
     }

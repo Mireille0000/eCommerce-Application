@@ -18,8 +18,9 @@ export default abstract class Page {
 
   footerWrapper: HTMLDivElement;
 
-  constructor() {
+  constructor(id: string) {
     this.pageWrapper = createHtmlElement('div', 'wrapper');
+    this.pageWrapper.id = id;
     this.header = createHtmlElement('header');
     this.headerWrapper = createHtmlElement('div', 'wrapper-header');
     this.appName = createHtmlElement('h1');
