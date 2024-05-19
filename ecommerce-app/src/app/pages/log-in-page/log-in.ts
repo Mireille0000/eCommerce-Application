@@ -83,7 +83,6 @@ export default class LogInPage extends Page {
     emailContainer.append(this.email, hintsContainerEmail);
     const passwordEye = createHtmlElement('span', 'show-password');
 
-    // const authErrorMessage = createHtmlElement('span', 'auth-error-message');
     for (let i = 0; i < 2; i += 1) {
       hintsContainerEmail.appendChild(this.emailHint.cloneNode(true));
     }
@@ -91,7 +90,6 @@ export default class LogInPage extends Page {
     for (let i = 0; i < 5; i += 1) {
       hintsContainerPassword.appendChild(this.passwordHint.cloneNode(true));
     }
-    // hintsContainerPassword.append(authErrorMessage);
     passwordContainer.append(this.password, passwordEye, hintsContainerPassword);
     const openedEyeImage = createImage(openedeye, 'Opened eye', 'opened-eye', new Image());
     const closedEyeImage = createImage(closedEye, 'Closed eye', 'closed-eye', new Image());

@@ -6,30 +6,6 @@ const ProcessEnv = {
   SECRET: 'fUQ87UVBzwinq_JJYBbqsJGFOuYBZGQk',
 };
 
-// export default async function postRequest() {
-//   const response = await fetch(
-//     `https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials`,
-//     {
-//       method: 'POST',
-//       headers: {
-//         'Content-Type': 'application/x-www-form-urlencoded',
-//         Authorization: `Basic ${btoa(`${ProcessEnv.CLIENT_ID}:${ProcessEnv.SECRET}`)}`,
-//       },
-//     }
-//   );
-//   console.log(response.json());
-// }
-
-// verify user
-
-// interface PasswordFlow {
-//   access_token: string;
-//   expires_in: number;
-//   refresh_token: string;
-//   scope: string;
-//   token_type: string;
-// }
-
 async function getCustomerToken(passwordFlowDataParam: string) {
   try {
     const response = await fetch(`https://api.europe-west1.gcp.commercetools.com/${ProcessEnv.PROJECT_KEY}/me`, {
@@ -78,6 +54,12 @@ async function getPasswordFlow(email: string, password: string, errorMessageElem
 export default async function checkCustomer(email: string, password: string, errorMessageElem: string) {
   try {
     const passwordFlowData = await getPasswordFlow(email, password, errorMessageElem);
+    const tokens = {
+      access_token: `${passwordFlowData.access_token}`,
+      refresh_token: `${passwordFlowData.refresh_token}`,
+    };
+
+    localStorage.setItem('data', JSON.stringify(tokens));
     getCustomerToken(passwordFlowData.access_token);
   } catch (err) {
     const mute = err;
