@@ -52,7 +52,7 @@ async function getCustomerToken(passwordFlowDataParam: string) {
   }
 }
 
-async function getPasswordFlow(email: string, password: string) {
+async function getPasswordFlow(email: string, password: string, errorMessageElem: string) {
   const response1 = await fetch(
     `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnv.PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
     {
@@ -66,17 +66,18 @@ async function getPasswordFlow(email: string, password: string) {
   const passwordFlowData = await response1.json();
   if (response1.status === 400) {
     const error = new Error(`${passwordFlowData.message}`);
-    // const errorElem = document.querySelector(`.${errorMessageElem}`) as HTMLElement;
-    // errorElem.innerHTML = passwordFlowData.message;
+    const errorElem = document.querySelector(`.${errorMessageElem}`) as HTMLElement;
+    errorElem.innerHTML = `${passwordFlowData.message} Check your email or password`;
+    setTimeout(() => errorElem.remove(), 4000);
     throw error.message;
   } else {
     return passwordFlowData;
   }
 }
 
-export default async function checkCustomer(email: string, password: string) {
+export default async function checkCustomer(email: string, password: string, errorMessageElem: string) {
   try {
-    const passwordFlowData = await getPasswordFlow(email, password);
+    const passwordFlowData = await getPasswordFlow(email, password, errorMessageElem);
     getCustomerToken(passwordFlowData.access_token);
   } catch (err) {
     const mute = err;

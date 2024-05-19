@@ -73,6 +73,8 @@ export default class LogInPage extends Page {
     this.form.append(fieldset, this.loginButton, this.regButton);
     const emailContainer = createHtmlElement('div', 'email-container');
     const passwordContainer = createHtmlElement('div', 'password-container');
+
+    const authErrorMessage = createHtmlElement('span', 'auth-error-message');
     fieldset.append(legend, emailContainer, passwordContainer);
     const hintsContainerEmail = createHtmlElement('div', 'hints-email');
     const hintsContainerPassword = createHtmlElement('div', 'hints-password');
@@ -89,10 +91,10 @@ export default class LogInPage extends Page {
     for (let i = 0; i < 5; i += 1) {
       hintsContainerPassword.appendChild(this.passwordHint.cloneNode(true));
     }
+    // hintsContainerPassword.append(authErrorMessage);
     passwordContainer.append(this.password, passwordEye, hintsContainerPassword);
     const openedEyeImage = createImage(openedeye, 'Opened eye', 'opened-eye', new Image());
     const closedEyeImage = createImage(closedEye, 'Closed eye', 'closed-eye', new Image());
-
     addEventHandler('show-password', 'click', () => {
       if (this.password.type === 'password') {
         closedEyeImage.style.display = 'none';
@@ -109,7 +111,11 @@ export default class LogInPage extends Page {
 
     this.loginButton.addEventListener('click', (e) => {
       if (isEmailFormat.test(this.email.value) && isPasswordFormat.test(this.password.value)) {
-        checkCustomer(this.email.value, this.password.value);
+        fieldset.append(authErrorMessage);
+        checkCustomer(this.email.value, this.password.value, 'auth-error-message').catch((err) => err.message);
+        const logInBtnDisabled = document.querySelector('.log-in');
+        logInBtnDisabled?.setAttribute('disabled', '');
+        setTimeout(() => logInBtnDisabled?.removeAttribute('disabled'), 6000);
       } else {
         console.log('invalid cridentials');
       } // TEST

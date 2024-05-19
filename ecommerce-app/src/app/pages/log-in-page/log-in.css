@@ -49,6 +49,10 @@ body {
     padding: 30px;
 }
 
+.log-in-fieldset {
+    width: 50%;
+}
+
 .log-in-legend {
     text-align: center;
 }
@@ -75,10 +79,35 @@ body {
     gap: 5px;
 }
 
-.email-hint, .password-hint {
+.email-hint, .password-hint, .auth-error-message {
     display: flex;
     font-size: 12px;
     color: rgb(204 70 70);
+}
+
+.auth-error-message {
+    position: relative;
+    width: 50%;
+    text-align: justify;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+.auth-error-message::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 2px;
+    background-color: rgb(133, 230, 230);
+    animation: timeNotification 5s linear forwards;
+}
+
+@keyframes timeNotification {
+    100% {
+        width: 0;
+    }
 }
 
 .show-password {
@@ -155,5 +184,11 @@ li {
         font-size: 10px;
         border-radius: 20px;
         cursor: pointer;
+    }
+
+    .show-password {
+        position: absolute;
+        top: -10%;
+        right: 32%;
     }
 }
