@@ -65,6 +65,7 @@ export default class LogInPage extends Page {
     list.append(listItem);
     listItem.append(link);
     link.innerHTML = 'Back to Main';
+    link.setAttribute('href', '#main-page');
     name.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
@@ -119,6 +120,11 @@ export default class LogInPage extends Page {
       } // TEST
 
       e.preventDefault();
+    });
+
+    this.regButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.location.hash = 'registration-page';
     });
     passwordEye.append(closedEyeImage);
 

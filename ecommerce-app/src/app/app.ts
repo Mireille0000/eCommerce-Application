@@ -2,6 +2,7 @@ import Page from './templates/page';
 import LogInPage from './pages/log-in-page/log-in';
 import MainPage from './pages/main-page/main';
 import RegistrationPage from './pages/registration-page/registration';
+import ErrorPage from './pages/error-page/error-page';
 // import { routes } from './pages/main-page/main';
 
 const Pages = {
@@ -23,6 +24,8 @@ export default class App {
       page = new RegistrationPage('registration-page');
     } else if (id === Pages.MainPageId) {
       page = new MainPage('main-page');
+    } else {
+      page = new ErrorPage('error-page');
     }
 
     if (page) {
@@ -44,7 +47,13 @@ export default class App {
   }
 
   renderPage() {
-    window.location.hash = 'main-page';
+    console.log('I got called');
+    if (window.location.hash.slice(1) === 'main-page') {
+      window.location.hash = '';
+      window.location.hash = 'main-page';
+    } else {
+      window.location.hash = 'main-page';
+    }
     this.changeRoute();
   }
 }
