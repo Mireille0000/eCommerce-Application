@@ -2,6 +2,7 @@ import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement from '../../utils/functions';
 
+export const routes = ['#log-in-page', '#registration-page'];
 export default class MainPage extends Page {
   info: HTMLDivElement;
 
@@ -26,8 +27,7 @@ export default class MainPage extends Page {
     this.addElemsToHeader(title, navigation);
     navigation.className = 'navigation-main-page';
     navigation.append(navList);
-
-    const route = ['Log in', 'Sign up'];
+    const linkName = ['Log in', 'Register'];
     navList.append(navListItem);
     navListItem.className = 'nav-item';
     for (let i = 0; i < 1; i += 1) {
@@ -39,10 +39,12 @@ export default class MainPage extends Page {
       navListItemsArr[i].appendChild(link.cloneNode(true));
     }
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
+
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = route[i];
-      navLinksArr[i].setAttribute('href', './');
+      navLinksArr[i].innerHTML = linkName[i];
+      navLinksArr[i].setAttribute('href', routes[i]);
     }
+
     title.innerHTML = 'Ultimate ScriptSmith';
 
     this.addElemsToMain(this.info);

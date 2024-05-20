@@ -26,6 +26,7 @@ export default class RegistrationPage extends Page {
   constructor(id: string) {
     //
     super(id);
+    this.pageWrapper.id = 'registration-page';
     this.form = createHtmlElement('form', 'registration-form');
   }
 
