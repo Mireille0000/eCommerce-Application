@@ -27,7 +27,9 @@ export default class MainPage extends Page {
     this.addElemsToHeader(title, navigation);
     navigation.className = 'navigation-main-page';
     navigation.append(navList);
-    const linkName = ['Log in', 'Register'];
+    const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
+    const linkName = [logLink, 'Register'];
     navList.append(navListItem);
     navListItem.className = 'nav-item';
     for (let i = 0; i < 1; i += 1) {
@@ -44,6 +46,19 @@ export default class MainPage extends Page {
       navLinksArr[i].innerHTML = linkName[i];
       navLinksArr[i].setAttribute('href', routes[i]);
     }
+
+    const logInLink = navLinksArr[0];
+
+    logInLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (isUserLoggedIn) {
+        localStorage.clear();
+        window.location.hash = '';
+        window.location.hash = 'main-page';
+      } else {
+        window.location.hash = 'log-in-page';
+      }
+    });
 
     title.innerHTML = 'Ultimate ScriptSmith';
 

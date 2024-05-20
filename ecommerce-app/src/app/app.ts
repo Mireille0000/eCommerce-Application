@@ -17,9 +17,12 @@ export default class App {
   static renderAppPage(id: string) {
     document.body.innerHTML = '';
     let page: Page | null = null;
-
-    if (id === Pages.LogInPageId) {
+    const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    if (id === Pages.LogInPageId && !isUserLoggedIn) {
       page = new LogInPage('log-in-page');
+    } else if (id === Pages.LogInPageId && isUserLoggedIn) {
+      window.location.hash = 'main-page';
+      //   page = new MainPage('main-page');
     } else if (id === Pages.RegisterPageId) {
       page = new RegistrationPage('registration-page');
     } else if (id === Pages.MainPageId) {
