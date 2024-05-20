@@ -1,0 +1,9 @@
+#main-page {
+    display: flex;
+    justify-content: space-between;
+}
+
+.navigation-main-pages  {
+    display: flex;
+    align-items: center;
+}

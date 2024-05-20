@@ -21,6 +21,7 @@ async function getCustomerToken(passwordFlowDataParam: string) {
     } else {
       const customerTokenData = await response.json();
       console.log(customerTokenData);
+      window.location.hash = 'main-page';
     }
   } catch (err) {
     const mute = err;
