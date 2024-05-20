@@ -59,6 +59,9 @@ body {
     border-color: #000;
     transition: all 0.2s;
 }
+.USInput__input:focus:not(:focus-visible) {
+    border-color: #d9d9d9;
+}
 .USInput:last-of-type {
     margin-bottom: 10px;
 }
@@ -78,14 +81,20 @@ body {
     outline: none;
     border-color: #000;
 }
-.USInput__hint {
+.USInput__hint, 
+.registration__btn__hint {
     display: none;
     font-size: 12px;
     color: rgb(204 70 70);
     padding: 0 4px;
 }
+.registration__btn-wrapper {
+    width: 100%;
+}
 
-.registration__btn {
+.registration__btn, 
+.btn__auth-window {
+    width: 100%;
     padding: 4px 15px;
     border: 0px #fff;
     height: 32px;
@@ -97,8 +106,30 @@ body {
     transition: all 0.2s;
 }
 
-.registration__btn:hover {
+.registration__btn:hover,
+.btn__auth-window:hover {
     background-color: #4096ff;
     transition: all 0.2s;
 }
 
+.wrapper__auth {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.wrapper__auth-window {
+    width: 300px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
+.msg__auth-window {
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+}

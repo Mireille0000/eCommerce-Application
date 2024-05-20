@@ -1,6 +1,7 @@
 import Page from '../../templates/page';
 import createHtmlElement from '../../utils/functions';
 import { StringArr, arrConditionFn } from '../../utils/types';
+import { btnEventHandler } from './utils-registration/functions-registration';
 import {
   conditionBirthDate,
   conditionEmail,
@@ -23,8 +24,8 @@ import {
 export default class RegistrationPage extends Page {
   form: HTMLFormElement;
 
-  constructor() {
-    super();
+  constructor(id = '') {
+    super(id);
     this.form = createHtmlElement('form', 'registration-form');
   }
 
@@ -67,6 +68,8 @@ export default class RegistrationPage extends Page {
       }
       input.addEventListener('input', () => {
         const { value } = input;
+        input.removeAttribute('style');
+
         conditionDone.forEach((condition, index) => {
           const errMsg = hintsForm.children[index] as HTMLElement;
           if (condition(value) || value.length === 0) {
@@ -172,7 +175,12 @@ export default class RegistrationPage extends Page {
       errMsgsPostcode,
       conditionPostcode
     );
+
+    const registBtnWrapp = createHtmlElement('div', 'registration__btn-wrapper');
     const registBtn = createHtmlElement('button', 'registration__btn', 'Sign up');
+    registBtn.addEventListener('click', btnEventHandler);
+    const registBtnHint = createHtmlElement('span', 'registration__btn__hint', 'Please fill out all fields correctly');
+    registBtnWrapp.append(registBtn, registBtnHint);
 
     const registrFieldset = createHtmlElement('fieldset', 'registration-fieldset');
     const fieldsetItems = [
@@ -187,7 +195,7 @@ export default class RegistrationPage extends Page {
       streetIn,
       houseIn,
       postcodeIn,
-      registBtn,
+      registBtnWrapp,
     ];
     registrFieldset.append(...fieldsetItems);
 
