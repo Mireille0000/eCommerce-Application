@@ -4,7 +4,7 @@ import MainPage from './pages/main-page/main';
 
 const Pages = {
   LogInPageId: 'log-in',
-  MainPageId: 'main page',
+  MainPageId: 'main-page',
 };
 
 export default class App extends Page {

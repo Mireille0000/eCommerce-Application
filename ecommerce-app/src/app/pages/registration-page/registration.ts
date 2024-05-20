@@ -23,8 +23,9 @@ import {
 export default class RegistrationPage extends Page {
   form: HTMLFormElement;
 
-  constructor() {
-    super();
+  constructor(id: string) {
+    //
+    super(id);
     this.form = createHtmlElement('form', 'registration-form');
   }
 
