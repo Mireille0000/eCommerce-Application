@@ -92,6 +92,9 @@ body {
     width: 100%;
 }
 
+.registration__btn:focus-visible {
+    outline: none;
+}
 .registration__btn, 
 .btn__auth-window {
     width: 100%;
@@ -132,4 +135,62 @@ body {
     font-size: 18px;
     font-weight: 500;
     text-align: center;
+}
+
+.reg-msg {
+    position: absolute;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+}
+.reg-msg__window {
+    display: flex;
+    /* flex-direction: column; */
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background-color: #fff;
+    width: 300px;
+    padding: 15px;
+}
+.reg-msg__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.reg-msg__title {
+    font-size: 18px;
+    margin: 0;
+}
+.reg-msg__descr {
+    margin: 0;
+}
+.reg-msg__closed {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+.reg-msg__closed::before,
+.reg-msg__closed::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background-color: #d9d9d9;;
+    transform-origin: center;
+    transition: all 0.2s;
+}
+.reg-msg__closed:hover::before,
+.reg-msg__closed:hover::after {
+    transition: all 0.2s;
+    background-color: red;
+}
+.reg-msg__closed::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+.reg-msg__closed::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
 }

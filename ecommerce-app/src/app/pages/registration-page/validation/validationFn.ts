@@ -9,7 +9,10 @@ export const conditionWord = [
 
 export const conditionBirthDate = [
   (value: string) => {
-    const [year, month, day] = value.split('.').map((str) => Number(str));
+    const arr = value.split('.');
+    if (arr.length > 3) return false;
+
+    const [year, month, day] = arr.map((str) => Number(str));
     const condition = !!(year > 999 && month > 0 && day > 0);
     return condition;
   },
@@ -42,7 +45,7 @@ export const conditionPassword = [
   (value: string) => /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(value),
 ];
 
-export const conditionStreet = [(value: string) => value.length >= 2];
+export const conditionStreet = [(value: string) => value.length >= 1];
 
 export const conditionHouseNumber = [
   (value: string) => /^\d/.test(value),

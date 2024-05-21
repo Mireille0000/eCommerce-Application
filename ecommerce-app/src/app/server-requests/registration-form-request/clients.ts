@@ -19,13 +19,9 @@ type CustomerData = {
   postalCode: string;
 };
 
-// const getCustomerByKey = (key: string) => {
-//   return apiRoot
-//     .customers()
-//     .withKey({ key })
-//     .get()
-//     .execute();
-// };
+export const getCustomerByKey = (key: string) => {
+  return apiRoot.customers().withKey({ key }).get().execute();
+};
 
 // getCustomerByKey('test123456')
 //   .then(console.log)
@@ -65,7 +61,7 @@ const createCustomerDraft = (customerData: CustomerData) => {
   };
 };
 
-export const createCustomer = (customerData: CustomerData) => {
+export const createCustomer = async (customerData: CustomerData) => {
   return apiRoot
     .customers()
     .post({

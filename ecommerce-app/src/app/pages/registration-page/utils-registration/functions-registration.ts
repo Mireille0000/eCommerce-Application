@@ -1,4 +1,5 @@
-import { createCustomer } from '../../../server-requests/registration-form-request/clients';
+import { ClientResponse } from '@commercetools/platform-sdk';
+import { createCustomer, getCustomerByKey } from '../../../server-requests/registration-form-request/clients';
 import createHtmlElement from '../../../utils/functions';
 import { arrConditionFn } from '../../../utils/types';
 import {
@@ -10,6 +11,7 @@ import {
   conditionStreet,
   conditionWord,
 } from '../validation/validationFn';
+import checkCustomer from '../../../server-requests/login-form-requests';
 
 function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionFn) {
   const inputElem = document.querySelector(`.${inputClass}`) as HTMLInputElement;
@@ -23,25 +25,60 @@ function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionF
   return inputValue;
 }
 
-function goToMainPageWindow() {
-  const main = document.querySelector('.main');
+function goToMainPageWindow(result: ClientResponse) {
+  console.log('typeof result.statusCode:', typeof result.statusCode);
+  console.log('ВСЁ ПРАВИЛЬНО:', result);
+  getCustomerByKey(result.body.customer.key)
+    .then((res) => console.log('ВЕРНУЛ ПО КЛЮЧУ:', res))
+    .catch((err) => console.log('ВЫШЛА ОШИБОЧКА(((:', err));
 
-  const authWindowWrap = createHtmlElement('div', 'wrapper__auth');
-  const authWindow = createHtmlElement('div', 'wrapper__auth-window');
-  const msgWindowElem = createHtmlElement(
-    'p',
-    'msg__auth-window',
-    'The account has been successfully created. To go to the main page click on the button below.'
-  );
-  const btnAuth = createHtmlElement('button', 'btn__auth-window', 'Go to main page');
-  btnAuth.addEventListener('click', (event) => {
+  if (result.statusCode === 201) {
+    const main = document.querySelector('.main');
+
+    const authWindowWrap = createHtmlElement('div', 'wrapper__auth');
+    const authWindow = createHtmlElement('div', 'wrapper__auth-window');
+    const msgWindowElem = createHtmlElement(
+      'p',
+      'msg__auth-window',
+      'The account has been successfully created. To go to the main page click on the button below.'
+    );
+    const btnAuth = createHtmlElement('button', 'btn__auth-window', 'Go to main page');
+    btnAuth.addEventListener('click', (event) => {
+      event.preventDefault();
+      const wrapper = document.querySelector('.wrapper');
+      wrapper?.remove();
+    });
+    authWindow.append(msgWindowElem, btnAuth);
+    authWindowWrap.appendChild(authWindow);
+    main?.appendChild(authWindowWrap);
+  }
+}
+
+function createMsgExistAcc(isEmail = true) {
+  const main = document.querySelector('.main') as HTMLElement;
+
+  const regMsg = createHtmlElement('div', 'reg-msg');
+  const msgWindow = createHtmlElement('div', 'reg-msg__window');
+  const msgWrapp = createHtmlElement('div', 'reg-msg__wrapper');
+  const msgTitle = createHtmlElement('h3', 'reg-msg__title', 'Account exists');
+  const titleAndDescr = isEmail
+    ? ['reg-msg__descr', 'Account with this email address already exists. Please log in or try a different email.']
+    : ['Invalid data entry', 'Try entering other entry data'];
+  const msgDescr = createHtmlElement('p', ...titleAndDescr);
+  const btnMsgClosed = createHtmlElement('div', 'reg-msg__closed');
+  btnMsgClosed.addEventListener('click', (event) => {
     event.preventDefault();
-    const wrapper = document.querySelector('.wrapper');
-    wrapper?.remove();
+    regMsg.remove();
   });
-  authWindow.append(msgWindowElem, btnAuth);
-  authWindowWrap.appendChild(authWindow);
-  main?.appendChild(authWindowWrap);
+
+  msgWrapp.append(msgTitle, msgDescr);
+  msgWindow.append(msgWrapp, btnMsgClosed);
+  regMsg.appendChild(msgWindow);
+  main.appendChild(regMsg);
+
+  setTimeout(() => {
+    regMsg.remove();
+  }, 4000);
 }
 
 export function btnEventHandler(event: Event) {
@@ -73,7 +110,7 @@ export function btnEventHandler(event: Event) {
     !!postalCode;
   if (fieldsCorrect) {
     errMsgRegistrBtn.removeAttribute('style');
-    console.log(firstName, lastName, birthDate, email, password, country, city, streetName, streetNumber, postalCode);
+    // console.log(firstName, lastName, birthDate, email, password, country, city, streetName, streetNumber, postalCode);
 
     const key = new Date().getTime().toString().slice(7);
     const dateOfBirth = birthDate.split('.').join('-');
@@ -91,8 +128,23 @@ export function btnEventHandler(event: Event) {
       postalCode,
     };
 
-    createCustomer(customerDraftData).then(console.log).catch(console.log);
-    goToMainPageWindow();
+    createCustomer(customerDraftData)
+      .then((res) => {
+        goToMainPageWindow(res);
+        checkCustomer(email, password, 'auth-error-message').catch((err) => err.message);
+      })
+      .catch((errRes) => {
+        // console.log('ВЫШЛА ОШИБКА:', errRes);
+        if (
+          errRes.statusCode === 400 &&
+          errRes.message === 'There is already an existing customer with the provided email.'
+        ) {
+          createMsgExistAcc();
+        } else {
+          createMsgExistAcc(false);
+        }
+      });
+    // goToMainPageWindow();
   } else {
     errMsgRegistrBtn.style.display = 'block';
   }

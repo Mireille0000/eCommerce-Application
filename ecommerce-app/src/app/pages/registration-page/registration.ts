@@ -2,6 +2,7 @@ import Page from '../../templates/page';
 import createHtmlElement from '../../utils/functions';
 import { StringArr, arrConditionFn } from '../../utils/types';
 import { btnEventHandler } from './utils-registration/functions-registration';
+import redirectionRegistration from './utils-registration/redirections';
 import {
   conditionBirthDate,
   conditionEmail,
@@ -88,6 +89,8 @@ export default class RegistrationPage extends Page {
   }
 
   renderPage() {
+    redirectionRegistration();
+
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.main);
     this.main.classList.add('main');
@@ -167,7 +170,7 @@ export default class RegistrationPage extends Page {
       conditionHouseNumber
     );
     const postcodeIn = this.createFormElement(
-      'Postcode',
+      'Postal code',
       'postcode__input',
       '12345',
       'hints-postcode',
