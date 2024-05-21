@@ -2,7 +2,6 @@ import Page from '../../templates/page';
 import createHtmlElement from '../../utils/functions';
 import { StringArr, arrConditionFn } from '../../utils/types';
 import { btnEventHandler } from './utils-registration/functions-registration';
-import redirectionRegistration from './utils-registration/redirections';
 import {
   conditionBirthDate,
   conditionEmail,
@@ -25,8 +24,9 @@ import {
 export default class RegistrationPage extends Page {
   form: HTMLFormElement;
 
-  constructor(id = '') {
+  constructor(id: string) {
     super(id);
+    this.pageWrapper.id = 'registration-page';
     this.form = createHtmlElement('form', 'registration-form');
   }
 
@@ -89,8 +89,6 @@ export default class RegistrationPage extends Page {
   }
 
   renderPage() {
-    redirectionRegistration();
-
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.main);
     this.main.classList.add('main');

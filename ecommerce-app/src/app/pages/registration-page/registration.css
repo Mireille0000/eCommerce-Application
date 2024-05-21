@@ -3,6 +3,7 @@
 }
 body {
     margin: 0 auto;
+    background-color: #9c9c9c83;
 }
 
 .wrapper {
@@ -21,23 +22,23 @@ body {
     justify-content: center;
     align-items: center;
 }
-
-/* .registration-form {
-    padding: 20px;
-} */
-
+.registration-form {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 10px;
+}
 .registration-fieldset {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 20px;
+    padding: 20px 20px 10px;
     width: 300px;
+    border: 0;
 }
 .registration-title {
     text-align: center;
     font-size: 20px;
 }
-
 .USLabel {
     padding: 0 0 2px 5px;
 }
@@ -49,6 +50,7 @@ body {
     border-radius: 2px;
     box-sizing: border-box;
     transition: all 0.2s;
+    background-color: #fff;
 }
 .USInput__input:focus-visible {
     outline: none;
@@ -88,7 +90,9 @@ body {
     color: rgb(204 70 70);
     padding: 0 4px;
 }
+
 .registration__btn-wrapper {
+    margin-top: 10px;
     width: 100%;
 }
 
@@ -145,7 +149,6 @@ body {
 }
 .reg-msg__window {
     display: flex;
-    /* flex-direction: column; */
     border-radius: 6px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     background-color: #fff;

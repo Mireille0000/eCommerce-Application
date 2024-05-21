@@ -37,7 +37,7 @@ export const conditionEmail = [
 ];
 
 export const conditionPassword = [
-  (value: string) => value.length >= 8,
+  (value: string) => /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(value),
   (value: string) => /(?=.*[A-Z])/.test(value),
   (value: string) => /(?=.*[a-z])/.test(value),
   (value: string) => /(?=.*\d)/.test(value),

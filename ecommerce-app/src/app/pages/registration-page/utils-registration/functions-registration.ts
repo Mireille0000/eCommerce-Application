@@ -25,46 +25,16 @@ function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionF
   return inputValue;
 }
 
-function goToMainPageWindow(result: ClientResponse) {
-  console.log('typeof result.statusCode:', typeof result.statusCode);
-  console.log('ВСЁ ПРАВИЛЬНО:', result);
-  getCustomerByKey(result.body.customer.key)
-    .then((res) => console.log('ВЕРНУЛ ПО КЛЮЧУ:', res))
-    .catch((err) => console.log('ВЫШЛА ОШИБОЧКА(((:', err));
-
-  if (result.statusCode === 201) {
-    const main = document.querySelector('.main');
-
-    const authWindowWrap = createHtmlElement('div', 'wrapper__auth');
-    const authWindow = createHtmlElement('div', 'wrapper__auth-window');
-    const msgWindowElem = createHtmlElement(
-      'p',
-      'msg__auth-window',
-      'The account has been successfully created. To go to the main page click on the button below.'
-    );
-    const btnAuth = createHtmlElement('button', 'btn__auth-window', 'Go to main page');
-    btnAuth.addEventListener('click', (event) => {
-      event.preventDefault();
-      const wrapper = document.querySelector('.wrapper');
-      wrapper?.remove();
-    });
-    authWindow.append(msgWindowElem, btnAuth);
-    authWindowWrap.appendChild(authWindow);
-    main?.appendChild(authWindowWrap);
-  }
-}
-
-function createMsgExistAcc(isEmail = true) {
-  const main = document.querySelector('.main') as HTMLElement;
+export function createMsgRegAcc(arrDescr: string[]) {
+  const title = arrDescr[0];
+  const descr = arrDescr[1];
+  const main = document.querySelector('main') as HTMLElement;
 
   const regMsg = createHtmlElement('div', 'reg-msg');
   const msgWindow = createHtmlElement('div', 'reg-msg__window');
   const msgWrapp = createHtmlElement('div', 'reg-msg__wrapper');
-  const msgTitle = createHtmlElement('h3', 'reg-msg__title', 'Account exists');
-  const titleAndDescr = isEmail
-    ? ['reg-msg__descr', 'Account with this email address already exists. Please log in or try a different email.']
-    : ['Invalid data entry', 'Try entering other entry data'];
-  const msgDescr = createHtmlElement('p', ...titleAndDescr);
+  const msgTitle = createHtmlElement('h3', 'reg-msg__title', title);
+  const msgDescr = createHtmlElement('p', 'reg-msg__descr', descr);
   const btnMsgClosed = createHtmlElement('div', 'reg-msg__closed');
   btnMsgClosed.addEventListener('click', (event) => {
     event.preventDefault();
@@ -78,7 +48,23 @@ function createMsgExistAcc(isEmail = true) {
 
   setTimeout(() => {
     regMsg.remove();
-  }, 4000);
+  }, 5000);
+}
+
+function goToMainPageWindow(result: ClientResponse) {
+  const registrationPage = document.getElementById('registration-page');
+
+  const msgReg = ['Registered', 'Registration successful! You`re now logged in.'];
+
+  getCustomerByKey(result.body.customer.key)
+    .then()
+    .catch((err) => console.log('ВЫШЛА ОШИБОЧКА:', err));
+
+  if (result.statusCode === 201) {
+    registrationPage?.remove();
+    window.location.hash = 'main-page';
+    setTimeout(() => createMsgRegAcc(msgReg), 0);
+  }
 }
 
 export function btnEventHandler(event: Event) {
@@ -110,7 +96,6 @@ export function btnEventHandler(event: Event) {
     !!postalCode;
   if (fieldsCorrect) {
     errMsgRegistrBtn.removeAttribute('style');
-    // console.log(firstName, lastName, birthDate, email, password, country, city, streetName, streetNumber, postalCode);
 
     const key = new Date().getTime().toString().slice(7);
     const dateOfBirth = birthDate.split('.').join('-');
@@ -131,20 +116,20 @@ export function btnEventHandler(event: Event) {
     createCustomer(customerDraftData)
       .then((res) => {
         goToMainPageWindow(res);
-        checkCustomer(email, password, 'auth-error-message').catch((err) => err.message);
+        checkCustomer(customerDraftData.email, customerDraftData.password, 'auth-error-message').catch(
+          (err) => err.message
+        );
       })
       .catch((errRes) => {
-        // console.log('ВЫШЛА ОШИБКА:', errRes);
-        if (
-          errRes.statusCode === 400 &&
-          errRes.message === 'There is already an existing customer with the provided email.'
-        ) {
-          createMsgExistAcc();
-        } else {
-          createMsgExistAcc(false);
-        }
+        const msgRegExist = [
+          'Account exists',
+          'Account with this email address already exists. Please log in or try a different email.',
+        ];
+        const msgRegAcc = ['Invalid data entry', 'Try entering other entry data'];
+        const msgReg =
+          errRes.message === 'There is already an existing customer with the provided email.' ? msgRegExist : msgRegAcc;
+        createMsgRegAcc(msgReg);
       });
-    // goToMainPageWindow();
   } else {
     errMsgRegistrBtn.style.display = 'block';
   }
