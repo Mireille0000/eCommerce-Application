@@ -16,7 +16,7 @@ module.exports = {
   devServer: {
     port: 3000,
     open: true,
-    historyApiFallback: true
+    historyApiFallback: true,
   },
   entry: path.resolve(__dirname, './src/index'),
   output: {
