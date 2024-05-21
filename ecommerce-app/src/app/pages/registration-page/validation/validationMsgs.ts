@@ -20,7 +20,7 @@ export const errorMsgsPassword = [
   'Password must contain at least one special character (e.g., !@#$%^&*)',
 ];
 
-export const errMsgsStreet = ['The field must contain at least two characters'];
+export const errMsgsStreet = ['The field must contain at least one character'];
 
 export const errMsgsHouseNumber = ['The value must start with a number', 'The value must not have special characters'];
 

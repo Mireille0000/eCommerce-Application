@@ -64,7 +64,7 @@ export default async function checkCustomer(email: string, password: string, err
     getCustomerToken(passwordFlowData.access_token);
   } catch (err) {
     const mute = err;
-    console.error(mute);
+    console.log(mute);
     console.log('Invalid email and password');
   }
 }
