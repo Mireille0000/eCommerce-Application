@@ -5,13 +5,7 @@ const projectKey = ProcessEnv.CTP_PROJECT_KEY as string;
 
 const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
 
-type CustomerData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  dateOfBirth: string;
-  password: string;
-  key: string;
+export type Address = {
   streetName: string;
   streetNumber: string;
   city: string;
@@ -19,13 +13,47 @@ type CustomerData = {
   postalCode: string;
 };
 
-export const getCustomerByKey = (key: string) => {
-  return apiRoot.customers().withKey({ key }).get().execute();
+type CustomerData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateOfBirth: string;
+  password: string;
+  key: string;
+  shippingAddress: Address;
+  billingAddress?: Address;
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
+  shippingAddresses: number[];
+  billingAddresses: number[];
 };
 
-// getCustomerByKey('test123456')
-//   .then(console.log)
-//   .catch(console.log);
+type CustomerDraftData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateOfBirth: string;
+  password: string;
+  key: string;
+  addresses: Address[];
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
+  shippingAddresses: number[];
+  billingAddresses: number[];
+};
+
+// export const getCustomerByKey = (key: string) => {
+//   return apiRoot.customers().withKey({ key }).get().execute();
+// };
+// export const getCustomerByKey = async (key: string) => {
+//   try {
+//     const response = await apiRoot.customers().withKey({ key }).get().execute();
+//     return response;
+//   } catch (err) {
+//     console.error('ВЫШЛА ОШИБОЧКА:', err);
+//     throw err; // чтобы вызвать обработчик ошибок в .catch()
+//   }
+// };
 
 const createCustomerDraft = (customerData: CustomerData) => {
   const {
@@ -35,33 +63,39 @@ const createCustomerDraft = (customerData: CustomerData) => {
     dateOfBirth,
     password,
     key,
-    streetName,
-    streetNumber,
-    city,
-    country,
-    postalCode,
+    shippingAddress,
+    billingAddress,
+    defaultShippingAddress,
+    defaultBillingAddress,
+    shippingAddresses,
+    billingAddresses,
   } = customerData;
 
-  return {
+  const addresses = [shippingAddress];
+
+  if (billingAddress) {
+    addresses.push(billingAddress);
+  }
+
+  const customerDraft: CustomerDraftData = {
     firstName,
     lastName,
     email,
     dateOfBirth,
     password,
     key,
-    addresses: [
-      {
-        streetName,
-        streetNumber,
-        city,
-        country,
-        postalCode,
-      },
-    ],
+    addresses,
+    shippingAddresses,
+    billingAddresses,
   };
+
+  if (defaultShippingAddress !== null) customerDraft.defaultShippingAddress = defaultShippingAddress;
+  if (defaultBillingAddress !== null) customerDraft.defaultBillingAddress = defaultBillingAddress;
+
+  return customerDraft;
 };
 
-export const createCustomer = async (customerData: CustomerData) => {
+const createCustomer = async (customerData: CustomerData) => {
   return apiRoot
     .customers()
     .post({
@@ -70,11 +104,4 @@ export const createCustomer = async (customerData: CustomerData) => {
     .execute();
 };
 
-export const customerDraftData = {
-  firstName: 'Checktestim',
-  lastName: 'Test',
-  email: 'checkTestim@test.com',
-  password: 'Password1!',
-  key: 'checkApiii',
-  countryCode: 'DE',
-};
+export default createCustomer;
