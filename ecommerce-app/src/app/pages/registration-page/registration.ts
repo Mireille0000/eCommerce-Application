@@ -1,7 +1,7 @@
 import Page from '../../templates/page';
 import createHtmlElement from '../../utils/functions';
 import { StringArr, arrConditionFn } from '../../utils/types';
-import { btnEventHandler } from './utils-registration/functions-registration';
+import { btnEventHandler, goLoginPage } from './utils-registration/functions-registration';
 import {
   conditionBirthDate,
   conditionEmail,
@@ -25,13 +25,12 @@ export default class RegistrationPage extends Page {
   form: HTMLFormElement;
 
   constructor(id: string) {
-    //
     super(id);
     this.pageWrapper.id = 'registration-page';
     this.form = createHtmlElement('form', 'registration-form');
   }
 
-  createFormElement(
+  private createFormElement(
     labelText: string,
     inputClass: string,
     placeholderValue: string,
@@ -39,8 +38,6 @@ export default class RegistrationPage extends Page {
     hintName: string = '',
     errMsgs: StringArr = [],
     conditionDone: arrConditionFn = []
-    // inputEventHandler: ,
-    // isCountry = false
   ) {
     const userInputElem = createHtmlElement('div', 'USInput');
 
@@ -89,10 +86,98 @@ export default class RegistrationPage extends Page {
     return userInputElem;
   }
 
-  renderPage() {
+  private createAddressForm(addressType: string) {
+    const adrsWrap = createHtmlElement('div', `${addressType}-wrapper`);
+    const adrsTitle = createHtmlElement(
+      'h3',
+      `${addressType}-title`,
+      `${addressType[0].toUpperCase().concat(addressType.slice(1))} Address`
+    );
+    const adrsRegion = createHtmlElement('div', `${addressType}-region`);
+    const countryIn = this.createFormElement('Country', 'country__input', '', 'hints-country');
+    const cityIn = this.createFormElement(
+      'City',
+      `city__input ${addressType}-city__input`,
+      'Berlin',
+      'hints-city',
+      'hint-city',
+      errMsgsWord,
+      conditionWord
+    );
+    adrsRegion.append(countryIn, cityIn);
+
+    const adrsHome = createHtmlElement('div', `${addressType}-home`);
+    const streetIn = this.createFormElement(
+      'Street',
+      `street__input ${addressType}-street__input`,
+      'Friedrichstraße',
+      'hints-street',
+      'hint-street',
+      errMsgsStreet,
+      conditionStreet
+    );
+    const streetNumberIn = this.createFormElement(
+      'Street Number',
+      `house__input ${addressType}-house__input`,
+      '21a',
+      'hints-house',
+      'hint-house',
+      errMsgsHouseNumber,
+      conditionHouseNumber
+    );
+    adrsHome.append(streetIn, streetNumberIn);
+
+    const adrsPostal = createHtmlElement('div', `${addressType}-postal-code`);
+    const postcodeIn = this.createFormElement(
+      'Postal code',
+      `postcode__input ${addressType}-postal-code__input`,
+      '12345',
+      'hints-postcode',
+      'hint-postcode',
+      errMsgsPostcode,
+      conditionPostcode
+    );
+    adrsPostal.appendChild(postcodeIn);
+
+    const adrsDefault = createHtmlElement('div', `${addressType}-default-addrs`);
+    const labelDefaultAddrs = createHtmlElement('label', '', 'Set as default address');
+    const inputDefaultAddrs = createHtmlElement('input', `${addressType}-default-addrs__choise`, '', [
+      { name: 'type', value: 'checkbox' },
+    ]);
+    labelDefaultAddrs.prepend(inputDefaultAddrs);
+    adrsDefault.appendChild(labelDefaultAddrs);
+
+    if (addressType === 'shipping') {
+      const shippingChbxs = createHtmlElement('div', `${addressType}-chbxs`);
+      const addBillingAdrs = createHtmlElement('div', `${addressType}-add-billing-adrs`);
+      const labelAddBilling = createHtmlElement('label', '', 'Also use as billing address');
+      const inputAddBilling = createHtmlElement('input', `${addressType}-add-billing__input`, '', [
+        { name: 'type', value: 'checkbox' },
+      ]) as HTMLInputElement;
+      inputAddBilling.addEventListener('input', () => {
+        const { checked } = inputAddBilling;
+        if (checked) {
+          const billingWrapp = document.querySelector('.billing-wrapper');
+          billingWrapp?.remove();
+        } else {
+          const billingAddrs = this.createAddressForm('billing');
+          adrsWrap.insertAdjacentElement('afterend', billingAddrs);
+        }
+      });
+      labelAddBilling.prepend(inputAddBilling);
+      addBillingAdrs.appendChild(labelAddBilling);
+      shippingChbxs.append(adrsDefault, addBillingAdrs);
+      adrsWrap.append(adrsTitle, adrsRegion, adrsHome, adrsPostal, shippingChbxs);
+    } else {
+      adrsWrap.append(adrsTitle, adrsRegion, adrsHome, adrsPostal, adrsDefault);
+    }
+    return adrsWrap;
+  }
+
+  public renderPage() {
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.main);
-    this.main.classList.add('main');
+    this.main.classList.add('registration-main');
 
     const regTitle = createHtmlElement('legend', 'registration-title', 'Registration form');
     const firstNameIn = this.createFormElement(
@@ -140,49 +225,20 @@ export default class RegistrationPage extends Page {
       errorMsgsPassword,
       conditionPassword
     );
-    const countryIn = this.createFormElement('Country', 'country__input', '', 'hints-country');
-    const cityIn = this.createFormElement(
-      'City',
-      'city__input',
-      'Berlin',
-      'hints-city',
-      'hint-city',
-      errMsgsWord,
-      conditionWord
-    );
-    const streetIn = this.createFormElement(
-      'Street',
-      'street__input',
-      'Friedrichstraße',
-      'hints-street',
-      'hint-street',
-      errMsgsStreet,
-      conditionStreet
-    );
-    const houseIn = this.createFormElement(
-      'House Number',
-      'house__input',
-      '21a',
-      'hints-house',
-      'hint-house',
-      errMsgsHouseNumber,
-      conditionHouseNumber
-    );
-    const postcodeIn = this.createFormElement(
-      'Postal code',
-      'postcode__input',
-      '12345',
-      'hints-postcode',
-      'hint-postcode',
-      errMsgsPostcode,
-      conditionPostcode
-    );
+
+    const shippingAddrs = this.createAddressForm('shipping');
+    const billingAddrs = this.createAddressForm('billing');
 
     const registBtnWrapp = createHtmlElement('div', 'registration__btn-wrapper');
     const registBtn = createHtmlElement('button', 'registration__btn', 'Sign up');
     registBtn.addEventListener('click', btnEventHandler);
     const registBtnHint = createHtmlElement('span', 'registration__btn__hint', 'Please fill out all fields correctly');
     registBtnWrapp.append(registBtn, registBtnHint);
+
+    const loginBtnWrapp = createHtmlElement('div', 'login__btn-wrapper');
+    const loginBtn = createHtmlElement('button', 'login__btn', 'Log in');
+    loginBtn.addEventListener('click', goLoginPage);
+    loginBtnWrapp.appendChild(loginBtn);
 
     const registrFieldset = createHtmlElement('fieldset', 'registration-fieldset');
     const fieldsetItems = [
@@ -192,12 +248,10 @@ export default class RegistrationPage extends Page {
       birthDateIn,
       emailIn,
       passwordIn,
-      countryIn,
-      cityIn,
-      streetIn,
-      houseIn,
-      postcodeIn,
+      shippingAddrs,
+      billingAddrs,
       registBtnWrapp,
+      loginBtnWrapp,
     ];
     registrFieldset.append(...fieldsetItems);
 
