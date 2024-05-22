@@ -262,3 +262,8 @@ export function inputEventHandler(
     });
   });
 }
+
+export function goLoginPage(event: Event) {
+  event.preventDefault();
+  window.location.hash = '#log-in-page';
+}

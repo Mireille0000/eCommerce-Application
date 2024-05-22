@@ -107,15 +107,20 @@ body {
     padding: 0 4px;
 }
 
-.registration__btn-wrapper {
-    margin-top: 10px;
+.registration__btn-wrapper,
+.login__btn-wrapper {
     width: 100%;
 }
+.registration__btn-wrapper {
+    margin-top: 10px;
+}
 
-.registration__btn:focus-visible {
+.registration__btn:focus-visible,
+.login__btn:focus-visible {
     outline: none;
 }
-.registration__btn, 
+.registration__btn,
+.login__btn, 
 .btn__auth-window {
     width: 100%;
     padding: 4px 15px;
@@ -130,6 +135,7 @@ body {
 }
 
 .registration__btn:hover,
+.login__btn:hover,
 .btn__auth-window:hover {
     background-color: #4096ff;
     transition: all 0.2s;
@@ -168,7 +174,6 @@ body {
     border-radius: 6px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     background-color: #fff;
-    width: 40%;
     padding: 15px;
 }
 .reg-msg__wrapper {

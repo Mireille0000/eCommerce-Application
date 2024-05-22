@@ -1,7 +1,7 @@
 import Page from '../../templates/page';
 import createHtmlElement from '../../utils/functions';
 import { StringArr, arrConditionFn } from '../../utils/types';
-import { btnEventHandler } from './utils-registration/functions-registration';
+import { btnEventHandler, goLoginPage } from './utils-registration/functions-registration';
 import {
   conditionBirthDate,
   conditionEmail,
@@ -235,6 +235,11 @@ export default class RegistrationPage extends Page {
     const registBtnHint = createHtmlElement('span', 'registration__btn__hint', 'Please fill out all fields correctly');
     registBtnWrapp.append(registBtn, registBtnHint);
 
+    const loginBtnWrapp = createHtmlElement('div', 'login__btn-wrapper');
+    const loginBtn = createHtmlElement('button', 'login__btn', 'Log in');
+    loginBtn.addEventListener('click', goLoginPage);
+    loginBtnWrapp.appendChild(loginBtn);
+
     const registrFieldset = createHtmlElement('fieldset', 'registration-fieldset');
     const fieldsetItems = [
       regTitle,
@@ -246,6 +251,7 @@ export default class RegistrationPage extends Page {
       shippingAddrs,
       billingAddrs,
       registBtnWrapp,
+      loginBtnWrapp,
     ];
     registrFieldset.append(...fieldsetItems);
 
