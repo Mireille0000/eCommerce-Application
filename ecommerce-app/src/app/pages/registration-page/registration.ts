@@ -147,7 +147,30 @@ export default class RegistrationPage extends Page {
     labelDefaultAddrs.prepend(inputDefaultAddrs);
     adrsDefault.appendChild(labelDefaultAddrs);
 
-    adrsWrap.append(adrsTitle, adrsRegion, adrsHome, adrsPostal, adrsDefault);
+    if (addressType === 'shipping') {
+      const shippingChbxs = createHtmlElement('div', `${addressType}-chbxs`);
+      const addBillingAdrs = createHtmlElement('div', `${addressType}-add-billing-adrs`);
+      const labelAddBilling = createHtmlElement('label', '', 'Also use as billing address');
+      const inputAddBilling = createHtmlElement('input', `${addressType}-add-billing__input`, '', [
+        { name: 'type', value: 'checkbox' },
+      ]) as HTMLInputElement;
+      inputAddBilling.addEventListener('input', () => {
+        const { checked } = inputAddBilling;
+        if (checked) {
+          const billingWrapp = document.querySelector('.billing-wrapper');
+          billingWrapp?.remove();
+        } else {
+          const billingAddrs = this.createAddressForm('billing');
+          adrsWrap.insertAdjacentElement('afterend', billingAddrs);
+        }
+      });
+      labelAddBilling.prepend(inputAddBilling);
+      addBillingAdrs.appendChild(labelAddBilling);
+      shippingChbxs.append(adrsDefault, addBillingAdrs);
+      adrsWrap.append(adrsTitle, adrsRegion, adrsHome, adrsPostal, shippingChbxs);
+    } else {
+      adrsWrap.append(adrsTitle, adrsRegion, adrsHome, adrsPostal, adrsDefault);
+    }
     return adrsWrap;
   }
 

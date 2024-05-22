@@ -21,11 +21,11 @@ type DataCustomer = {
   password: string;
   key: string;
   shippingAddress: Address;
-  billingAddress: Address | undefined;
+  billingAddress?: Address;
   defaultShippingAddress?: number;
   defaultBillingAddress?: number;
   shippingAddresses: number[];
-  billingAddresses?: number[];
+  billingAddresses: number[];
 };
 
 function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionFn) {
@@ -96,7 +96,6 @@ function getAddress(addressType: string) {
   const city = (address.querySelector(`.${addressType}-city__input`) as HTMLInputElement).value;
   const country = 'DE';
   const postalCode = (address.querySelector(`.${addressType}-postal-code__input`) as HTMLInputElement).value;
-  // const addressKey = `${addressType}-address`;
 
   return {
     streetName,
@@ -104,8 +103,6 @@ function getAddress(addressType: string) {
     city,
     country,
     postalCode,
-    // addressKey,
-    // addressType,
   };
 }
 
@@ -120,14 +117,11 @@ function getAddrsDefault(addressType: string) {
   return null;
 }
 
-export function btnEventHandler(event: Event) {
-  event.preventDefault();
-
-  const errMsgRegistrBtn = document.querySelector('.registration__btn__hint') as HTMLElement;
-
+function getDataRegistration() {
   const firstName = checkDataRegistration('first-name__input', conditionWord);
   const lastName = checkDataRegistration('last-name__input', conditionWord);
   const birthDate = checkDataRegistration('birth-date__input', conditionBirthDate);
+  const dateOfBirth = birthDate ? birthDate.split('.').join('-') : birthDate;
   const email = checkDataRegistration('email__input', conditionEmail);
   const password = checkDataRegistration('password__input', conditionPassword);
   const { textContent: country } = document.querySelector('.USInput__container__select-choice') as HTMLElement;
@@ -137,18 +131,61 @@ export function btnEventHandler(event: Event) {
   const postalCode = checkDataRegistration('postcode__input', conditionPostcode);
 
   const shippingAddress = getAddress('shipping') as Address;
-  // console.log('shippingAddress:', shippingAddress);
   const billingAddress = getAddress('billing');
-  // console.log('billingAddress:', billingAddress);
   const defaultShippingAddress = getAddrsDefault('shipping');
   const defaultBillingAddress = getAddrsDefault('billing');
   const shippingAddresses = [0];
-  const billingAddresses = [1]; // TODO: пофиксить если будет только один выбора адреса
+  const billingAddresses = [1];
+
+  return {
+    firstName,
+    lastName,
+    dateOfBirth,
+    email,
+    password,
+    country,
+    city,
+    streetName,
+    streetNumber,
+    postalCode,
+    shippingAddress,
+    billingAddress,
+    defaultShippingAddress,
+    defaultBillingAddress,
+    shippingAddresses,
+    billingAddresses,
+  };
+}
+
+export function btnEventHandler(event: Event) {
+  event.preventDefault();
+
+  const dataRgstr = getDataRegistration();
+  const {
+    firstName,
+    lastName,
+    dateOfBirth,
+    email,
+    password,
+    country,
+    city,
+    streetName,
+    streetNumber,
+    postalCode,
+    shippingAddress,
+    billingAddress,
+    defaultShippingAddress,
+    defaultBillingAddress,
+    shippingAddresses,
+    billingAddresses,
+  } = dataRgstr;
+
+  const errMsgRegistrBtn = document.querySelector('.registration__btn__hint') as HTMLElement;
 
   const fieldsCorrect =
     !!firstName &&
     !!lastName &&
-    !!birthDate &&
+    !!dateOfBirth &&
     !!email &&
     !!password &&
     !!country &&
@@ -160,7 +197,6 @@ export function btnEventHandler(event: Event) {
     errMsgRegistrBtn.removeAttribute('style');
 
     const key = new Date().getTime().toString().slice(7);
-    const dateOfBirth = birthDate.split('.').join('-');
 
     const customerDraftData: DataCustomer = {
       firstName,
@@ -170,13 +206,22 @@ export function btnEventHandler(event: Event) {
       password,
       key,
       shippingAddress,
-      billingAddress,
       shippingAddresses,
       billingAddresses,
     };
 
-    if (defaultShippingAddress !== null) customerDraftData.defaultShippingAddress = defaultShippingAddress;
-    if (defaultBillingAddress !== null) customerDraftData.defaultBillingAddress = defaultBillingAddress;
+    if (defaultShippingAddress !== null) {
+      customerDraftData.defaultShippingAddress = defaultShippingAddress;
+      if (!billingAddress) customerDraftData.defaultBillingAddress = defaultShippingAddress;
+    }
+    if (defaultBillingAddress !== null) {
+      customerDraftData.defaultBillingAddress = defaultBillingAddress;
+    }
+    if (billingAddress) {
+      customerDraftData.billingAddress = billingAddress;
+    } else {
+      customerDraftData.billingAddresses = shippingAddresses;
+    }
 
     createCustomer(customerDraftData)
       .then((res) => {

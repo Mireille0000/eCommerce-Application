@@ -25,7 +25,7 @@ type CustomerData = {
   defaultShippingAddress?: number;
   defaultBillingAddress?: number;
   shippingAddresses: number[];
-  billingAddresses?: number[];
+  billingAddresses: number[];
 };
 
 type CustomerDraftData = {
@@ -39,7 +39,7 @@ type CustomerDraftData = {
   defaultShippingAddress?: number;
   defaultBillingAddress?: number;
   shippingAddresses: number[];
-  billingAddresses?: number[];
+  billingAddresses: number[];
 };
 
 // export const getCustomerByKey = (key: string) => {
@@ -86,11 +86,11 @@ const createCustomerDraft = (customerData: CustomerData) => {
     key,
     addresses,
     shippingAddresses,
+    billingAddresses,
   };
 
   if (defaultShippingAddress !== null) customerDraft.defaultShippingAddress = defaultShippingAddress;
   if (defaultBillingAddress !== null) customerDraft.defaultBillingAddress = defaultBillingAddress;
-  if (billingAddresses) customerDraft.billingAddresses = billingAddresses;
 
   return customerDraft;
 };
