@@ -1,5 +1,4 @@
 import { ClientResponse } from '@commercetools/platform-sdk';
-import { createCustomer, getCustomerByKey } from '../../../server-requests/registration-form-request/clients';
 import createHtmlElement from '../../../utils/functions';
 import { arrConditionFn } from '../../../utils/types';
 import {
@@ -12,6 +11,22 @@ import {
   conditionWord,
 } from '../validation/validationFn';
 import checkCustomer from '../../../server-requests/login-form-requests';
+import createCustomer, { Address } from '../../../server-requests/registration-form-request/clients';
+
+type DataCustomer = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateOfBirth: string;
+  password: string;
+  key: string;
+  shippingAddress: Address;
+  billingAddress: Address | undefined;
+  defaultShippingAddress?: number;
+  defaultBillingAddress?: number;
+  shippingAddresses: number[];
+  billingAddresses?: number[];
+};
 
 function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionFn) {
   const inputElem = document.querySelector(`.${inputClass}`) as HTMLInputElement;
@@ -56,15 +71,53 @@ function goToMainPageWindow(result: ClientResponse) {
 
   const msgReg = ['Registered', 'Registration successful! You`re now logged in.'];
 
-  getCustomerByKey(result.body.customer.key)
-    .then()
-    .catch((err) => console.log('ВЫШЛА ОШИБОЧКА:', err));
-
   if (result.statusCode === 201) {
     registrationPage?.remove();
-    window.location.hash = 'main-page';
+    window.location.hash = '#main-page';
     setTimeout(() => createMsgRegAcc(msgReg), 0);
   }
+}
+
+function customerAuth() {
+  if (window.location.hash === '#main-page') {
+    const element = document.querySelector('a[href="#log-in-page"]');
+    if (element) {
+      element.textContent = 'Log out';
+    }
+  }
+}
+
+function getAddress(addressType: string) {
+  const address = document.querySelector(`.${addressType}-wrapper`);
+  if (address === null) return undefined;
+
+  const streetName = (address.querySelector(`.${addressType}-street__input`) as HTMLInputElement).value;
+  const streetNumber = (address.querySelector(`.${addressType}-house__input`) as HTMLInputElement).value;
+  const city = (address.querySelector(`.${addressType}-city__input`) as HTMLInputElement).value;
+  const country = 'DE';
+  const postalCode = (address.querySelector(`.${addressType}-postal-code__input`) as HTMLInputElement).value;
+  // const addressKey = `${addressType}-address`;
+
+  return {
+    streetName,
+    streetNumber,
+    city,
+    country,
+    postalCode,
+    // addressKey,
+    // addressType,
+  };
+}
+
+function getAddrsDefault(addressType: string) {
+  const addrsDefault = document.querySelector(`.${addressType}-default-addrs__choise`) as HTMLInputElement;
+  if (addrsDefault) {
+    const { checked } = addrsDefault;
+    if (checked) {
+      return addressType === 'shipping' ? 0 : 1;
+    }
+  }
+  return null;
 }
 
 export function btnEventHandler(event: Event) {
@@ -83,6 +136,15 @@ export function btnEventHandler(event: Event) {
   const streetNumber = checkDataRegistration('house__input', conditionHouseNumber);
   const postalCode = checkDataRegistration('postcode__input', conditionPostcode);
 
+  const shippingAddress = getAddress('shipping') as Address;
+  // console.log('shippingAddress:', shippingAddress);
+  const billingAddress = getAddress('billing');
+  // console.log('billingAddress:', billingAddress);
+  const defaultShippingAddress = getAddrsDefault('shipping');
+  const defaultBillingAddress = getAddrsDefault('billing');
+  const shippingAddresses = [0];
+  const billingAddresses = [1]; // TODO: пофиксить если будет только один выбора адреса
+
   const fieldsCorrect =
     !!firstName &&
     !!lastName &&
@@ -99,26 +161,29 @@ export function btnEventHandler(event: Event) {
 
     const key = new Date().getTime().toString().slice(7);
     const dateOfBirth = birthDate.split('.').join('-');
-    const customerDraftData = {
+
+    const customerDraftData: DataCustomer = {
       firstName,
       lastName,
       email,
       dateOfBirth,
       password,
       key,
-      streetName,
-      streetNumber,
-      city,
-      country: 'DE',
-      postalCode,
+      shippingAddress,
+      billingAddress,
+      shippingAddresses,
+      billingAddresses,
     };
+
+    if (defaultShippingAddress !== null) customerDraftData.defaultShippingAddress = defaultShippingAddress;
+    if (defaultBillingAddress !== null) customerDraftData.defaultBillingAddress = defaultBillingAddress;
 
     createCustomer(customerDraftData)
       .then((res) => {
         goToMainPageWindow(res);
-        checkCustomer(customerDraftData.email, customerDraftData.password, 'auth-error-message').catch(
-          (err) => err.message
-        );
+        checkCustomer(customerDraftData.email, customerDraftData.password, 'auth-error-message')
+          .then(customerAuth)
+          .catch((err) => err.message);
       })
       .catch((errRes) => {
         const msgRegExist = [
