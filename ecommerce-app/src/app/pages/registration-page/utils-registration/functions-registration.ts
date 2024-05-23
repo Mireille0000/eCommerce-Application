@@ -11,22 +11,7 @@ import {
   conditionWord,
 } from '../validation/validationFn';
 import checkCustomer from '../../../server-requests/login-form-requests';
-import createCustomer, { Address } from '../../../server-requests/registration-form-request/clients';
-
-type DataCustomer = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  dateOfBirth: string;
-  password: string;
-  key: string;
-  shippingAddress: Address;
-  billingAddress?: Address;
-  defaultShippingAddress?: number;
-  defaultBillingAddress?: number;
-  shippingAddresses: number[];
-  billingAddresses: number[];
-};
+import createCustomer, { Address, CustomerData } from '../../../server-requests/registration-form-request/clients';
 
 function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionFn) {
   const inputElem = document.querySelector(`.${inputClass}`) as HTMLInputElement;
@@ -91,11 +76,11 @@ function getAddress(addressType: string) {
   const address = document.querySelector(`.${addressType}-wrapper`);
   if (address === null) return undefined;
 
-  const streetName = (address.querySelector(`.${addressType}-street__input`) as HTMLInputElement).value;
-  const streetNumber = (address.querySelector(`.${addressType}-house__input`) as HTMLInputElement).value;
-  const city = (address.querySelector(`.${addressType}-city__input`) as HTMLInputElement).value;
+  const streetName = checkDataRegistration(`${addressType}-street__input`, conditionStreet);
+  const streetNumber = checkDataRegistration(`${addressType}-house__input`, conditionHouseNumber);
+  const city = checkDataRegistration(`${addressType}-city__input`, conditionWord);
   const country = 'DE';
-  const postalCode = (address.querySelector(`.${addressType}-postal-code__input`) as HTMLInputElement).value;
+  const postalCode = checkDataRegistration(`${addressType}-postal-code__input`, conditionPostcode);
 
   return {
     streetName,
@@ -124,14 +109,9 @@ function getDataRegistration() {
   const dateOfBirth = birthDate ? birthDate.split('.').join('-') : birthDate;
   const email = checkDataRegistration('email__input', conditionEmail);
   const password = checkDataRegistration('password__input', conditionPassword);
-  const { textContent: country } = document.querySelector('.USInput__container__select-choice') as HTMLElement;
-  const city = checkDataRegistration('city__input', conditionWord);
-  const streetName = checkDataRegistration('street__input', conditionStreet);
-  const streetNumber = checkDataRegistration('house__input', conditionHouseNumber);
-  const postalCode = checkDataRegistration('postcode__input', conditionPostcode);
 
   const shippingAddress = getAddress('shipping') as Address;
-  const billingAddress = getAddress('billing');
+  const billingAddress = getAddress('billing') as Address | undefined;
   const defaultShippingAddress = getAddrsDefault('shipping');
   const defaultBillingAddress = getAddrsDefault('billing');
   const shippingAddresses = [0];
@@ -143,11 +123,6 @@ function getDataRegistration() {
     dateOfBirth,
     email,
     password,
-    country,
-    city,
-    streetName,
-    streetNumber,
-    postalCode,
     shippingAddress,
     billingAddress,
     defaultShippingAddress,
@@ -167,11 +142,6 @@ export function btnEventHandler(event: Event) {
     dateOfBirth,
     email,
     password,
-    country,
-    city,
-    streetName,
-    streetNumber,
-    postalCode,
     shippingAddress,
     billingAddress,
     defaultShippingAddress,
@@ -181,24 +151,16 @@ export function btnEventHandler(event: Event) {
   } = dataRgstr;
 
   const errMsgRegistrBtn = document.querySelector('.registration__btn__hint') as HTMLElement;
+  const allShipValid = Object.values(shippingAddress).every((value) => !!value);
+  const allBilValid = billingAddress ? Object.values(billingAddress).every((value) => !!value) : undefined;
 
-  const fieldsCorrect =
-    !!firstName &&
-    !!lastName &&
-    !!dateOfBirth &&
-    !!email &&
-    !!password &&
-    !!country &&
-    !!city &&
-    !!streetName &&
-    !!streetNumber &&
-    !!postalCode;
-  if (fieldsCorrect) {
+  const fieldsCorrect = !!firstName && !!lastName && !!dateOfBirth && !!email && !!password && allShipValid;
+  if ((fieldsCorrect && typeof allBilValid === 'undefined') || (fieldsCorrect && allBilValid)) {
     errMsgRegistrBtn.removeAttribute('style');
 
     const key = new Date().getTime().toString().slice(7);
 
-    const customerDraftData: DataCustomer = {
+    const customerDraftData: CustomerData = {
       firstName,
       lastName,
       email,
@@ -217,7 +179,7 @@ export function btnEventHandler(event: Event) {
     if (defaultBillingAddress !== null) {
       customerDraftData.defaultBillingAddress = defaultBillingAddress;
     }
-    if (billingAddress) {
+    if (allBilValid) {
       customerDraftData.billingAddress = billingAddress;
     } else {
       customerDraftData.billingAddresses = shippingAddresses;

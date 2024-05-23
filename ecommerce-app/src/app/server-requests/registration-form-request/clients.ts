@@ -13,33 +13,26 @@ export type Address = {
   postalCode: string;
 };
 
-type CustomerData = {
+type Data = {
   firstName: string;
   lastName: string;
   email: string;
   dateOfBirth: string;
   password: string;
   key: string;
-  shippingAddress: Address;
-  billingAddress?: Address;
   defaultShippingAddress?: number;
   defaultBillingAddress?: number;
   shippingAddresses: number[];
-  billingAddresses: number[];
+  billingAddresses?: number[];
 };
 
-type CustomerDraftData = {
-  firstName: string;
-  lastName: string;
-  email: string;
-  dateOfBirth: string;
-  password: string;
-  key: string;
+export type CustomerData = Data & {
+  shippingAddress: Address;
+  billingAddress?: Address;
+};
+
+type CustomerDraftData = Data & {
   addresses: Address[];
-  defaultShippingAddress?: number;
-  defaultBillingAddress?: number;
-  shippingAddresses: number[];
-  billingAddresses: number[];
 };
 
 // export const getCustomerByKey = (key: string) => {
@@ -86,11 +79,11 @@ const createCustomerDraft = (customerData: CustomerData) => {
     key,
     addresses,
     shippingAddresses,
-    billingAddresses,
   };
 
   if (defaultShippingAddress !== null) customerDraft.defaultShippingAddress = defaultShippingAddress;
   if (defaultBillingAddress !== null) customerDraft.defaultBillingAddress = defaultBillingAddress;
+  if (billingAddresses) customerDraft.billingAddresses = billingAddresses;
 
   return customerDraft;
 };
