@@ -1,12 +1,6 @@
-// import './global.css';
-// // import LogInPage from './app/pages/log-in-page/log-in';
-
-// // new LogInPage('log-in-page').renderPage();
-// import RegistrationPage from './app/pages/registration-page/registration';
-
-// new RegistrationPage('registration-page').renderPage();
-
 import './global.css';
-import App from './app/app';
+// import App from './app/app';
+import CatalogProductPage from './app/pages/catalog-product-page/catalog-product-page';
 
-new App().renderPage();
+// new App().renderPage();
+new CatalogProductPage('catalog-product-page').renderPage();
