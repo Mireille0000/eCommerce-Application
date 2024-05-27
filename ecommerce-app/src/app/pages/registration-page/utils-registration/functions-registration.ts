@@ -10,7 +10,7 @@ import {
   conditionStreet,
   conditionWord,
 } from '../validation/validationFn';
-import checkCustomer from '../../../server-requests/login-form-requests';
+import checkCustomer from '../../../server-requests/log-in-form-requests/login-form-requests';
 import createCustomer, { Address, CustomerData } from '../../../server-requests/registration-form-request/clients';
 
 function checkDataRegistration(inputClass: string, conditionArrFn: arrConditionFn) {

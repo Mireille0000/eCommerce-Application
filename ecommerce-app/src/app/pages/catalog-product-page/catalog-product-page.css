@@ -1,0 +1,14 @@
+.nav-bar-catalog-page {
+    display: flex;
+    align-items: center;
+}
+
+.product-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.product-image img {
+    width: 150px;
+}

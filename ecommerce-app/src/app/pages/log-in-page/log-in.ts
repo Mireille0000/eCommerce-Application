@@ -1,7 +1,7 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement, { addEventHandler, createImage } from '../../utils/functions';
-import checkCustomer from '../../server-requests/login-form-requests';
+import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 
 import {
   emailInputEventHandler,
