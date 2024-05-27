@@ -1,6 +1,7 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement from '../../utils/functions';
+import { getProductListByToken } from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 
 export default class CatalogProductPage extends Page {
   pageTitle: HTMLHeadingElement;
@@ -8,6 +9,8 @@ export default class CatalogProductPage extends Page {
   productContainer: HTMLDivElement;
 
   imageElem: HTMLDivElement;
+
+  image: HTMLImageElement;
 
   productDetails: HTMLDivElement;
 
@@ -21,6 +24,7 @@ export default class CatalogProductPage extends Page {
     this.pageTitle = createHtmlElement('h2', 'catalog-page-title', 'Catalog');
     this.productContainer = createHtmlElement('div', 'product-container');
     this.imageElem = createHtmlElement('div', 'product-image');
+    this.image = createHtmlElement('img');
     this.productDetails = createHtmlElement('div', 'product-details');
     this.productName = createHtmlElement('h3', 'product-name');
     this.productDescription = createHtmlElement('div', 'product-description');
@@ -53,8 +57,12 @@ export default class CatalogProductPage extends Page {
     });
 
     // main
+    getProductListByToken();
+
     this.addElemsToMain(this.productContainer);
-    this.productContainer.append(this.imageElem, this.productName, this.productDescription);
+    this.productContainer.append(this.imageElem, this.productDetails);
+    this.productDetails.append(this.productName, this.productDescription);
+    this.imageElem.append(this.image);
 
     return this.pageWrapper;
   }

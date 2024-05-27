@@ -1,3 +1,5 @@
+import { ProductsListData } from './interfaces-catalog-page';
+
 const ProcessEnvCatalog = {
   PROJECT_KEY: 'ecommerce-app-f-devs',
 
@@ -5,6 +7,28 @@ const ProcessEnvCatalog = {
 
   SECRET: 'o-i1eGtuwKbH0T8FgH4Gq-Elbbr6sBEf',
 };
+
+function createProductCard(data: ProductsListData) {
+  const numOfProducts = data.total;
+
+  const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
+  const productContainer = document.querySelector('.product-container') as HTMLDivElement;
+
+  for (let i = 0; i < numOfProducts - 1; i += 1) {
+    wrapperProductCarts.appendChild(productContainer.cloneNode(true));
+  }
+
+  for (let i = 0; i < numOfProducts; i += 1) {
+    const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
+    const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
+    const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
+
+    productImagesArr[i].src = `${data.results[i].masterData.staged.masterVariant.images[0].url}`;
+    productImagesArr[i].alt = `${data.results[i].masterData.staged.name['en-US']}`;
+    productNamesArr[i].innerHTML = `${data.results[i].masterData.staged.name['en-US']}`;
+    productDescriptionsArr[i].innerHTML = `${data.results[i].masterData.staged.description['en-US']}`;
+  }
+}
 
 export async function getProductList(token: string) {
   try {
@@ -23,7 +47,8 @@ export async function getProductList(token: string) {
       const error = new Error(`${data.message}`);
       throw error;
     } else {
-      return data; //
+      createProductCard(data);
+      return data;
     }
   } catch (err) {
     console.log(err);
@@ -45,8 +70,6 @@ export async function getProductListByToken() {
     );
     const data = await response.json();
     getProductList(data.access_token);
-
-    console.log(data.access_token);
   } catch (err) {
     console.log(err);
   }
