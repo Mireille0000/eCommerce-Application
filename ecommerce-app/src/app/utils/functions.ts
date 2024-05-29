@@ -20,6 +20,28 @@ export default function createHtmlElement<T = HTMLElement>(
   return newElem as T;
 }
 
+export function createDivElement(newClass = '', text = '', attributes: ElemAttributes = []): HTMLDivElement {
+  return createHtmlElement('div', newClass, text, attributes);
+}
+export function createSpanElement(newClass = '', text = '', attributes: ElemAttributes = []): HTMLSpanElement {
+  return createHtmlElement('span', newClass, text, attributes);
+}
+export function createLabelElement(newClass = '', text = '', attributes: ElemAttributes = []): HTMLLabelElement {
+  return createHtmlElement('label', newClass, text, attributes);
+}
+export function createButtonElement(newClass = '', text = '', attributes: ElemAttributes = []): HTMLButtonElement {
+  return createHtmlElement('button', newClass, text, attributes);
+}
+export function createInputElement(newClass = '', text = '', attributes: ElemAttributes = []): HTMLInputElement {
+  return createHtmlElement('input', newClass, text, attributes);
+}
+export function createH2Element(newClass = '', text = '', attributes: ElemAttributes = []): HTMLInputElement {
+  return createHtmlElement('h2', newClass, text, attributes);
+}
+export function createH3Element(newClass = '', text = '', attributes: ElemAttributes = []): HTMLInputElement {
+  return createHtmlElement('h3', newClass, text, attributes);
+}
+
 export function addEventHandler(element: string, eventType: string, callback = () => {}) {
   const target = document.querySelector(`.${element}`);
   target?.addEventListener(`${eventType}`, callback);
@@ -29,6 +51,6 @@ export function createImage(source: File, alt: string, classImg: string, image =
   const newImage = image;
   newImage.src = `${source}`;
   newImage.alt = `${alt}`;
-  newImage.className = `.${classImg}`;
+  newImage.className = `${classImg}`;
   return newImage;
 }

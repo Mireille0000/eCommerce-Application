@@ -28,8 +28,12 @@
       }
     ],
     "import/no-unresolved": [
-        0, 
-        { "caseSensitive": false }
-    ]
+      0,
+      {
+        "caseSensitive": false
+      }
+    ],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "error"
   }
 }

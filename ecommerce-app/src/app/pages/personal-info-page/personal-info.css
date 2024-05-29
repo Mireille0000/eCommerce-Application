@@ -1,0 +1,238 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    scrollbar-width: thin;
+}
+body {
+    margin: 0 auto;
+    background-color: #9c9c9c83;
+    /* overflow-y: scroll; */
+    /* min-height: 100vh; */
+    /* scrollbar-width: thin; */
+    /* min-width: 100vh; */
+    /* scrollbar-width: thin; */
+    overflow-y: scroll;
+}
+
+.wrapper {
+    max-width: 1980px;
+    height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    /* overflow-y: auto; */
+}
+.wrapper--PI {
+    justify-content: normal;
+    width: 100%;
+    flex-direction: column;
+    font-size: 0.875rem;
+}
+.personal-info-main {
+    width: 100%;
+}
+.wrapper-main {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.wrapper-main--PI {
+    flex-direction: column;
+    padding: 10px 0;
+}
+.PI__title-heading {
+    font-size: 1.75rem;
+}
+.PI__container {
+    max-width: 980px;
+    width: 65%;
+    border-radius: 8px;
+    border: 1px solid #e1e3e1;
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin: 24px 12px 0px;
+    padding: 12px 0px 0px;
+    background-color: #fff;
+    box-shadow: 6px 6px 6px -2px rgba(156, 156, 156, 0.75);
+}
+.PI__container-title-heading {
+    font-size: 1.375rem;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding: 0 24px;
+    color: #1f1f1f;
+}
+.user-info__address-open {
+    padding: 0 24px;
+    position: relative;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1s ease;
+}
+.user-info__address-open.address-open {
+    max-height: 1000px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 14px 24px;
+    position: relative;
+    min-height: 65px;
+}
+.user-address:not(:last-child) .user-info::after,
+.user-address:not(:last-child) .user-info__address-open::after {
+    position: absolute;
+    content: '';
+    left: 23px;
+    width: calc(100% - 23px);
+    bottom: 0;
+    height: 1px;
+    background-color: #e1e3e1;
+}
+
+/* .PI__container .user-info:last-child:after {
+    content: none;
+} */
+
+.user-info__field-wrap {
+    flex: 1 1 0;
+}
+.user-info__field {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    text-align: left;
+    height: 100%;
+}
+.user-info__field-address {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+.user-info__descr-wrap {
+    display: flex;
+    align-items: center;
+    flex-basis: 156px;
+    margin-right: 24px;
+    padding-top: 4px;
+}
+.user-info__descr {
+    font-size: 16px;
+    color: #444746;
+    font-size: 0.875rem;
+}
+.user-info__content-wrap {
+    display: flex;
+    flex-basis: 300px;
+}
+.user-info__content {
+    display: block;
+    font-size: 1.125rem;
+    word-break: break-all;
+    color: #1f1f1f;
+}
+.user-info__btns {
+    display: flex;
+}
+.user-info__edit,
+.user-info__toggle,
+.user-info__delete-adress {
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-left: 16px;
+}
+.user-info__edit-btn,
+.user-info__toggle-btn,
+.user-info__delete-adress-btn {
+    padding: 6px;
+    border: 0px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s;
+}
+.user-info__edit-btn:hover,
+.user-info__toggle-btn:hover,
+.user-info__delete-adress-btn:hover {
+    background-color: #e1e3e1;
+    transition: all 0.2s;
+}
+.img-edit,
+.img-toggle,
+.img-delete-adress {
+    width: 20px;
+    height: 20px;
+}
+
+.user-info__address-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 100%;
+}
+.user-info__address-number-wrap {
+    display: flex;
+    align-items: center;
+}
+
+.user-info__address-container {
+    display: flex;
+    flex: 1 1 0;
+    font-size: 1.125rem;
+}
+.user-info__address-wrap {
+    margin-right: 24px;
+    flex-basis: 300px;
+}
+.user-info__address {
+    word-break: break-all;
+    display: block;
+}
+.user-info__address,
+.user-info__address-type {
+    color: #1f1f1f;
+}
+
+.user-info__address-type-wrap {
+    flex-basis: 300px;
+}
+
+@media (max-width: 1048px) {
+    .PI__container {
+        width: 70%;
+    }
+}
+
+@media (max-width: 940px) {
+    .PI__container {
+        width: 75%;
+    }
+}
+
+@media (max-width: 720px) {
+    .PI__container {
+        width: 80%;
+    }
+}
+
+@media (max-width: 659px) {
+    .PI__container {
+        width: 95%;
+    }
+    .user-info {
+        align-items: normal;
+        flex-direction: column;
+    }
+    .user-info__edit,
+    .user-info__btns {
+        align-self: flex-end;
+    }
+}

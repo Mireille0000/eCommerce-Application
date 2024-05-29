@@ -14,7 +14,7 @@ body {
     justify-content: center;
     align-items: center;
     margin: 0 auto;
-    overflow-y: auto;
+    /* overflow-y: auto; */
 }
 
 .registration-main {
