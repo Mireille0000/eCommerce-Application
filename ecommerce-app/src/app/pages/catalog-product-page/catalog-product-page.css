@@ -63,3 +63,10 @@
 .product-name {
     margin: 5px 0 10px 0;
 }
+
+.product-prices {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+}

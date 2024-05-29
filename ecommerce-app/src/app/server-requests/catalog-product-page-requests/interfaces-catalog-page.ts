@@ -3,13 +3,24 @@ interface Images {
   url: string;
 }
 
+export interface Prices {
+  id: string;
+  key: string;
+  value: {
+    centAmount: number;
+    currencyCode: string;
+    fractationDigits: number;
+    type: string;
+  };
+}
+
 interface MasterVarinatData {
   assets: [];
   attributes: [];
   id: number;
   images: Array<Images>;
   key: string;
-  prices: [];
+  prices: [Prices];
   sku: string;
 }
 
@@ -55,4 +66,14 @@ export interface ProductsListData {
   offset: number;
   results: Array<ProductsArr>;
   total: number;
+}
+
+// discounts
+
+export interface Discounts {
+  value: {
+    type: string;
+    permyriad: number;
+  };
+  predicate: string;
 }

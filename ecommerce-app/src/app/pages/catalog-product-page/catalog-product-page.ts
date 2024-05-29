@@ -1,7 +1,7 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement from '../../utils/functions';
-import { getProductListByToken } from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
+import getProductListByToken from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 
 export default class CatalogProductPage extends Page {
   pageTitle: HTMLHeadingElement;
@@ -18,6 +18,14 @@ export default class CatalogProductPage extends Page {
 
   productDescription: HTMLDivElement;
 
+  productPrices: HTMLDivElement;
+
+  price: HTMLSpanElement;
+
+  discount: HTMLSpanElement;
+
+  discountPrice: HTMLSpanElement;
+
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'catalog-product-page';
@@ -28,6 +36,10 @@ export default class CatalogProductPage extends Page {
     this.productDetails = createHtmlElement('div', 'product-details');
     this.productName = createHtmlElement('h3', 'product-name');
     this.productDescription = createHtmlElement('div', 'product-description');
+    this.productPrices = createHtmlElement('div', 'product-prices');
+    this.price = createHtmlElement('span', 'price');
+    this.discount = createHtmlElement('span', 'discount');
+    this.discountPrice = createHtmlElement('span', 'discount-price');
   }
 
   renderPage() {
@@ -42,13 +54,13 @@ export default class CatalogProductPage extends Page {
       catalogPageHeader.navItem,
       catalogPageHeader.link,
     ];
-    const [appName, navBar, linksList, linkListItem, link] = headerElems;
+    const [appName, navBar, navigation, navItem, link] = headerElems;
     navBar.className = 'nav-bar-catalog-page';
 
     this.addElemsToHeader(appName, this.pageTitle, navBar);
     appName.innerHTML = 'ScriptSmith';
-    navBar.append(linksList);
-    catalogPageHeader.createNavigation(linksList, linkListItem, 4, link);
+    navBar.append(navigation);
+    catalogPageHeader.createNavigation(navigation, navItem, 4, link);
     const navLinksNames = ['Profile', 'Back to main', 'Log in', 'Register'];
     const navLinksArr = Array.from(document.querySelectorAll('.nav-link'));
     navLinksArr.forEach((item, i) => {
@@ -60,8 +72,9 @@ export default class CatalogProductPage extends Page {
     getProductListByToken();
 
     this.addElemsToMain(this.productContainer);
-    this.productContainer.append(this.imageElem, this.productDetails);
+    this.productContainer.append(this.imageElem, this.productDetails, this.productPrices);
     this.productDetails.append(this.productName, this.productDescription);
+    this.productPrices.append(this.price, this.discount, this.discountPrice);
     this.imageElem.append(this.image);
 
     return this.pageWrapper;
