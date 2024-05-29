@@ -45,6 +45,6 @@ export function createImage(source: File | string, alt: string, classImg: string
   const newImage = image;
   newImage.src = `${source}`;
   newImage.alt = `${alt}`;
-  newImage.className = `.${classImg}`;
+  newImage.className = `${classImg}`;
   return newImage;
 }

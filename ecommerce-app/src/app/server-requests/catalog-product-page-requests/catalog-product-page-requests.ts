@@ -21,18 +21,18 @@ function createProductCards(dataProducts: ProductsListData) {
   }
 
   for (let i = 0; i < numOfProducts; i += 1) {
+    const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
 
-    productImagesArr[i].src = `${dataProducts.results[i].masterData.staged.masterVariant.images[0].url}`;
-    productImagesArr[i].alt = `${dataProducts.results[i].masterData.staged.name['en-US']}`;
-    productNamesArr[i].innerHTML = `${dataProducts.results[i].masterData.staged.name['en-US']}`;
-    productDescriptionsArr[i].innerHTML = `${dataProducts.results[i].masterData.staged.description['en-US']}`;
-    if (dataProducts.results[i].masterData.staged.masterVariant.prices.length > 0) {
-      productPrices[i].innerHTML =
-        `Price: ${(dataProducts.results[i].masterData.staged.masterVariant.prices[0] as Prices).value.centAmount / 100}€`;
+    productImagesArr[i].src = `${masterVariant.images[0].url}`;
+    productImagesArr[i].alt = `${name['en-US']}`;
+    productNamesArr[i].innerHTML = `${name['en-US']}`;
+    productDescriptionsArr[i].innerHTML = `${description['en-US']}`;
+    if (masterVariant.prices.length > 0) {
+      productPrices[i].innerHTML = `Price: ${(masterVariant.prices[0] as Prices).value.centAmount / 100}€`;
     } else {
       productPrices[i].innerHTML = 'No price';
     }
@@ -83,7 +83,7 @@ async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Arra
         const originalPrice = data.results[i].masterData.staged.masterVariant.prices[0].value.centAmount / 100;
         if (skuArr.includes(SKU[i])) {
           productDiscounts[i].innerHTML = `Discount ${discount}%`;
-          productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (discount / 100)}€`;
+          productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
         }
       }
 
@@ -113,7 +113,7 @@ async function getProductList(token: string) {
       throw error;
     } else {
       createProductCards(data);
-      const SKUArr = [];
+      const SKUArr: Array<string> = [];
       for (let i = 0; i < data.total; i += 1) {
         SKUArr.push(data.results[i].masterData.staged.masterVariant.sku);
       }

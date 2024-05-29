@@ -47,14 +47,7 @@ export default class CatalogProductPage extends Page {
     this.pageWrapper.append(this.header, this.main, this.footer);
     // header
     const catalogPageHeader = new HeaderComponent();
-    const headerElems = [
-      catalogPageHeader.appName,
-      catalogPageHeader.navBar,
-      catalogPageHeader.navigation,
-      catalogPageHeader.navItem,
-      catalogPageHeader.link,
-    ];
-    const [appName, navBar, navigation, navItem, link] = headerElems;
+    const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
     navBar.className = 'nav-bar-catalog-page';
 
     this.addElemsToHeader(appName, this.pageTitle, navBar);
