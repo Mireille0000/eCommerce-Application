@@ -30,25 +30,35 @@ async function getCustomerToken(passwordFlowDataParam: string) {
 }
 
 async function getPasswordFlow(email: string, password: string, errorMessageElem: string) {
-  const response1 = await fetch(
-    `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnv.PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Basic ${btoa(`${ProcessEnv.CLIENT_ID}:${ProcessEnv.SECRET}`)}`,
-      },
+  try {
+    const response1 = await fetch(
+      `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnv.PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${btoa(`${ProcessEnv.CLIENT_ID}:${ProcessEnv.SECRET}`)}`,
+        },
+      }
+    );
+    const passwordFlowData = await response1.json();
+    if (response1.status === 400) {
+      const error = new Error(`${passwordFlowData.message}`);
+      const errorElem = document.querySelector(`.${errorMessageElem}`) as HTMLElement;
+      errorElem.innerHTML = `${passwordFlowData.message} Check your email or password`;
+      setTimeout(() => errorElem.remove(), 4000);
+      throw error.message;
+    } else {
+      return passwordFlowData;
     }
-  );
-  const passwordFlowData = await response1.json();
-  if (response1.status === 400) {
-    const error = new Error(`${passwordFlowData.message}`);
-    const errorElem = document.querySelector(`.${errorMessageElem}`) as HTMLElement;
-    errorElem.innerHTML = `${passwordFlowData.message} Check your email or password`;
-    setTimeout(() => errorElem.remove(), 4000);
-    throw error.message;
-  } else {
-    return passwordFlowData;
+  } catch (err) {
+    const mute = err as Error;
+    const errorElem = document.querySelector(`.auth-error-message`) as HTMLElement;
+    if (!errorElem.innerHTML) {
+      errorElem.innerHTML = `${mute.message}`;
+      setTimeout(() => errorElem.remove(), 4000);
+    }
+    return mute;
   }
 }
 

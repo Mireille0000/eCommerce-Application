@@ -1,7 +1,7 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement, { addEventHandler, createImage } from '../../utils/functions';
-import checkCustomer from '../../server-requests/login-form-requests';
+import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 
 import {
   emailInputEventHandler,
@@ -51,22 +51,15 @@ export default class LogInPage extends Page {
     this.main.className = 'log-in-main';
     // header
     const headerComponent = new HeaderComponent();
-    const headerComponentItems = [
-      headerComponent.appName,
-      headerComponent.navBar,
-      headerComponent.navigation,
-      headerComponent.navItem,
-      headerComponent.link,
-    ];
+    const { appName, navBar, navigation, navItem, link } = headerComponent;
     headerComponent.navBar.className = 'nav-bar';
-    const [name, navigation, list, listItem, link] = headerComponentItems;
-    this.addElemsToHeader(name, navigation);
-    navigation.append(list);
-    list.append(listItem);
-    listItem.append(link);
+    this.addElemsToHeader(appName, navBar);
+    navBar.append(navigation);
+    navigation.append(navItem);
+    navItem.append(link);
     link.innerHTML = 'Back to Main';
     link.setAttribute('href', '#main-page');
-    name.innerHTML = 'Ultimate ScriptSmith';
+    appName.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
     const fieldset = createHtmlElement('fieldset', 'log-in-fieldset');
