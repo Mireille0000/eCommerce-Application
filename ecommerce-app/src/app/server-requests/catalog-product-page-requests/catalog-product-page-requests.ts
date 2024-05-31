@@ -14,19 +14,23 @@ function createProductCards(dataProducts: ProductsListData) {
   const numOfProducts = dataProducts.total;
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
+  const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
+  wrapperProductCarts.append(productsWrapper);
+  console.log(productsWrapper);
   const productContainer = document.querySelector('.product-container') as HTMLDivElement;
 
   for (let i = 0; i < numOfProducts - 1; i += 1) {
-    wrapperProductCarts.appendChild(productContainer.cloneNode(true));
+    productsWrapper.appendChild(productContainer.cloneNode(true));
   }
 
+  const attributes = [];
   for (let i = 0; i < numOfProducts; i += 1) {
     const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
-
+    attributes.push(masterVariant.attributes);
     productImagesArr[i].src = `${masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
@@ -37,7 +41,8 @@ function createProductCards(dataProducts: ProductsListData) {
       productPrices[i].innerHTML = 'No price';
     }
   }
-  console.log(dataProducts);
+  // console.log(dataProducts.results);
+  // console.log(attributes);
 }
 
 function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>) {
