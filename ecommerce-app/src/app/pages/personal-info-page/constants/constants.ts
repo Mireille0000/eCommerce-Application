@@ -17,6 +17,13 @@ export const enum ClssNms {
   U_INFO_CONTENT_WRAP = 'user-info__content-wrap',
   U_INFO_CONTENT = 'user-info__content',
   U_INFO_CONTENT_INPUT = 'user-info__content-input',
+  U_INFO_CONTENT_INPUT_OPEN_BTN = 'user-info__content-input-open-btn',
+  U_INFO_CONTENT_ADRS_TYPE_WRAP = 'user-info__content-adrs-type-wrap',
+  U_INFO_CONTENT_ADRS_TYPE = 'user-info__content-adrs-type',
+  U_INFO_CONTENT_ADRS_TYPE_BTN_DEL = 'user-info__content-adrs-type-btn-delete',
+  U_INFO_OPEN_LIST_TYPE = 'user-info__open-list-type',
+  U_INFO_OPEN_TYPE_ELEM = 'user-info__open-type-elem',
+  U_INFO_OPEN_NO_OPT = 'user-info__open-no-options',
   FIRST_NAME_CONTENT = 'first-name__content',
   U_INFO_EDIT = 'user-info__edit',
   U_INFO_EDIT_BTN = 'user-info__edit-btn',
@@ -74,6 +81,14 @@ export const enum Txt {
   STREET_DSCR = 'Street',
   STREET_NUMB_DSCR = 'Street Number',
   POSTAL_CODE_DSCR = 'Postal Code',
-  ADRS_TYPE_DSCR = 'Address type',
+  ADRS_TYPE_DSCR = 'Address Type',
   ADRS_COUNTRY = 'Germany',
+  NO_OPTIONS = 'No options',
 }
+
+export const AdrsType = {
+  BILLING: 'Billing',
+  SHIPPING: 'Shipping',
+  BILLING_DEFAULT: 'Default Billing',
+  SHIPPING_DEFAULT: 'Default Shipping',
+};

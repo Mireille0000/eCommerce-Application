@@ -19,6 +19,16 @@ export interface Address {
   addressType?: string[];
 }
 
+export interface CurrAddress {
+  id: string;
+  streetName: string;
+  streetNumber: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  addressType: string[];
+}
+
 export type Addresses = Address[];
 
 export interface CustomerData {
@@ -39,5 +49,9 @@ export interface CurrAdrs {
   Street: string;
   'Street Number': string;
   'Postal Code': string;
-  'Address type'?: string;
+  'Address Type': string;
+}
+
+export interface AdrsValueObj {
+  [currValue: string]: string | undefined;
 }
