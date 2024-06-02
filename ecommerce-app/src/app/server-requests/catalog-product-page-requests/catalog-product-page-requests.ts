@@ -1,4 +1,6 @@
 import { ProductsListData, Prices } from './interfaces-catalog-page';
+import { addEventHandler } from '../../utils/functions';
+import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
 
 const enum ProcessEnvCatalog {
   PROJECT_KEY = 'ecommerce-app-f-devs',
@@ -16,21 +18,18 @@ function createProductCards(dataProducts: ProductsListData) {
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
   const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
   wrapperProductCarts.append(productsWrapper);
-  console.log(productsWrapper);
   const productContainer = document.querySelector('.product-container') as HTMLDivElement;
 
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
 
-  const attributes = [];
   for (let i = 0; i < numOfProducts; i += 1) {
     const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
-    attributes.push(masterVariant.attributes);
     productImagesArr[i].src = `${masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
@@ -41,8 +40,77 @@ function createProductCards(dataProducts: ProductsListData) {
       productPrices[i].innerHTML = 'No price';
     }
   }
-  // console.log(dataProducts.results);
-  // console.log(attributes);
+}
+
+interface ProductsArrF {
+  description: { 'en-US': string };
+  masterVariant: {
+    assets: [];
+    attributes: [];
+    id: number;
+    images: [
+      {
+        dimensions: object;
+        url: string;
+      },
+    ];
+    key: string;
+    prices: [
+      {
+        id: string;
+        key: string;
+        value: {
+          centAmount: number;
+          currencyCode: string;
+          fractationDigits: number;
+          type: string;
+        };
+      },
+    ];
+    sku: string;
+  };
+  name: { 'en-US': string };
+}
+
+interface filteredData {
+  count: number;
+  limit: 20;
+  offset: number;
+  results: Array<ProductsArrF>;
+  total: number;
+}
+
+function createFilteredProductCards(dataProducts: filteredData) {
+  const numOfProducts = dataProducts.total;
+
+  const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
+  const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
+  productsWrapper.innerHTML = '';
+  productContainerElem(productsWrapper);
+  wrapperProductCarts.append(productsWrapper);
+  const productContainer = document.querySelector('.product-container') as HTMLDivElement;
+
+  for (let i = 0; i < numOfProducts - 1; i += 1) {
+    productsWrapper.appendChild(productContainer.cloneNode(true));
+  }
+
+  for (let i = 0; i < numOfProducts; i += 1) {
+    const { name, description } = dataProducts.results[i];
+    const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
+    const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
+    const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
+    const productPrices = Array.from(document.querySelectorAll('.price'));
+    productImagesArr[i].src = `${dataProducts.results[i].masterVariant.images[0].url}`;
+    productImagesArr[i].alt = `${name['en-US']}`;
+    productNamesArr[i].innerHTML = `${name['en-US']}`;
+    productDescriptionsArr[i].innerHTML = `${description['en-US']}`;
+    if (dataProducts.results[i].masterVariant.prices.length > 0) {
+      productPrices[i].innerHTML =
+        `Price: ${(dataProducts.results[i].masterVariant.prices[0] as Prices).value.centAmount / 100}€`;
+    } else {
+      productPrices[i].innerHTML = 'No price';
+    }
+  }
 }
 
 function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>) {
@@ -131,6 +199,33 @@ async function getProductList(token: string) {
   }
 }
 
+// filtering request
+
+export async function getFilteredList(token: string, attributes: string) {
+  try {
+    const response = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-projections/search?${attributes}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${`${token}`}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+    console.log(data);
+    for (let i = 0; i < data.results.length; i += 1) {
+      console.log(data.results[i].name);
+    }
+    createFilteredProductCards(data);
+    return data;
+  } catch (err) {
+    return err;
+  }
+}
+
 export default async function getProductListByToken() {
   try {
     const response = await fetch(
@@ -145,7 +240,34 @@ export default async function getProductListByToken() {
     );
     const data = await response.json();
     getProductList(data.access_token);
-    // getDiscountsInfo(data.access_token);
+    addEventHandler('apply-button', 'click', () => {
+      const dataObjects = [];
+      const inputsArr = Array.from(document.querySelectorAll('.input-option')) as HTMLInputElement[];
+      for (let i = 0; i < inputsArr.length; i += 1) {
+        if (inputsArr[i].checked) {
+          const obj = { ...inputsArr[i].dataset };
+          dataObjects.push(obj);
+        }
+      }
+
+      const dataCheckboxes = dataObjects.reduce(
+        (acc, item) => {
+          const itemEntries = Object.entries(item);
+          if (acc[itemEntries[0][0]]) {
+            acc[itemEntries[0][0]].push(`"${itemEntries[0][1]}"`);
+          } else {
+            acc[itemEntries[0][0]] = [`"${itemEntries[0][1] as string}"`];
+          }
+          return acc;
+        },
+        {} as { [key: string]: string[] }
+      );
+      const test = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
+        acc.push(`filter=variants.attributes.${item[0]}-attribute:${item[1].join(',')}`);
+        return acc;
+      }, []);
+      getFilteredList(data.access_token, test.join('&'));
+    });
   } catch (err) {
     console.log(err);
   }

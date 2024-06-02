@@ -39,7 +39,7 @@ export default class FilterForm {
     this.label = createLabelElement('option-lable');
     this.input = createInputElement('input-option', '', [{ name: 'type', value: 'checkbox' }]);
 
-    this.buttons = createDivElement('buttons-container');
+    this.buttons = createDivElement('filter-buttons-container');
     this.applyButton = createButtonElement('apply-button', 'Apply');
     this.clearButton = createButtonElement('clear-button', 'Clear');
   }
@@ -64,11 +64,16 @@ export default class FilterForm {
     const checkboxElem = document.querySelector(`.${checkboxClass}`) as HTMLFieldSetElement;
     const labelItem = label;
     for (let i = 0; i < numOfInputs; i += 1) {
+      input.setAttribute('id', `${attribute}-${i + 1}`);
       checkboxElem.appendChild(input.cloneNode(true));
-      input.setAttribute(`data-${attribute}`, `${dataAttributes[attribute][i]}`);
       labelItem.innerHTML = dataAttributes[attribute][i];
+      labelItem.setAttribute('for', `${attribute}-${i + 1}`);
       checkboxElem.appendChild(label.cloneNode(true));
-      // labelItem.innerHTML = dataAttributes[attribute][i];
     }
+
+    const inputElems = Array.from(document.querySelectorAll(`.${checkboxClass} input`));
+    inputElems.forEach((itm, index) => {
+      itm.setAttribute(`data-${attribute}`, `${dataAttributes[attribute][index].toLocaleLowerCase()}`);
+    });
   }
 }
