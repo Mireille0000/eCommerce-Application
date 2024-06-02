@@ -201,7 +201,7 @@ async function getProductList(token: string) {
 
 // filtering request
 
-export async function getFilteredList(token: string, attributes: string) {
+async function getFilteredList(token: string, attributes: string) {
   try {
     const response = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-projections/search?${attributes}`,
@@ -226,6 +226,29 @@ export async function getFilteredList(token: string, attributes: string) {
   }
 }
 
+// sorting request
+// ?sort=name.en-US+asc
+async function getSortedElements(token: string, requestOption: string) {
+  try {
+    const responseSorted = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-projections/${requestOption}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${`${token}`}`,
+        },
+      }
+    );
+    const dataSorted = await responseSorted.json();
+    console.log(dataSorted);
+    createFilteredProductCards(dataSorted);
+    return dataSorted;
+  } catch (err) {
+    return err;
+  }
+}
+
 export default async function getProductListByToken() {
   try {
     const response = await fetch(
@@ -239,35 +262,70 @@ export default async function getProductListByToken() {
       }
     );
     const data = await response.json();
-    getProductList(data.access_token);
-    addEventHandler('apply-button', 'click', () => {
-      const dataObjects = [];
-      const inputsArr = Array.from(document.querySelectorAll('.input-option')) as HTMLInputElement[];
-      for (let i = 0; i < inputsArr.length; i += 1) {
-        if (inputsArr[i].checked) {
-          const obj = { ...inputsArr[i].dataset };
-          dataObjects.push(obj);
-        }
-      }
-
-      const dataCheckboxes = dataObjects.reduce(
-        (acc, item) => {
-          const itemEntries = Object.entries(item);
-          if (acc[itemEntries[0][0]]) {
-            acc[itemEntries[0][0]].push(`"${itemEntries[0][1]}"`);
-          } else {
-            acc[itemEntries[0][0]] = [`"${itemEntries[0][1] as string}"`];
+    if (data.status === 400 || data.status === 401) {
+      const error = new Error(data.message);
+      throw error;
+    } else {
+      getProductList(data.access_token);
+      addEventHandler('apply-button', 'click', () => {
+        const dataObjects = [];
+        const inputsArr = Array.from(document.querySelectorAll('.input-option')) as HTMLInputElement[];
+        for (let i = 0; i < inputsArr.length; i += 1) {
+          if (inputsArr[i].checked) {
+            const obj = { ...inputsArr[i].dataset };
+            dataObjects.push(obj);
           }
+        }
+
+        const dataCheckboxes = dataObjects.reduce(
+          (acc, item) => {
+            const itemEntries = Object.entries(item);
+            if (acc[itemEntries[0][0]]) {
+              acc[itemEntries[0][0]].push(`"${itemEntries[0][1]}"`);
+            } else {
+              acc[itemEntries[0][0]] = [`"${itemEntries[0][1] as string}"`];
+            }
+            return acc;
+          },
+          {} as { [key: string]: string[] }
+        );
+        const test = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
+          acc.push(`filter=variants.attributes.${item[0]}-attribute:${item[1].join(',')}`);
           return acc;
-        },
-        {} as { [key: string]: string[] }
-      );
-      const test = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
-        acc.push(`filter=variants.attributes.${item[0]}-attribute:${item[1].join(',')}`);
-        return acc;
-      }, []);
-      getFilteredList(data.access_token, test.join('&'));
-    });
+        }, []);
+        getFilteredList(data.access_token, test.join('&'));
+      });
+      addEventHandler('sort-name', 'click', () => {
+        console.log('works');
+        const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
+        const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
+        const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
+        clickedButtonName.classList.toggle('active');
+        clickedButtonPriceL.classList.remove('active');
+        clickedButtonPriceH.classList.remove('active');
+        getSortedElements(data.access_token, '?sort=name.en-US+asc');
+      });
+      addEventHandler('sort-price-lowest', 'click', () => {
+        console.log('works');
+        const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
+        const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
+        const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
+        clickedButtonName.classList.remove('active');
+        clickedButtonPriceL.classList.toggle('active');
+        clickedButtonPriceH.classList.remove('active');
+        getSortedElements(data.access_token, 'search?sort=price+asc');
+      });
+      addEventHandler('sort-price-highest', 'click', () => {
+        console.log('works');
+        const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
+        const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
+        const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
+        clickedButtonName.classList.remove('active');
+        clickedButtonPriceH.classList.toggle('active');
+        clickedButtonPriceL.classList.remove('active');
+        getSortedElements(data.access_token, 'search?sort=price+desc');
+      });
+    }
   } catch (err) {
     console.log(err);
   }

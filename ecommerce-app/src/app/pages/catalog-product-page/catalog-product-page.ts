@@ -3,7 +3,7 @@ import HeaderComponent from '../../components/header';
 import FilterForm from './product-list-manipulations/filtering-form';
 import createHtmlElement, { createButtonElement, addEventHandler } from '../../utils/functions';
 import getProductListByToken from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
-
+import SortingMenu from './product-list-manipulations/sorting-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
 
 export default class CatalogProductPage extends Page {
@@ -68,6 +68,9 @@ export default class CatalogProductPage extends Page {
     this.addElemsToMain(this.productListManipulatings, this.productsWrapper);
     this.productListManipulatings.append(this.manipulationgButtons, filterContainer);
     this.manipulationgButtons.append(this.filterButton, this.sortButton);
+    const sortMenuInstance = new SortingMenu();
+    sortMenuInstance.renderSortingMenu(this.manipulationgButtons);
+
     filterContainer.append(title, filterOptions, buttons);
     fieldset.append(legend, checkboxContainer);
     buttons.append(applyButton, clearButton);
@@ -126,31 +129,12 @@ export default class CatalogProductPage extends Page {
       console.log('Change active state of the elem');
     });
 
-    // apply button
-    // addEventHandler('apply-button', 'click', () => {
-    //   const dataObjects = [];
-    //   const inputsArr = Array.from(document.querySelectorAll('.input-option')) as HTMLInputElement[];
-    //   for (let i = 0; i < inputsArr.length; i += 1) {
-    //     if (inputsArr[i].checked) {
-    //       const obj = { ...inputsArr[i].dataset };
-    //       dataObjects.push(obj);
-    //     }
-    //   }
-
-    //   const test = dataObjects.reduce(
-    //     (acc, item) => {
-    //       const itemEntries = Object.entries(item);
-    //       console.log(itemEntries[0][1]);
-    //       if (acc[itemEntries[0][0]]) {
-    //         acc[itemEntries[0][0]].push(`${itemEntries[0][1]}`);
-    //       } else {
-    //         acc[itemEntries[0][0]] = [itemEntries[0][1] as string];
-    //       }
-    //       return acc;
-    //     },
-    //     {} as { [key: string]: string[] }
-    //   );
-    // });
+    // sort button
+    addEventHandler('sort-button', 'click', () => {
+      console.log('click');
+      const sortMenu = document.querySelector('.sorting-menu') as HTMLDivElement;
+      sortMenu.classList.toggle('active');
+    });
 
     // clear button
     addEventHandler('clear-button', 'click', () => {

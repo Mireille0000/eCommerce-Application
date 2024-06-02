@@ -146,6 +146,31 @@
     text-align: center;
 }
 
+/* sorting */
+.sorting-menu {
+    display: none;
+}
+
+.sorting-menu.active  {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    border: 2px solid #c1711ce7;
+}
+
+.sort-option {
+    text-align: center;
+    cursor: pointer;
+}
+
+.sort-name.active, .sort-price-lowest.active, .sort-price-highest.active {
+    font-weight: 800;
+    color: #1068c7;
+}
+
 @media screen and (max-width: 1040px) {
     .filtering-options {
         display: grid;
@@ -155,6 +180,13 @@
     }
 }
 
+@media screen and (max-width: 875px) {
+
+    .sorting-menu {
+        padding-right: 100px;
+        padding-left: 100px;
+    }
+}
 
 @media screen and (max-width: 550px) {
     #catalog-product-page .wrapper-main {
