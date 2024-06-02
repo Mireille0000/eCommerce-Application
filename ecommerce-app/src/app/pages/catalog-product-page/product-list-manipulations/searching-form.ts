@@ -13,7 +13,7 @@ export default class SearchingForm {
       { name: 'type', value: 'search' },
       { name: 'placeholder', value: 'Search...' },
     ]);
-    this.searchButton = createButtonElement('search-button', 'Search');
+    this.searchButton = createButtonElement('search-button', 'Search', [{ name: 'disabled', value: '' }]);
   }
 
   renderSearchingForm(toAppendElem: HTMLElement) {

@@ -74,6 +74,15 @@ export default class CatalogProductPage extends Page {
     const searchFormInstance = new SearchingForm();
     searchFormInstance.renderSearchingForm(this.productListManipulatings);
 
+    // const inputSearchField = document.querySelector('.search-input');
+    addEventHandler('search-input', 'click', () => {
+      searchFormInstance.searchButton.disabled = false;
+    });
+
+    addEventHandler('search-input', 'focusout', () => {
+      searchFormInstance.searchButton.disabled = true;
+    });
+
     filterContainer.append(title, filterOptions, buttons);
     fieldset.append(legend, checkboxContainer);
     buttons.append(applyButton, clearButton);
