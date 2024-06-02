@@ -90,6 +90,9 @@ function createFilteredProductCards(dataProducts: filteredData) {
   wrapperProductCarts.append(productsWrapper);
   const productContainer = document.querySelector('.product-container') as HTMLDivElement;
 
+  if (numOfProducts < 1) {
+    productsWrapper.innerHTML = 'NOTHING WAS FOUND';
+  }
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
@@ -215,11 +218,13 @@ async function getFilteredList(token: string, attributes: string) {
     );
 
     const data = await response.json();
-    console.log(data);
-    for (let i = 0; i < data.results.length; i += 1) {
-      console.log(data.results[i].name);
+
+    if (data.status === 400 || data.status === 401) {
+      const error = new Error(data.message);
+      throw error;
+    } else {
+      createFilteredProductCards(data);
     }
-    createFilteredProductCards(data);
     return data;
   } catch (err) {
     return err;
@@ -227,7 +232,6 @@ async function getFilteredList(token: string, attributes: string) {
 }
 
 // sorting request
-// ?sort=name.en-US+asc
 async function getSortedElements(token: string, requestOption: string) {
   try {
     const responseSorted = await fetch(
@@ -241,9 +245,39 @@ async function getSortedElements(token: string, requestOption: string) {
       }
     );
     const dataSorted = await responseSorted.json();
-    console.log(dataSorted);
-    createFilteredProductCards(dataSorted);
+    if (dataSorted.status === 400 || dataSorted.status === 401) {
+      const error = new Error(dataSorted.message);
+      throw error;
+    } else {
+      createFilteredProductCards(dataSorted);
+    }
     return dataSorted;
+  } catch (err) {
+    return err;
+  }
+}
+
+async function getSearchedData(token: string, inputValue: string) {
+  try {
+    const responseSearched = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-projections/search?staged=true&fuzzy=true&text.en-US=${inputValue}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${`${token}`}`,
+        },
+      }
+    );
+    const dataSearched = await responseSearched.json();
+    if (dataSearched.status === 400 || dataSearched.status === 401) {
+      const error = new Error(dataSearched.message);
+      throw error;
+    } else {
+      createFilteredProductCards(dataSearched);
+      console.log(dataSearched);
+    }
+    return dataSearched;
   } catch (err) {
     return err;
   }
@@ -267,6 +301,7 @@ export default async function getProductListByToken() {
       throw error;
     } else {
       getProductList(data.access_token);
+      // filtered data
       addEventHandler('apply-button', 'click', () => {
         const dataObjects = [];
         const inputsArr = Array.from(document.querySelectorAll('.input-option')) as HTMLInputElement[];
@@ -295,6 +330,7 @@ export default async function getProductListByToken() {
         }, []);
         getFilteredList(data.access_token, test.join('&'));
       });
+      // sorted data
       addEventHandler('sort-name', 'click', () => {
         console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
@@ -324,6 +360,12 @@ export default async function getProductListByToken() {
         clickedButtonPriceH.classList.toggle('active');
         clickedButtonPriceL.classList.remove('active');
         getSortedElements(data.access_token, 'search?sort=price+desc');
+      });
+      // searched data
+      const searchInputValue = document.querySelector('.search-input') as HTMLInputElement;
+      addEventHandler('search-button', 'click', () => {
+        getSearchedData(data.access_token, searchInputValue.value);
+        console.log(searchInputValue.value);
       });
     }
   } catch (err) {

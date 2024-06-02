@@ -4,6 +4,7 @@ import FilterForm from './product-list-manipulations/filtering-form';
 import createHtmlElement, { createButtonElement, addEventHandler } from '../../utils/functions';
 import getProductListByToken from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 import SortingMenu from './product-list-manipulations/sorting-menu';
+import SearchingForm from './product-list-manipulations/searching-form';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
 
 export default class CatalogProductPage extends Page {
@@ -70,6 +71,8 @@ export default class CatalogProductPage extends Page {
     this.manipulationgButtons.append(this.filterButton, this.sortButton);
     const sortMenuInstance = new SortingMenu();
     sortMenuInstance.renderSortingMenu(this.manipulationgButtons);
+    const searchFormInstance = new SearchingForm();
+    searchFormInstance.renderSearchingForm(this.productListManipulatings);
 
     filterContainer.append(title, filterOptions, buttons);
     fieldset.append(legend, checkboxContainer);
