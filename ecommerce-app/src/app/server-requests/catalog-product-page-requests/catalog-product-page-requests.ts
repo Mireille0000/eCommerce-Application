@@ -1,6 +1,7 @@
 import { ProductsListData, Prices } from './interfaces-catalog-page';
 import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
+// import CategoriesNavigation from '../../pages/catalog-product-page/product-list-manipulations/category-navigation-menu';
 
 const enum ProcessEnvCatalog {
   PROJECT_KEY = 'ecommerce-app-f-devs',
@@ -17,6 +18,8 @@ function createProductCards(dataProducts: ProductsListData) {
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
   const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
+  productsWrapper.innerHTML = '';
+  productContainerElem(productsWrapper);
   wrapperProductCarts.append(productsWrapper);
   const productContainer = document.querySelector('.product-container') as HTMLDivElement;
 
@@ -124,6 +127,15 @@ function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>
   });
 }
 
+function addRemoveActiveState(elemByClass: string) {
+  const activeToRemove = document.querySelector('.active-category') as HTMLElement;
+  if (activeToRemove) {
+    activeToRemove.classList.remove('active-category');
+  }
+  const elem = document.querySelector(`.${elemByClass}`) as HTMLElement;
+  elem.classList.add('active-category');
+}
+
 async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Array<string>) {
   try {
     const responseDiscounts = await fetch(
@@ -157,6 +169,53 @@ async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Arra
       const discount = discountsData.value.permyriad / 100;
       for (let i = 0; i < SKU.length; i += 1) {
         const originalPrice = data.results[i].masterData.staged.masterVariant.prices[0].value.centAmount / 100;
+        if (skuArr.includes(SKU[i])) {
+          productDiscounts[i].innerHTML = `Discount ${discount}%`;
+          productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
+        }
+      }
+
+      overlinePrice(productPrices, productDiscounts);
+      return skuArr;
+    }
+  } catch (err) {
+    return err;
+  }
+}
+
+async function getDiscountsInfoFilteredList(token: string, data: filteredData, SKU: Array<string>) {
+  try {
+    const responseDiscounts = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-discounts/key=${ProcessEnvCatalog.DISCOUNT_KEY}/`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const discountsData = await responseDiscounts.json();
+    if (discountsData.status === 400) {
+      const error = new Error(`${discountsData.message}`);
+      throw error;
+    } else {
+      const discountAmount = discountsData.predicate;
+      const productPrices = Array.from(document.querySelectorAll('.price')) as Array<HTMLElement>;
+      const productDiscounts = Array.from(document.querySelectorAll('.discount')) as Array<HTMLElement>;
+      const productDiscountPrices = Array.from(document.querySelectorAll('.discount-price'));
+      // get skus of the discounted products
+      const SKUData: Array<string> = discountAmount.split('"');
+      const skuArr = SKUData.reduce((acc: Array<string>, sku, _, arr) => {
+        if (arr.indexOf(sku) % 2 !== 0) {
+          acc.push(sku);
+        }
+        return acc;
+      }, []);
+      //  display discounts and prices with discounts
+      const discount = discountsData.value.permyriad / 100;
+      for (let i = 0; i < SKU.length; i += 1) {
+        const originalPrice = data.results[i].masterVariant.prices[0].value.centAmount / 100;
         if (skuArr.includes(SKU[i])) {
           productDiscounts[i].innerHTML = `Discount ${discount}%`;
           productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
@@ -216,16 +275,19 @@ async function getFilteredList(token: string, attributes: string) {
         },
       }
     );
-
-    const data = await response.json();
-
-    if (data.status === 400 || data.status === 401) {
-      const error = new Error(data.message);
+    const filteredData = await response.json();
+    if (filteredData.status === 400 || filteredData.status === 401) {
+      const error = new Error(filteredData.message);
       throw error;
     } else {
-      createFilteredProductCards(data);
+      createFilteredProductCards(filteredData);
+      const SKUArr: Array<string> = [];
+      for (let i = 0; i < filteredData.total; i += 1) {
+        SKUArr.push(filteredData.results[i].masterVariant.sku);
+      }
+      getDiscountsInfoFilteredList(token, filteredData, SKUArr);
     }
-    return data;
+    return filteredData;
   } catch (err) {
     return err;
   }
@@ -250,6 +312,11 @@ async function getSortedElements(token: string, requestOption: string) {
       throw error;
     } else {
       createFilteredProductCards(dataSorted);
+      const SKUArr: Array<string> = [];
+      for (let i = 0; i < dataSorted.total; i += 1) {
+        SKUArr.push(dataSorted.results[i].masterVariant.sku);
+      }
+      getDiscountsInfoFilteredList(token, dataSorted, SKUArr);
     }
     return dataSorted;
   } catch (err) {
@@ -257,7 +324,7 @@ async function getSortedElements(token: string, requestOption: string) {
   }
 }
 
-// serching request
+// searching request
 async function getSearchedData(token: string, inputValue: string) {
   try {
     const responseSearched = await fetch(
@@ -276,6 +343,11 @@ async function getSearchedData(token: string, inputValue: string) {
       throw error;
     } else {
       createFilteredProductCards(dataSearched);
+      const SKUArr: Array<string> = [];
+      for (let i = 0; i < dataSearched.total; i += 1) {
+        SKUArr.push(dataSearched.results[i].masterVariant.sku);
+      }
+      getDiscountsInfoFilteredList(token, dataSearched, SKUArr);
       console.log(dataSearched);
     }
     return dataSearched;
@@ -285,7 +357,35 @@ async function getSearchedData(token: string, inputValue: string) {
 }
 
 // navigation category
-async function getCategoryData(token: string, categoryId: string) {
+
+async function getSubcategoryData(token: string, subcategoryId: string) {
+  try {
+    const responseSubcategoryData = await fetch(
+      `
+      https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-projections/search?filter=categories.id:${subcategoryId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${`${token}`}`,
+        },
+      }
+    );
+    const subcategoryData = await responseSubcategoryData.json();
+    if (subcategoryData.status === 400 || subcategoryData.status === 401) {
+      const error = new Error(subcategoryData.message);
+      throw error;
+    } else {
+      createFilteredProductCards(subcategoryData);
+      console.log(subcategoryData);
+    }
+    return subcategoryData;
+  } catch (err) {
+    return err;
+  }
+}
+
+async function getCategoryDataById(token: string, categoryId: string) {
   try {
     const responseCategoryData = await fetch(
       `
@@ -304,6 +404,11 @@ async function getCategoryData(token: string, categoryId: string) {
       throw error;
     } else {
       createFilteredProductCards(categoryData);
+      const SKUArr: Array<string> = [];
+      for (let i = 0; i < categoryData.total; i += 1) {
+        SKUArr.push(categoryData.results[i].masterVariant.sku);
+      }
+      getDiscountsInfoFilteredList(token, categoryData, SKUArr);
       console.log(categoryData);
     }
     return categoryData;
@@ -312,22 +417,101 @@ async function getCategoryData(token: string, categoryId: string) {
   }
 }
 
-// staff - e55c6123-6fc5-4dca-bd45-69b0da748f83
-// robe - 56e82db6-856a-4e06-9fa4-40f525e577d1
-// cauldron - ebf3ff31-53b8-4d9e-97ea-32632f276550
+async function getCategories(token: string) {
+  try {
+    const responseCategoriesData = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/categories/`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${`${token}`}`,
+        },
+      }
+    );
+    const categoriesData = await responseCategoriesData.json();
+    if (categoriesData.status === 400 || categoriesData.status === 401) {
+      const error = new Error(categoriesData.message);
+      throw error;
+    } else {
+      const categoriesId: Array<string> = [];
+      for (let i = 0; i < categoriesData.total; i += 1) {
+        categoriesId.push(categoriesData.results[i].id);
+      }
+      const [
+        staffCategoryId,
+        cauldronCategoryId,
+        mageRobeCategoryId,
+        enchantedRobesSubcId,
+        foggyCauldronSubcId,
+        elementalDamageSubcId,
+      ] = categoriesId;
+      const elemDamageSubcategory = document.querySelector('.elemental-damage-category') as HTMLElement;
+      const enchantedRobeSubcategory = document.querySelector('.enchanted-robes-category') as HTMLElement;
+      const foggyCauldronSubcategory = document.querySelector('.foggy-cauldron-category') as HTMLElement;
+      console.log(elemDamageSubcategory, enchantedRobeSubcategory, foggyCauldronSubcategory);
 
-function addRemoveActiveState(elemByClass: string) {
-  const activeToRemove = document.querySelector('.active-category') as HTMLElement;
-  if (activeToRemove) {
-    activeToRemove.classList.remove('active-category');
+      addEventHandler('all-categories', 'click', () => {
+        elemDamageSubcategory.innerHTML = '';
+        enchantedRobeSubcategory.innerHTML = '';
+        foggyCauldronSubcategory.innerHTML = '';
+        addRemoveActiveState('all-categories');
+        getProductList(token);
+        console.log('All categories');
+      });
+
+      // Staff category
+      addEventHandler('staff-category', 'click', () => {
+        elemDamageSubcategory.innerHTML = 'Elemental damage';
+        enchantedRobeSubcategory.innerHTML = '';
+        foggyCauldronSubcategory.innerHTML = '';
+        addRemoveActiveState('staff-category');
+        getCategoryDataById(token, `"${staffCategoryId}"`);
+      });
+
+      addEventHandler('elemental-damage-category', 'click', () => {
+        console.log('Elemental damage');
+        addRemoveActiveState('elemental-damage-category');
+        getSubcategoryData(token, `"${elementalDamageSubcId}"`);
+      });
+
+      // Mage robe category
+      addEventHandler('mage-robe-category', 'click', () => {
+        console.log('mage-robe');
+        elemDamageSubcategory.innerHTML = '';
+        enchantedRobeSubcategory.innerHTML = 'Enchanted mage robe';
+        foggyCauldronSubcategory.innerHTML = '';
+        addRemoveActiveState('mage-robe-category');
+        getCategoryDataById(token, `"${mageRobeCategoryId}"`);
+      });
+
+      addEventHandler('enchanted-robes-category', 'click', () => {
+        console.log('Enchanted robes');
+        addRemoveActiveState('enchanted-robes-category');
+        getSubcategoryData(token, `"${enchantedRobesSubcId}"`);
+      });
+
+      // Cauldron category
+      addEventHandler('cauldron-category', 'click', () => {
+        elemDamageSubcategory.innerHTML = '';
+        enchantedRobeSubcategory.innerHTML = '';
+        foggyCauldronSubcategory.innerHTML = 'Foggy cauldron';
+        addRemoveActiveState('cauldron-category');
+        getCategoryDataById(token, `"${cauldronCategoryId}"`);
+      });
+
+      addEventHandler('foggy-cauldron-category', 'click', () => {
+        console.log('Foggy cauldron');
+        addRemoveActiveState('foggy-cauldron-category');
+        getSubcategoryData(token, `"${foggyCauldronSubcId}"`);
+      });
+    }
+    return categoriesData;
+  } catch (err) {
+    return err;
   }
-  const elem = document.querySelector(`.${elemByClass}`) as HTMLElement;
-  // if (elem.classList.contains('active-category')) {
-  //   elem.classList.remove('active-category');
-  // } else {
-  elem.classList.add('active-category');
-  // }
 }
+
 export default async function getProductListByToken() {
   try {
     const response = await fetch(
@@ -412,24 +596,8 @@ export default async function getProductListByToken() {
         getSearchedData(data.access_token, searchInputValue.value);
         console.log(searchInputValue.value);
       });
-      // navigation categories data
-      const staffCategoryId = `"e55c6123-6fc5-4dca-bd45-69b0da748f83"`;
-      const mageRobeCategoryId = `"56e82db6-856a-4e06-9fa4-40f525e577d1"`;
-      const cauldronCategoryId = `"ebf3ff31-53b8-4d9e-97ea-32632f276550"`;
 
-      addEventHandler('staff-category', 'click', () => {
-        addRemoveActiveState('staff-category');
-        getCategoryData(data.access_token, staffCategoryId);
-      });
-      addEventHandler('mage-robe-category', 'click', () => {
-        addRemoveActiveState('mage-robe-category');
-        getCategoryData(data.access_token, mageRobeCategoryId);
-      });
-      addEventHandler('cauldron-category', 'click', () => {
-        addRemoveActiveState('cauldron-category');
-        getCategoryData(data.access_token, cauldronCategoryId);
-      });
-      console.log('Hey');
+      getCategories(data.access_token);
     }
   } catch (err) {
     console.log(err);

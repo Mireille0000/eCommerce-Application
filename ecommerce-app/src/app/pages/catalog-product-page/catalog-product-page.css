@@ -228,8 +228,17 @@
     text-shadow: rgb(224, 221, 125) 1px 0 10px;
 }
 
-.staff-category.active-category, .mage-robe-category.active-category, .cauldron-category.active-category {
+.all-categories.active-category,
+.staff-category.active-category, 
+.elemental-damage-category.active-category,
+.mage-robe-category.active-category, 
+.enchanted-robes-category.active-category,
+.cauldron-category.active-category,
+.foggy-cauldron-category.active-category
+ {
+    color: rgb(112, 139, 220) 1px 0 10px;
     text-shadow: rgb(224, 221, 125) 1px 0 10px;
+    cursor: auto;
 }
 
 @media screen and (max-width: 1040px) {

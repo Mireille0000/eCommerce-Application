@@ -75,7 +75,26 @@ export default class CatalogProductPage extends Page {
     const searchFormInstance = new SearchingForm();
     searchFormInstance.renderSearchingForm(this.productListManipulatings);
     const categoriesNavigation = new CategoriesNavigation();
-    categoriesNavigation.renderCategoriesNavElem(this.mainWrapper);
+    const categoriesNamesDefault = [
+      'All  >',
+      'Staff  >',
+      '', // Elemental damage
+      'Mage robe  >',
+      '', // Enchanted mage robe
+      'Cauldron  >',
+      '', // Foggy cauldron
+    ];
+
+    const categoriesClassNamesDefault = [
+      'categories-list-item all-categories',
+      'categories-list-item staff-category',
+      'categories-list-item elemental-damage-category',
+      'categories-list-item mage-robe-category',
+      'categories-list-item enchanted-robes-category',
+      'categories-list-item cauldron-category',
+      'categories-list-item foggy-cauldron-category',
+    ];
+    categoriesNavigation.renderCategoriesNavElem(this.mainWrapper, categoriesNamesDefault, categoriesClassNamesDefault);
 
     // const inputSearchField = document.querySelector('.search-input');
     addEventHandler('search-input', 'click', () => {

@@ -16,15 +16,19 @@ export default class CategoriesNavigation {
     this.categoriesListItem = createHtmlElement('li');
   }
 
-  renderCategoriesNavElem(toAppendElem: HTMLElement) {
+  renderCategoriesNavElem(
+    toAppendElem: HTMLElement,
+    categoriesNames: Array<string>,
+    categoriesClassNames: Array<string>
+  ) {
     toAppendElem.append(this.categoriesNavContainer);
     this.categoriesNavContainer.append(this.title, this.categoriesList);
-    const categoriesNames = ['Staff', 'Mage robe', 'Cauldron'];
-    const categoriesClassNames = [
-      'categories-list-item staff-category',
-      'categories-list-item mage-robe-category',
-      'categories-list-item cauldron-category',
-    ];
+    // const categoriesNames = ['Staff', 'Mage robe', 'Cauldron'];
+    // const categoriesClassNames = [
+    //   'categories-list-item staff-category',
+    //   'categories-list-item mage-robe-category',
+    //   'categories-list-item cauldron-category',
+    // ];
     for (let i = 0; i < categoriesNames.length; i += 1) {
       this.categoriesListItem.innerHTML = categoriesNames[i];
       this.categoriesListItem.className = categoriesClassNames[i];
