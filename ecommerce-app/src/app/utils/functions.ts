@@ -47,7 +47,7 @@ export function addEventHandler(element: string, eventType: string, callback = (
   target?.addEventListener(`${eventType}`, callback);
 }
 
-export function createImage(source: File, alt: string, classImg: string, image = new Image()) {
+export function createImage(source: File | string, alt: string, classImg: string, image = new Image()) {
   const newImage = image;
   newImage.src = `${source}`;
   newImage.alt = `${alt}`;

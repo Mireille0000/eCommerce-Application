@@ -13,7 +13,6 @@ import {
   Address,
   AddressTypes,
   Addresses,
-  // AdrsObj,
   CurrAdrs,
   CustomerData,
   FieldsEdit,
@@ -24,7 +23,6 @@ import {
   AdrsType,
   ClssNms,
   Txt,
-  // adrsFieldMap,
   fieldMapping,
   msgPassFail,
   msgPassSuccess,
@@ -59,8 +57,11 @@ import CustomerLoader from '../../server-requests/personal-info-request/getPerso
 import updateCustomerField, {
   updatePasswordField,
 } from '../../server-requests/personal-info-request/updatePersonalData';
-import checkCustomer from '../../server-requests/login-form-requests';
 import { createMsgRegAcc } from '../registration-page/utils-registration/functions-registration';
+import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
+import HeaderComponent from '../../components/header';
+import { routes } from '../main-page/main';
+// import { routes } from '../main-page/main';
 
 interface FieldUser {
   field: string;
@@ -175,7 +176,6 @@ class PersonalRender extends Page {
   }
 
   private createSaveBtn(fields: FieldsUser, isPass = false) {
-    // isAddress = false
     const PIContainerSave = createDivElement('PI__container-save');
     const UInfoBtnSave = createButtonElement('user-info__btn-save', 'Save', [{ name: 'disabled', value: 'true' }]);
     UInfoBtnSave.addEventListener('click', async (event) => {
@@ -841,6 +841,11 @@ class PersonalRender extends Page {
   }
 
   render(allUserData: CustomerData) {
+    this.pageWrapper.append(this.header, this.main);
+    const { body } = document;
+    body.appendChild(this.pageWrapper);
+
+    window.location.hash = 'profile-page';
     this.UserData = getPersonalData(allUserData);
 
     const adrssesInit: Addresses = [];
@@ -933,9 +938,57 @@ class PersonalRender extends Page {
       securContainer
     );
     this.main.appendChild(this.mainWrapper);
-    this.pageWrapper.appendChild(this.main);
-    const { body } = document;
-    body.appendChild(this.pageWrapper);
+
+    const catalogPageHeader = new HeaderComponent();
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
+    console.log('link:', link);
+    this.addElemsToHeader(appName, logoContainer, navBar);
+    logoContainer.append(logo);
+    navBar.className = 'nav-bar-catalog-page';
+    navBar.append(navigation);
+    const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
+    const profileLink = isUserLoggedIn ? 'Profile' : false;
+    console.log(isUserLoggedIn, logLink, profileLink);
+    const linkName = [logLink, 'Register', 'Back to main', 'Catalog'];
+    // console.log(linkName);
+    navigation.append(navItem);
+    navItem.className = 'nav-item';
+    console.log('navItem:', navItem);
+    for (let i = 0; i < 2; i += 1) {
+      navigation.appendChild(navItem.cloneNode(true));
+    }
+
+    if (profileLink) {
+      navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
+    }
+    const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
+    console.log('navListItemsArr:', navListItemsArr);
+
+    for (let i = 0; i < navListItemsArr.length; i += 1) {
+      // console.log('link:', link);
+      navListItemsArr[i].appendChild(link.cloneNode(true));
+    }
+    const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
+
+    for (let i = 0; i < navLinksArr.length; i += 1) {
+      navLinksArr[i].innerHTML = linkName[i];
+      navLinksArr[i].setAttribute('href', routes[i]);
+    }
+
+    const logInLink = navLinksArr[0];
+
+    logInLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (isUserLoggedIn) {
+        localStorage.clear();
+        window.location.hash = '';
+        window.location.hash = 'main-page';
+      } else {
+        window.location.hash = 'log-in-page';
+      }
+    });
+    appName.innerHTML = 'Ultimate ScriptSmith';
   }
 
   renderPage() {

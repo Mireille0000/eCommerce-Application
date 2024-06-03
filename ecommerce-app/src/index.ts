@@ -1,13 +1,8 @@
-// import './global.css';
-// // import LogInPage from './app/pages/log-in-page/log-in';
-
-// // new LogInPage('log-in-page').renderPage();
-// import RegistrationPage from './app/pages/registration-page/registration';
-
-// new RegistrationPage('registration-page').renderPage();
-import PersonalRender from './app/pages/personal-info-page/personal-info';
 import './global.css';
 // import App from './app/app';
+// import CatalogProductPage from './app/pages/catalog-product-page/catalog-product-page';
 
 // new App().renderPage();
-new PersonalRender('personal-info').renderPage();
+import PersonalRender from './app/pages/personal-info-page/personal-info';
+
+new PersonalRender('profile-page').renderPage();
