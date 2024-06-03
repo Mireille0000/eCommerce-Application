@@ -5,6 +5,7 @@ import createHtmlElement, { createButtonElement, addEventHandler } from '../../u
 import getProductListByToken from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 import SortingMenu from './product-list-manipulations/sorting-menu';
 import SearchingForm from './product-list-manipulations/searching-form';
+import CategoriesNavigation from './product-list-manipulations/category-navigation-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
 
 export default class CatalogProductPage extends Page {
@@ -40,7 +41,7 @@ export default class CatalogProductPage extends Page {
     navBar.className = 'nav-bar-catalog-page';
 
     this.addElemsToHeader(appName, this.pageTitle, navBar);
-    appName.innerHTML = 'ScriptSmith';
+    appName.innerHTML = 'Ultimate  ScriptSmith';
     navBar.append(navigation);
     catalogPageHeader.createNavigation(navigation, navItem, 4, link);
     const navLinksNames = ['Profile', 'Back to main', 'Log in', 'Register'];
@@ -73,6 +74,27 @@ export default class CatalogProductPage extends Page {
     sortMenuInstance.renderSortingMenu(this.manipulationgButtons);
     const searchFormInstance = new SearchingForm();
     searchFormInstance.renderSearchingForm(this.productListManipulatings);
+    const categoriesNavigation = new CategoriesNavigation();
+    const categoriesNamesDefault = [
+      'All  >',
+      'Staff  >',
+      '', // Elemental damage
+      'Mage robe  >',
+      '', // Enchanted mage robe
+      'Cauldron  >',
+      '', // Foggy cauldron
+    ];
+
+    const categoriesClassNamesDefault = [
+      'categories-list-item all-categories',
+      'categories-list-item staff-category',
+      'categories-list-item elemental-damage-category',
+      'categories-list-item mage-robe-category',
+      'categories-list-item enchanted-robes-category',
+      'categories-list-item cauldron-category',
+      'categories-list-item foggy-cauldron-category',
+    ];
+    categoriesNavigation.renderCategoriesNavElem(this.mainWrapper, categoriesNamesDefault, categoriesClassNamesDefault);
 
     // const inputSearchField = document.querySelector('.search-input');
     addEventHandler('search-input', 'click', () => {
@@ -80,7 +102,9 @@ export default class CatalogProductPage extends Page {
     });
 
     addEventHandler('search-input', 'focusout', () => {
-      searchFormInstance.searchButton.disabled = true;
+      setTimeout(() => {
+        searchFormInstance.searchButton.disabled = true;
+      }, 1000);
     });
 
     filterContainer.append(title, filterOptions, buttons);
