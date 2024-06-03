@@ -9,12 +9,25 @@ import {
   createH2Element,
   createH3Element,
 } from '../../utils/functions';
-import { Address, AddressTypes, Addresses, CurrAdrs, CustomerData } from '../../utils/types';
-import { AdrsType, ClssNms, Txt } from './constants/constants';
+import {
+  Address,
+  AddressTypes,
+  Addresses,
+  CurrAdrs,
+  CustomerData,
+  FieldsEdit,
+  StringArr,
+  arrConditionFn,
+} from '../../utils/types';
+import { AdrsType, ClssNms, Txt, fieldMapping } from './constants/constants';
 
 import edit from '../../../assets/images/edit.svg';
 import deleteAddress from '../../../assets/images/delete_address.svg';
 import toogle from '../../../assets/images/toggle.svg';
+import { condBirthPersonal, condEmailPersonal, conditionWord } from '../registration-page/validation/validationFn';
+import { errBirthPersonal, errEmailPersonal, errMsgsWord } from '../registration-page/validation/validationMsgs';
+import CustomerLoader from '../../server-requests/personal-info-request/getPersonalData';
+import updateCustomerField from '../../server-requests/personal-info-request/updatePersonalData';
 
 interface FieldUser {
   field: string;
@@ -23,53 +36,52 @@ interface FieldUser {
 
 type FieldsUser = FieldUser[];
 
-const objData = {
-  email: 'ggdg3333@gm.com',
-  firstName: 'gh',
-  lastName: 'hgf',
-  dateOfBirth: '2000-06-05',
-  addresses: [
-    {
-      id: 'lbDtYVBt',
-      streetName: 'h',
-      streetNumber: '5',
-      postalCode: '55555',
-      city: 'sh',
-      country: 'DE',
-    },
-    {
-      id: 'MBxoLE-T',
-      streetName: 'g',
-      streetNumber: '2',
-      postalCode: '33333',
-      city: 'j',
-      country: 'DE',
-    },
-    {
-      id: 'hQ5LN0Vv',
-      streetName: 'hHj',
-      streetNumber: '33',
-      postalCode: '75389',
-      city: 'Bghgfh',
-      country: 'DE',
-    },
-    {
-      id: 'tmiWbgvO',
-      streetName: 'g4444',
-      streetNumber: '2',
-      postalCode: '42477',
-      city: 'HHHHHHHHHHHH',
-      country: 'DE',
-      pOBox: '',
-    },
-  ],
-  defaultBillingAddressId: 'MBxoLE-T',
-  shippingAddressIds: ['hQ5LN0Vv', 'lbDtYVBt'],
-  billingAddressIds: ['tmiWbgvO', 'hQ5LN0Vv', 'MBxoLE-T'],
-  key: '852881',
-};
+// const objData = {
+//   email: 'ggdg3333@gm.com',
+//   firstName: 'gh',
+//   lastName: 'hgf',
+//   dateOfBirth: '2000-06-05',
+//   addresses: [
+//     {
+//       id: 'lbDtYVBt',
+//       streetName: 'h',
+//       streetNumber: '5',
+//       postalCode: '55555',
+//       city: 'sh',
+//       country: 'DE',
+//     },
+//     {
+//       id: 'MBxoLE-T',
+//       streetName: 'g',
+//       streetNumber: '2',
+//       postalCode: '33333',
+//       city: 'j',
+//       country: 'DE',
+//     },
+//     {
+//       id: 'hQ5LN0Vv',
+//       streetName: 'hHj',
+//       streetNumber: '33',
+//       postalCode: '75389',
+//       city: 'Bghgfh',
+//       country: 'DE',
+//     },
+//     {
+//       id: 'tmiWbgvO',
+//       streetName: 'g4444',
+//       streetNumber: '2',
+//       postalCode: '42477',
+//       city: 'HHHHHHHHHHHH',
+//       country: 'DE',
+//       pOBox: '',
+//     },
+//   ],
+//   defaultBillingAddressId: 'MBxoLE-T',
+//   shippingAddressIds: ['hQ5LN0Vv', 'lbDtYVBt'],
+//   billingAddressIds: ['tmiWbgvO', 'hQ5LN0Vv', 'MBxoLE-T'],
+//   key: '852881',
+// };
 
-// TODO: добавить аннотацию с помощью Response
 const getPersonalData = (customerData: CustomerData) => {
   const {
     email,
@@ -81,6 +93,8 @@ const getPersonalData = (customerData: CustomerData) => {
     defaultShippingAddressId,
     shippingAddressIds,
     billingAddressIds,
+    id,
+    version,
   } = customerData;
 
   // {
@@ -121,13 +135,28 @@ const getPersonalData = (customerData: CustomerData) => {
     addresses[index] = updatedAddress;
   });
 
-  return { firstName, lastName, dateOfBirth, email, addresses };
+  return { firstName, lastName, dateOfBirth, email, addresses, id, version };
 };
 
 class PersonalRender extends Page {
   numberAddrs: number;
 
-  UserData!: { firstName: string; lastName: string; dateOfBirth: string; email: string; addresses: Addresses };
+  UserData!: {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    email: string;
+    addresses: Addresses;
+    id: string;
+    version: string;
+  };
+
+  UserDataInit!: {
+    firstName: string;
+    lastName: string;
+    dateOfBirth: string;
+    email: string;
+  };
 
   constructor(id: string) {
     super(id);
@@ -153,11 +182,49 @@ class PersonalRender extends Page {
     return container;
   }
 
-  // [{field: 'Email', value: 'example@gmail.com'}, ...]
-  private createPIContainer(titleContainer: string, fields: FieldsUser) {
-    const container = this.createContainer(titleContainer);
+  private createSaveBtn(fields: FieldsUser) {
+    const PIContainerSave = createDivElement('PI__container-save');
+    const UInfoBtnSave = createButtonElement('user-info__btn-save', 'Save', [{ name: 'disabled', value: 'true' }]);
+    UInfoBtnSave.addEventListener('click', async (event) => {
+      event.preventDefault();
 
-    fields.forEach(({ field, value }) => {
+      const editFields: FieldsEdit = {};
+      fields.forEach(({ field }) => {
+        const fieldName = fieldMapping[field];
+        if (fieldName && this.UserDataInit[fieldName] !== this.UserData[fieldName]) {
+          editFields[fieldName] = this.UserData[fieldName];
+        }
+      });
+      console.log('editFields:', editFields);
+      console.log('this.UserData.version:', this.UserData.version);
+
+      updateCustomerField(this.UserData, editFields)
+        .then(() => console.log('Data updated'))
+        .catch(console.log);
+      UInfoBtnSave.setAttribute('disabled', 'true');
+      // this.UserData.version += 1;
+      // updateCustomerField(this.UserData)
+      //   .then(() => console.log('Data updated'))
+      //   .catch(console.log);
+      // UInfoBtnSave.setAttribute('disabled', 'true');
+      // this.UserData.version += 1;
+    });
+
+    PIContainerSave.appendChild(UInfoBtnSave);
+    return PIContainerSave;
+  }
+
+  // [{field: 'Email', value: 'example@gmail.com'}, ...]
+  private createPIContainer(
+    titleContainer: string,
+    fields: FieldsUser,
+    arrCondFn: arrConditionFn[],
+    errMsgsWords: StringArr[]
+  ) {
+    const container = this.createContainer(titleContainer);
+    const saveBtn = this.createSaveBtn(fields);
+
+    fields.forEach(({ field, value }, index) => {
       const currField = {
         field,
         value,
@@ -172,6 +239,7 @@ class PersonalRender extends Page {
 
       const userInfoCntntWrap = createDivElement(ClssNms.U_INFO_CONTENT_WRAP);
       const userInfoCntnt = createSpanElement(ClssNms.U_INFO_CONTENT, currField.value);
+      const errMsgElem = createLabelElement('user-info__err-msg');
       userInfoCntntWrap.appendChild(userInfoCntnt);
       userInfoField.append(userInfoDescrWrap, userInfoCntntWrap);
       userInfoFieldWrap.appendChild(userInfoField);
@@ -179,11 +247,6 @@ class PersonalRender extends Page {
       const userInfoEdit = createDivElement(ClssNms.U_INFO_EDIT);
       const userInfoEditBtn = createButtonElement(ClssNms.U_INFO_EDIT_BTN);
 
-      // addresses: [
-      //   {
-
-      //   }
-      // ]
       userInfoEditBtn.addEventListener('click', (event: Event) => {
         event.preventDefault();
         const openEditInput = userInfoField.querySelector(
@@ -194,9 +257,43 @@ class PersonalRender extends Page {
           const inputUserInfoCntnt = createInputElement(ClssNms.U_INFO_CONTENT_INPUT, '', [
             { name: 'value', value: currField.value },
           ]);
+          // const errMsgElem = createLabelElement('user-info__err-msg');
+          userInfoCntntWrap.appendChild(errMsgElem);
+
+          inputUserInfoCntnt.addEventListener('input', () => {
+            for (let i = 0; i < arrCondFn[index].length; i += 1) {
+              const inptValue = inputUserInfoCntnt.value;
+              const errMsg = errMsgsWords[index][i];
+              if (!arrCondFn[index][i](inptValue)) {
+                errMsgElem.textContent = errMsg;
+                errMsgElem.style.display = 'block';
+                userInfoEditBtn.classList.add(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                userInfoEditBtn.setAttribute('disabled', 'true');
+                break;
+                // userInfoCntntWrap.appendChild(errMsgElem);
+              } else {
+                errMsgElem.textContent = '';
+                errMsgElem.style.display = '';
+                userInfoEditBtn.classList.remove(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                userInfoEditBtn.removeAttribute('disabled');
+              }
+            }
+          });
           userInfoCntntSpan?.remove();
           userInfoCntntWrap.appendChild(inputUserInfoCntnt);
         } else {
+          const inputValue = openEditInput.value;
+          if (inputValue !== currField.value) {
+            const btnSave = container.querySelector('.user-info__btn-save');
+            btnSave?.removeAttribute('disabled');
+          }
+
+          const fieldName = fieldMapping[field];
+          if (fieldName) {
+            this.UserData[fieldName] = inputValue;
+          }
+
+          console.log('this.UserData:', this.UserData);
           currField.value = openEditInput.value;
           openEditInput.remove();
           const userInfoContent = createSpanElement(ClssNms.U_INFO_CONTENT, currField.value);
@@ -212,6 +309,7 @@ class PersonalRender extends Page {
       container.appendChild(userInfo);
     });
 
+    container.appendChild(saveBtn);
     return container;
   }
 
@@ -250,10 +348,10 @@ class PersonalRender extends Page {
         arrCurrTypes.splice(indexTypeDel, 1);
         const typeDefault = `Default ${typeAdd}`;
         if ((typeAdd === AdrsType.BILLING || typeAdd === AdrsType.SHIPPING) && arrCurrTypes.includes(typeDefault)) {
-          const typeElemDelete = Array.from(typeCont.querySelectorAll(`.${ClssNms.U_INFO_CONTENT_ADRS_TYPE}`)).filter(
+          const DefElemDelete = Array.from(typeCont.querySelectorAll(`.${ClssNms.U_INFO_CONTENT_ADRS_TYPE}`)).filter(
             (currTypeElem) => currTypeElem.textContent === typeDefault
           )[0].parentElement;
-          typeElemDelete?.remove();
+          DefElemDelete?.remove();
           const indexTypeDefaultDel = arrCurrTypes.indexOf(typeDefault);
           arrCurrTypes.splice(indexTypeDefaultDel, 1);
         }
@@ -266,6 +364,39 @@ class PersonalRender extends Page {
         typeCont.appendChild(UInfoCntntAdrsTypeWrap);
       }
     }
+  }
+
+  private addAndRemoveDefaultState(currValueTypes: string[], index: number) {
+    const allfieldsType = Array.from(document.querySelectorAll(`.${ClssNms.U_INFO_ADRS_TYPE}`));
+    const findTypes = currValueTypes.filter(
+      (currValueType) => currValueType === AdrsType.BILLING_DEFAULT || currValueType === AdrsType.SHIPPING_DEFAULT
+    );
+    allfieldsType.forEach((fieldType) => {
+      const elem = fieldType;
+      const fieldTypeTxt = fieldType.textContent?.split(', ');
+      findTypes.forEach((findType) => {
+        if (fieldTypeTxt?.includes(findType)) {
+          const indDel = fieldTypeTxt.indexOf(findType);
+          fieldTypeTxt.splice(indDel, 1);
+          elem.textContent = fieldTypeTxt.join(', ');
+        }
+      });
+    });
+    findTypes.forEach((findType) => {
+      this.UserData.addresses.forEach(({ addressType: adrsTypes }, indexAdrs) => {
+        if (indexAdrs !== index && adrsTypes && adrsTypes.includes(findType)) {
+          const indDel = adrsTypes.indexOf(findType);
+          this.UserData.addresses[indexAdrs].addressType?.splice(indDel, 1);
+        }
+      });
+      if (!this.UserData.addresses[index].addressType?.includes(findType)) {
+        this.UserData.addresses[index].addressType?.push(findType);
+        const commonType = findType.split(' ')[1];
+        if (!this.UserData.addresses[index].addressType?.includes(commonType)) {
+          this.UserData.addresses[index].addressType?.push(commonType);
+        }
+      }
+    });
   }
 
   private openAdrs(DataAdrs: Address, index: number) {
@@ -310,16 +441,17 @@ class PersonalRender extends Page {
         const openEditInput = UInfoContentWrap.querySelector(`.${ClssNms.U_INFO_CONTENT_INPUT}`) as HTMLElement | null;
         if (!openEditInput) {
           const userInfoCntntSpan = UInfoContentWrap.querySelector(`.${ClssNms.U_INFO_CONTENT}`);
-          const inputAttr = [{ name: 'value', value: currValueObj.currValue || '' }];
           let inputUserInfoCntnt: HTMLDivElement | HTMLInputElement;
           if (key === Txt.ADRS_TYPE_DSCR) {
             inputUserInfoCntnt = createDivElement(ClssNms.U_INFO_CONTENT_INPUT);
-            currValueObj.currValue?.split(', ').forEach((adrs) => {
+            inputUserInfoCntnt.classList.add('user-info__content-input-type');
+            (this.UserData.addresses[index].addressType as string[]).forEach((adrs) => {
               if (adrs !== ', ' && adrs) {
                 currValueTypes.push(adrs);
                 this.addType(inputUserInfoCntnt, null, adrs, currValueTypes);
               }
             });
+
             const UInfoCntntInpOpenBtn = createButtonElement(ClssNms.U_INFO_CONTENT_INPUT_OPEN_BTN);
 
             inputUserInfoCntnt.addEventListener('click', () => {
@@ -334,6 +466,7 @@ class PersonalRender extends Page {
                 UInfoOpenListTypeInput = createDivElement(ClssNms.U_INFO_OPEN_LIST_TYPE);
                 const UInfoOpenNoOptions = createDivElement(ClssNms.U_INFO_OPEN_NO_OPT, Txt.NO_OPTIONS);
                 UInfoOpenListTypeInput.appendChild(UInfoOpenNoOptions);
+
                 Object.values(AdrsType).forEach((type) => {
                   if (!strAdrsTypes.includes(type)) {
                     UInfoOpenNoOptions?.remove();
@@ -341,18 +474,18 @@ class PersonalRender extends Page {
                     typeElem.addEventListener('click', () => {
                       const addTypeForDefault = type.split(' ')[1];
                       currValueTypes.push(type);
+
                       this.addType(inputUserInfoCntnt, UInfoCntntInpOpenBtn, type, currValueTypes);
 
-                      if (
-                        (type === AdrsType.BILLING_DEFAULT || type === AdrsType.SHIPPING_DEFAULT) &&
-                        !currValueTypes.includes(addTypeForDefault)
-                      ) {
-                        const typeElemDelete = Array.from(
-                          UInfoContentWrap.querySelectorAll(`.${ClssNms.U_INFO_OPEN_TYPE_ELEM}`)
-                        ).filter((currTypeElem) => currTypeElem.textContent === addTypeForDefault)[0];
-                        typeElemDelete?.remove();
-                        this.addType(inputUserInfoCntnt, UInfoCntntInpOpenBtn, addTypeForDefault, currValueTypes);
-                        currValueTypes.push(addTypeForDefault);
+                      if (type === AdrsType.BILLING_DEFAULT || type === AdrsType.SHIPPING_DEFAULT) {
+                        if (!currValueTypes.includes(addTypeForDefault)) {
+                          const typeElemDelete = Array.from(
+                            UInfoFieldWrap.querySelectorAll(`.${ClssNms.U_INFO_OPEN_TYPE_ELEM}`)
+                          ).filter((currTypeElem) => currTypeElem.textContent === addTypeForDefault)[0];
+                          typeElemDelete?.remove();
+                          this.addType(inputUserInfoCntnt, UInfoCntntInpOpenBtn, addTypeForDefault, currValueTypes);
+                          currValueTypes.push(addTypeForDefault);
+                        }
                       }
                       typeElem.remove();
                     });
@@ -367,7 +500,8 @@ class PersonalRender extends Page {
             UInfoCntntInpOpenBtn.appendChild(UInfoCntntInpOpenBtnImg);
             inputUserInfoCntnt.appendChild(UInfoCntntInpOpenBtn);
           } else {
-            inputUserInfoCntnt = createInputElement(ClssNms.U_INFO_CONTENT_INPUT, '', inputAttr);
+            inputUserInfoCntnt = createInputElement(ClssNms.U_INFO_CONTENT_INPUT);
+            inputUserInfoCntnt.setAttribute('value', currValueObj.currValue || '');
           }
 
           userInfoCntntSpan?.remove();
@@ -396,6 +530,9 @@ class PersonalRender extends Page {
           const currAdrsType = (openEditInput as HTMLInputElement).value || currValueTypes.join(', ');
 
           currValueObj.currValue = currAdrsType;
+          if (currValueTypes.length) {
+            this.addAndRemoveDefaultState(currValueTypes, index);
+          }
           openEditInput.remove();
 
           const userInfoContent = createSpanElement(ClssNms.U_INFO_CONTENT, currValueObj.currValue);
@@ -444,7 +581,14 @@ class PersonalRender extends Page {
 
       UInfoToggleBtn.addEventListener('click', (event) => {
         console.log('DataAdrs:', DataAdrs);
+        console.log('this.UserData.addresses:', this.UserData.addresses);
         event.preventDefault();
+        const updateAdrsType = currOpenAdress.querySelectorAll(`.${ClssNms.U_INFO_CONTENT}`)[5];
+        if (updateAdrsType) {
+          const updateTxt = this.UserData.addresses[index].addressType?.join(', ') as string;
+          updateAdrsType.textContent = updateTxt;
+        }
+
         const openAdrsElem = userAddress.querySelector(`.${ClssNms.U_INFO_ADRS_OPEN}`) as HTMLElement;
         if (!openAdrsElem) {
           const deleteAdrsContainer = userAddress.querySelector(`.${ClssNms.U_INFO_ADRS_CONTAINER}`);
@@ -456,13 +600,15 @@ class PersonalRender extends Page {
           currOpenAdress = this.openAdrs(DataAdrs, index);
           const currUInfoAdrsContainer = this.createAdrsContainer(this.UserData.addresses[index]);
           openAdrsElem.classList.remove(ClssNms.ADRS_OPEN);
+          UInfoToggleBtn.setAttribute('disabled', 'true');
           setTimeout(() => {
             if (!openAdrsElem.classList.contains(ClssNms.ADRS_OPEN)) {
+              UInfoToggleBtn.removeAttribute('disabled');
               openAdrsElem.remove();
               UInfoAdrsInfo.appendChild(currUInfoAdrsContainer);
               openAdrsElem.style.overflow = '';
             }
-          }, 1000);
+          }, 500);
         }
       });
 
@@ -480,8 +626,15 @@ class PersonalRender extends Page {
     return container;
   }
 
-  render() {
-    this.UserData = getPersonalData(objData);
+  render(allUserData: CustomerData) {
+    this.UserData = getPersonalData(allUserData);
+    this.UserDataInit = {
+      firstName: this.UserData.firstName,
+      lastName: this.UserData.lastName,
+      dateOfBirth: this.UserData.dateOfBirth,
+      email: this.UserData.email,
+    };
+    console.log(this.UserData);
 
     const basicFields = [
       {
@@ -497,6 +650,8 @@ class PersonalRender extends Page {
         value: this.UserData.dateOfBirth,
       },
     ];
+    const basicCondFn = [conditionWord, conditionWord, condBirthPersonal];
+    const basicErr = [errMsgsWord, errMsgsWord, errBirthPersonal];
 
     const contactFields = [
       {
@@ -504,10 +659,12 @@ class PersonalRender extends Page {
         value: this.UserData.email,
       },
     ];
+    const contactCondFn = [condEmailPersonal];
+    const contErr = [errEmailPersonal];
 
     const titlePersonalPage = this.createTitlePage();
-    const basicInfContainer = this.createPIContainer(Txt.BASIC_TITLE, basicFields);
-    const contactInfContainer = this.createPIContainer(Txt.CONTACT_INF_TITLE, contactFields);
+    const basicInfContainer = this.createPIContainer(Txt.BASIC_TITLE, basicFields, basicCondFn, basicErr);
+    const contactInfContainer = this.createPIContainer(Txt.CONTACT_INF_TITLE, contactFields, contactCondFn, contErr);
 
     const addressesContainer = this.createPIContainerAddress(this.UserData.addresses);
 
@@ -516,7 +673,15 @@ class PersonalRender extends Page {
     this.pageWrapper.appendChild(this.main);
     const { body } = document;
     body.appendChild(this.pageWrapper);
-    // return this.pageWrapper;
+  }
+
+  renderPage() {
+    new CustomerLoader()
+      .getCustomerData()
+      .then((data) => this.render(data))
+      .catch(console.log);
+
+    return this.pageWrapper;
   }
 }
 

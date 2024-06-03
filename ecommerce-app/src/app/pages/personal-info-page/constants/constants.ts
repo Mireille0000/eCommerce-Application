@@ -1,3 +1,5 @@
+import { FieldsMap } from '../../../utils/types';
+
 export const enum ClssNms {
   WRAPPER = 'wrapper',
   WRAPPER_PI = 'wrapper--PI',
@@ -27,6 +29,7 @@ export const enum ClssNms {
   FIRST_NAME_CONTENT = 'first-name__content',
   U_INFO_EDIT = 'user-info__edit',
   U_INFO_EDIT_BTN = 'user-info__edit-btn',
+  U_INFO_EDIT_BTN_DISABLED = 'user-info__edit-btn--disabled',
   FIRST_NAME_EDIT_BTN = 'first-name__edit-btn',
   IMG_EDIT = 'img-edit',
   LAST_NAME_CONTENT = 'last-name__content',
@@ -91,4 +94,11 @@ export const AdrsType = {
   SHIPPING: 'Shipping',
   BILLING_DEFAULT: 'Default Billing',
   SHIPPING_DEFAULT: 'Default Shipping',
+};
+
+export const fieldMapping: FieldsMap = {
+  [Txt.FIRST_NAME_DSCR]: 'firstName',
+  [Txt.LAST_NAME_DSCR]: 'lastName',
+  [Txt.DATE_OF_BIRTH_DSCR]: 'dateOfBirth',
+  [Txt.EMAIL_DSCR]: 'email',
 };

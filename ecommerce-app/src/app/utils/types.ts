@@ -32,6 +32,8 @@ export interface CurrAddress {
 export type Addresses = Address[];
 
 export interface CustomerData {
+  id: string;
+  version: string;
   email: string;
   firstName: string;
   lastName: string;
@@ -54,4 +56,14 @@ export interface CurrAdrs {
 
 export interface AdrsValueObj {
   [currValue: string]: string | undefined;
+}
+
+type UserDataKeys = 'firstName' | 'lastName' | 'dateOfBirth' | 'email';
+export interface FieldsMap {
+  [key: string]: UserDataKeys;
+}
+
+export type CustomerDataUpdate = CustomerData;
+export interface FieldsEdit {
+  [key: string]: string;
 }

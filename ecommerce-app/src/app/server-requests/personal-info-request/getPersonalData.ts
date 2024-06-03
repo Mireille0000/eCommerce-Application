@@ -1,4 +1,3 @@
-// import fetch from 'node-fetch';
 import { ProcessEnv } from '../registration-form-request/BuildClient';
 
 const projectKey = ProcessEnv.CTP_PROJECT_KEY as string;
@@ -7,8 +6,8 @@ const apiUrl = ProcessEnv.CTP_API_URL as string;
 class CustomerLoader {
   private token: string;
 
-  constructor(token: string) {
-    this.token = token;
+  constructor() {
+    this.token = JSON.parse(localStorage.getItem('data') as string).access_token;
   }
 
   private errorHandler(res: Response) {

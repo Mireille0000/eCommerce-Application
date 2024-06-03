@@ -65,7 +65,7 @@ body {
     position: relative;
     max-height: 0;
     /* overflow: hidden; */
-    transition: max-height 1s ease;
+    transition: max-height 0.5s ease;
 }
 .user-info__address-open.address-open {
     max-height: 1000px;
@@ -82,6 +82,18 @@ body {
     position: relative;
     height: 100%;
 }
+.user-info:not(:last-child)::after {
+    position: absolute;
+    content: '';
+    left: 23px;
+    width: calc(100% - 23px);
+    bottom: 0;
+    height: 1px;
+    background-color: #e1e3e1;
+}
+/* .PI__container .user-info:last-child::after {
+    height: 0;
+} */
 .user-address:not(:last-child) .user-info::after,
 .user-address:not(:last-child) .user-info__address-open::after {
     position: absolute;
@@ -95,10 +107,41 @@ body {
 .user-address:has(.user-info__address-open) .user-info {
     padding-bottom: 19px;
 }
+.PI__container-save {
+    padding: 14px 30px 14px 24px;
+    display: flex;
+}
+.user-info__btn-save {
+    cursor: pointer;
+    margin-left: auto;
+    font-size: 1rem;
+    padding: 4px 24px;
+    border: 0;
+    border-radius: 15px;
+    color: rgb(240, 240, 240);
+    background-color: #1677ff;
+    box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 4px 0px;
+
+}
+.user-info__btn-save:hover,
+.user-info__btn-save:focus {
+    background-color: #4096ff;
+    box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 4px 0px;
+}
+.user-info__btn-save:disabled {
+    cursor: default;
+    color: rgba(31, 31, 31, 0.38);
+    background-color: rgba(31, 31, 31, 0.12);
+    border: 0;
+    box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px;
+}
 
 .user-info__field-wrap {
     flex: 1 1 0;
     position: relative;
+}
+.user-info__content-input:has(.user-info__content-adrs-type-wrap) {
+    padding: 4px 5px;
 }
 .user-info__field {
     display: flex;
@@ -134,36 +177,53 @@ body {
     font-size: 1.125rem;
     word-break: break-all;
     color: #1f1f1f;
-    padding-left: 6px;
 }
 .user-info__content-input {
+    position: relative;
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
     width: 100%;
     outline: none;
     border: 1px solid #1f1f1f;;
     border-radius: 4px;
-    padding: 5px 5px;
+    padding: 6px 5px;
     color: rgb(60, 64, 67);
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.875rem;
 }
 .user-info__content-input:hover,
 .user-info__content-input:focus {
-    padding: 4px;
+    padding: 5px 4px;
     border-width: 2px;
     border-color: #4096ff;
 }
 .user-info__address-open .user-info__content-input:hover,
 .user-info__address-open .user-info__content-input:focus {
-    padding: 5px;
+    padding: 6px 5px;
     border-width: 1px;
+}
+.user-info__content-input.user-info__content-input-type {
+    padding: 5px 5px;
+}
+.user-info__content-input.user-info__content-input-type:hover {
+    padding: 5px 5px;
 }
 .user-info__content-wrap:has(.user-info__content-input){
     flex-basis: auto;
     flex-grow: 1;
     /* width: 100%; */
 }
+.user-info__err-msg {
+    display: none;
+    position: absolute;
+    top: 95%;
+    /* height: 16px; */
+    font-size: 0.875rem;
+    color: red;
+}
+
 .user-info__content-input-open-btn {
     margin-left: auto;
     display: flex;
@@ -189,7 +249,7 @@ body {
 .user-info__open-list-type {
     position: absolute;
     top: 100%;
-    z-index: 1;
+    z-index: 2;
     margin-top: 2px;
     padding: 0 2px;
     width: 100%;
@@ -226,11 +286,13 @@ body {
     background-color: rgb(241, 240, 255);
     border: 1px solid rgb(210, 212, 224);
     border-radius: 15px;
-    padding: 4px 6px;
-    height: 18px;
+    padding: 0px 6px;
+    min-height: 16px;
+    max-height: max-content;
 }
 .user-info__content-adrs-type {
     text-align: center;
+    font-size: 0.875rem;
 }
 .user-info__content-adrs-type-btn-delete {
     position: relative;
@@ -274,6 +336,8 @@ body {
 .user-info__edit-btn,
 .user-info__toggle-btn,
 .user-info__delete-adress-btn {
+    position: relative;
+    z-index: 1;
     padding: 6px;
     border: 0px;
     border-radius: 50%;
@@ -290,9 +354,16 @@ body {
     background-color: #e1e3e1;
     transition: all 0.2s;
 }
+.user-info__edit-btn--disabled,
 .disabled-country {
     opacity: 0.5;
+    cursor: default;
 }
+.user-info__edit-btn--disabled:hover,
+.disabled-country:hover {
+    background-color: #fff;
+}
+
 .img-edit,
 .img-toggle,
 .img-delete-adress {
@@ -359,6 +430,7 @@ body {
     .user-info {
         align-items: normal;
         flex-direction: column;
+        gap: 15px;
     }
     .user-info__edit,
     .user-info__btns {
