@@ -8,7 +8,7 @@ import {
 import { CustomerDataUpdate, FieldsEdit } from '../../utils/types';
 import { apiRoot } from '../registration-form-request/clients';
 
-const createCustomerEmailUpdateDraft = (editFields: FieldsEdit, customerData: CustomerDataUpdate) => {
+const createCustomerDataUpdateDraft = (editFields: FieldsEdit, customerData: CustomerDataUpdate) => {
   const { firstName, lastName, dateOfBirth, email } = editFields;
   const { version } = customerData;
   const versionEditData = customerData;
@@ -24,7 +24,7 @@ const createCustomerEmailUpdateDraft = (editFields: FieldsEdit, customerData: Cu
     versionEditData.version += 1;
   }
 
-  if (firstName) {
+  if (lastName) {
     const changeLastNameAction: CustomerSetLastNameAction = {
       action: 'setLastName',
       lastName,
@@ -63,9 +63,31 @@ const updateCustomerField = (customerData: CustomerDataUpdate, editFields: Field
     .customers()
     .withId({ ID })
     .post({
-      body: createCustomerEmailUpdateDraft(editFields, customerData),
+      body: createCustomerDataUpdateDraft(editFields, customerData),
     })
     .execute();
 };
 
 export default updateCustomerField;
+
+const createCustomerPassUpdateDraft = (editFields: FieldsEdit, customerData: CustomerDataUpdate) => {
+  const { currentPassword, newPassword } = editFields;
+  const { version, id } = customerData;
+
+  return {
+    id,
+    version: Number(version),
+    currentPassword,
+    newPassword,
+  };
+};
+
+export const updatePasswordField = (customerData: CustomerDataUpdate, editFields: FieldsEdit) => {
+  return apiRoot
+    .customers()
+    .password()
+    .post({
+      body: createCustomerPassUpdateDraft(editFields, customerData),
+    })
+    .execute();
+};

@@ -19,15 +19,40 @@ import {
   StringArr,
   arrConditionFn,
 } from '../../utils/types';
-import { AdrsType, ClssNms, Txt, fieldMapping } from './constants/constants';
+import {
+  AdrsType,
+  ClssNms,
+  Txt,
+  fieldMapping,
+  msgPassFail,
+  msgPassSuccess,
+  msgUpdateData,
+  msgUpdateFail,
+} from './constants/constants';
 
 import edit from '../../../assets/images/edit.svg';
 import deleteAddress from '../../../assets/images/delete_address.svg';
 import toogle from '../../../assets/images/toggle.svg';
-import { condBirthPersonal, condEmailPersonal, conditionWord } from '../registration-page/validation/validationFn';
-import { errBirthPersonal, errEmailPersonal, errMsgsWord } from '../registration-page/validation/validationMsgs';
+import {
+  condBirthPersonal,
+  condEmailPersonal,
+  condOldPswrdPersonal,
+  condPswrdPersonal,
+  conditionWord,
+} from '../registration-page/validation/validationFn';
+import {
+  errBirthPersonal,
+  errEmailPersonal,
+  errMsgsWord,
+  errNewPswdPersonal,
+  errOldPswdPersonal,
+} from '../registration-page/validation/validationMsgs';
 import CustomerLoader from '../../server-requests/personal-info-request/getPersonalData';
-import updateCustomerField from '../../server-requests/personal-info-request/updatePersonalData';
+import updateCustomerField, {
+  updatePasswordField,
+} from '../../server-requests/personal-info-request/updatePersonalData';
+import checkCustomer from '../../server-requests/login-form-requests';
+import { createMsgRegAcc } from '../registration-page/utils-registration/functions-registration';
 
 interface FieldUser {
   field: string;
@@ -35,52 +60,6 @@ interface FieldUser {
 }
 
 type FieldsUser = FieldUser[];
-
-// const objData = {
-//   email: 'ggdg3333@gm.com',
-//   firstName: 'gh',
-//   lastName: 'hgf',
-//   dateOfBirth: '2000-06-05',
-//   addresses: [
-//     {
-//       id: 'lbDtYVBt',
-//       streetName: 'h',
-//       streetNumber: '5',
-//       postalCode: '55555',
-//       city: 'sh',
-//       country: 'DE',
-//     },
-//     {
-//       id: 'MBxoLE-T',
-//       streetName: 'g',
-//       streetNumber: '2',
-//       postalCode: '33333',
-//       city: 'j',
-//       country: 'DE',
-//     },
-//     {
-//       id: 'hQ5LN0Vv',
-//       streetName: 'hHj',
-//       streetNumber: '33',
-//       postalCode: '75389',
-//       city: 'Bghgfh',
-//       country: 'DE',
-//     },
-//     {
-//       id: 'tmiWbgvO',
-//       streetName: 'g4444',
-//       streetNumber: '2',
-//       postalCode: '42477',
-//       city: 'HHHHHHHHHHHH',
-//       country: 'DE',
-//       pOBox: '',
-//     },
-//   ],
-//   defaultBillingAddressId: 'MBxoLE-T',
-//   shippingAddressIds: ['hQ5LN0Vv', 'lbDtYVBt'],
-//   billingAddressIds: ['tmiWbgvO', 'hQ5LN0Vv', 'MBxoLE-T'],
-//   key: '852881',
-// };
 
 const getPersonalData = (customerData: CustomerData) => {
   const {
@@ -149,6 +128,8 @@ class PersonalRender extends Page {
     addresses: Addresses;
     id: string;
     version: string;
+    currentPassword?: string;
+    newPassword?: string;
   };
 
   UserDataInit!: {
@@ -156,6 +137,8 @@ class PersonalRender extends Page {
     lastName: string;
     dateOfBirth: string;
     email: string;
+    currentPassword: string;
+    newPassword: string;
   };
 
   constructor(id: string) {
@@ -182,7 +165,7 @@ class PersonalRender extends Page {
     return container;
   }
 
-  private createSaveBtn(fields: FieldsUser) {
+  private createSaveBtn(fields: FieldsUser, isPass = false) {
     const PIContainerSave = createDivElement('PI__container-save');
     const UInfoBtnSave = createButtonElement('user-info__btn-save', 'Save', [{ name: 'disabled', value: 'true' }]);
     UInfoBtnSave.addEventListener('click', async (event) => {
@@ -192,22 +175,28 @@ class PersonalRender extends Page {
       fields.forEach(({ field }) => {
         const fieldName = fieldMapping[field];
         if (fieldName && this.UserDataInit[fieldName] !== this.UserData[fieldName]) {
-          editFields[fieldName] = this.UserData[fieldName];
+          if (this.UserData[fieldName]) {
+            editFields[fieldName] = this.UserData[fieldName] || '';
+          }
         }
       });
-      console.log('editFields:', editFields);
-      console.log('this.UserData.version:', this.UserData.version);
 
-      updateCustomerField(this.UserData, editFields)
-        .then(() => console.log('Data updated'))
-        .catch(console.log);
+      if (isPass) {
+        updatePasswordField(this.UserData, editFields)
+          .then(() => {
+            this.UserData.version += 1;
+            setTimeout(() => createMsgRegAcc(msgPassSuccess), 0);
+            checkCustomer(this.UserData.email, this.UserData.newPassword || '', 'auth-error-message').catch(
+              (err) => err.message
+            );
+          })
+          .catch(() => setTimeout(() => createMsgRegAcc(msgPassFail), 0));
+      } else {
+        updateCustomerField(this.UserData, editFields)
+          .then(() => setTimeout(() => createMsgRegAcc(msgUpdateData), 0))
+          .catch(() => setTimeout(() => createMsgRegAcc(msgUpdateFail), 0));
+      }
       UInfoBtnSave.setAttribute('disabled', 'true');
-      // this.UserData.version += 1;
-      // updateCustomerField(this.UserData)
-      //   .then(() => console.log('Data updated'))
-      //   .catch(console.log);
-      // UInfoBtnSave.setAttribute('disabled', 'true');
-      // this.UserData.version += 1;
     });
 
     PIContainerSave.appendChild(UInfoBtnSave);
@@ -257,7 +246,6 @@ class PersonalRender extends Page {
           const inputUserInfoCntnt = createInputElement(ClssNms.U_INFO_CONTENT_INPUT, '', [
             { name: 'value', value: currField.value },
           ]);
-          // const errMsgElem = createLabelElement('user-info__err-msg');
           userInfoCntntWrap.appendChild(errMsgElem);
 
           inputUserInfoCntnt.addEventListener('input', () => {
@@ -270,7 +258,6 @@ class PersonalRender extends Page {
                 userInfoEditBtn.classList.add(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
                 userInfoEditBtn.setAttribute('disabled', 'true');
                 break;
-                // userInfoCntntWrap.appendChild(errMsgElem);
               } else {
                 errMsgElem.textContent = '';
                 errMsgElem.style.display = '';
@@ -355,7 +342,6 @@ class PersonalRender extends Page {
           const indexTypeDefaultDel = arrCurrTypes.indexOf(typeDefault);
           arrCurrTypes.splice(indexTypeDefaultDel, 1);
         }
-        //
       });
       UInfoCntntAdrsTypeWrap.append(UInfoCntntAdrsType, UInfoCntntAdrsTypeDelete);
       if (openBtnListType) {
@@ -626,13 +612,131 @@ class PersonalRender extends Page {
     return container;
   }
 
+  private createSecurityContainer(
+    titleContainer: string,
+    fields: FieldsUser,
+    arrCondFn: arrConditionFn[],
+    errMsgsWords: StringArr[]
+  ) {
+    const container = this.createContainer(titleContainer);
+    const saveBtn = this.createSaveBtn(fields, true);
+
+    fields.forEach(({ field, value }, index) => {
+      const currField = {
+        field,
+        value: '',
+      };
+      const userInfo = createDivElement(ClssNms.U_INFO);
+      const userInfoFieldWrap = createDivElement(ClssNms.U_INFO_FIELD_WRAP);
+      const userInfoField = createDivElement(ClssNms.U_INFO_FIELD);
+
+      const userInfoDescrWrap = createDivElement(ClssNms.U_INFO_DESCR_WRAP);
+      const userInfoDescr = createLabelElement(ClssNms.U_INFO_DESCR, currField.field);
+      userInfoDescrWrap.appendChild(userInfoDescr);
+
+      const userInfoCntntWrap = createDivElement(ClssNms.U_INFO_CONTENT_WRAP);
+      const userInfoCntnt = createSpanElement(ClssNms.U_INFO_CONTENT, value);
+      const errMsgElem = createLabelElement('user-info__err-msg');
+      userInfoCntntWrap.appendChild(userInfoCntnt);
+      userInfoField.append(userInfoDescrWrap, userInfoCntntWrap);
+      userInfoFieldWrap.appendChild(userInfoField);
+
+      const userInfoEdit = createDivElement(ClssNms.U_INFO_EDIT);
+      const userInfoEditBtn = createButtonElement(ClssNms.U_INFO_EDIT_BTN);
+
+      userInfoEditBtn.addEventListener('click', (event: Event) => {
+        event.preventDefault();
+        const openEditInput = userInfoField.querySelector(
+          `.${ClssNms.U_INFO_CONTENT_INPUT}`
+        ) as HTMLInputElement | null;
+        const fieldNameDel = fieldMapping[field];
+        if (fieldNameDel) {
+          this.UserData[fieldNameDel] = '';
+        }
+
+        if (!openEditInput) {
+          const btnSave = container.querySelector('.user-info__btn-save');
+          btnSave?.setAttribute('disabled', 'true');
+
+          const userInfoCntntSpan = userInfoField.querySelector(`.${ClssNms.U_INFO_CONTENT}`);
+          const inputUserInfoCntnt = createInputElement(ClssNms.U_INFO_CONTENT_INPUT, '', [
+            { name: 'value', value: currField.value },
+            { name: 'placeholder', value: 'Enter password' },
+            { name: 'type', value: 'password' },
+          ]);
+          userInfoCntntWrap.appendChild(errMsgElem);
+
+          inputUserInfoCntnt.addEventListener('input', () => {
+            for (let i = 0; i < arrCondFn[index].length; i += 1) {
+              const inptValue = inputUserInfoCntnt.value;
+              const errMsg = errMsgsWords[index][i];
+              if (!arrCondFn[index][i](inptValue)) {
+                errMsgElem.textContent = errMsg;
+                errMsgElem.style.display = 'block';
+                userInfoEditBtn.classList.add(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                userInfoEditBtn.setAttribute('disabled', 'true');
+                break;
+              } else {
+                errMsgElem.textContent = '';
+                errMsgElem.style.display = '';
+                userInfoEditBtn.classList.remove(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                userInfoEditBtn.removeAttribute('disabled');
+              }
+            }
+          });
+          userInfoCntntSpan?.remove();
+          userInfoCntntWrap.appendChild(inputUserInfoCntnt);
+        } else {
+          const inputValue = openEditInput.value;
+          if (this.UserData.currentPassword && this.UserData.newPassword) {
+            const btnSave = container.querySelector('.user-info__btn-save');
+            btnSave?.removeAttribute('disabled');
+          }
+
+          const fieldName = fieldMapping[field];
+          if (fieldName) {
+            this.UserData[fieldName] = inputValue;
+          }
+          if (this.UserData.currentPassword && this.UserData.newPassword) {
+            const btnSave = container.querySelector('.user-info__btn-save');
+            btnSave?.removeAttribute('disabled');
+          }
+
+          console.log('this.UserData:', this.UserData);
+          currField.value = openEditInput.value;
+          openEditInput.remove();
+          let userInfoContent: HTMLSpanElement;
+          if (inputValue === '') {
+            userInfoContent = createSpanElement(ClssNms.U_INFO_CONTENT, '•'.repeat(value.length));
+          } else {
+            userInfoContent = createSpanElement(ClssNms.U_INFO_CONTENT, '•'.repeat(currField.value.length));
+          }
+          userInfoCntntWrap.appendChild(userInfoContent);
+        }
+      });
+
+      const imgEdit = createImage(edit, Txt.ALT_EDIT, ClssNms.IMG_EDIT);
+      userInfoEditBtn.appendChild(imgEdit);
+      userInfoEdit.appendChild(userInfoEditBtn);
+
+      userInfo.append(userInfoFieldWrap, userInfoEdit);
+      container.appendChild(userInfo);
+    });
+
+    container.appendChild(saveBtn);
+    return container;
+  }
+
   render(allUserData: CustomerData) {
     this.UserData = getPersonalData(allUserData);
+
     this.UserDataInit = {
       firstName: this.UserData.firstName,
       lastName: this.UserData.lastName,
       dateOfBirth: this.UserData.dateOfBirth,
       email: this.UserData.email,
+      currentPassword: '',
+      newPassword: '',
     };
     console.log(this.UserData);
 
@@ -662,13 +766,44 @@ class PersonalRender extends Page {
     const contactCondFn = [condEmailPersonal];
     const contErr = [errEmailPersonal];
 
+    const securityFields = [
+      {
+        field: 'Old Password',
+        value: '••••••••',
+      },
+      {
+        field: 'New Password',
+        value: '••••••••',
+      },
+    ];
+    const securityCondFn = [condOldPswrdPersonal, condPswrdPersonal];
+    const securityErr = [errOldPswdPersonal, errNewPswdPersonal];
+
     const titlePersonalPage = this.createTitlePage();
     const basicInfContainer = this.createPIContainer(Txt.BASIC_TITLE, basicFields, basicCondFn, basicErr);
     const contactInfContainer = this.createPIContainer(Txt.CONTACT_INF_TITLE, contactFields, contactCondFn, contErr);
-
     const addressesContainer = this.createPIContainerAddress(this.UserData.addresses);
+    // const securityContainer = this.createPIContainer(
+    //   'Security Information (change password)',
+    //   securityFields,
+    //   securityCondFn,
+    //   securityErr
+    // );
+    const test123 = this.createSecurityContainer(
+      'Security Information (change password)',
+      securityFields,
+      securityCondFn,
+      securityErr
+    );
 
-    this.mainWrapper.append(titlePersonalPage, basicInfContainer, contactInfContainer, addressesContainer);
+    this.mainWrapper.append(
+      titlePersonalPage,
+      basicInfContainer,
+      contactInfContainer,
+      addressesContainer,
+      // securityContainer,
+      test123
+    );
     this.main.appendChild(this.mainWrapper);
     this.pageWrapper.appendChild(this.main);
     const { body } = document;

@@ -39,6 +39,8 @@ export interface CustomerData {
   lastName: string;
   dateOfBirth: string;
   addresses: Addresses;
+  currentPassword?: string;
+  newPassword?: string;
   defaultBillingAddressId?: string;
   defaultShippingAddressId?: string;
   shippingAddressIds?: string[];
@@ -58,7 +60,7 @@ export interface AdrsValueObj {
   [currValue: string]: string | undefined;
 }
 
-type UserDataKeys = 'firstName' | 'lastName' | 'dateOfBirth' | 'email';
+type UserDataKeys = 'firstName' | 'lastName' | 'dateOfBirth' | 'email' | 'currentPassword' | 'newPassword';
 export interface FieldsMap {
   [key: string]: UserDataKeys;
 }

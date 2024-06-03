@@ -101,4 +101,11 @@ export const fieldMapping: FieldsMap = {
   [Txt.LAST_NAME_DSCR]: 'lastName',
   [Txt.DATE_OF_BIRTH_DSCR]: 'dateOfBirth',
   [Txt.EMAIL_DSCR]: 'email',
+  'Old Password': 'currentPassword',
+  'New Password': 'newPassword',
 };
+
+export const msgUpdateData = ['Success!', 'Data updated successfully.'];
+export const msgUpdateFail = ['Failure!', 'Something went wrong :('];
+export const msgPassSuccess = ['Success!', 'Password successfully updated.'];
+export const msgPassFail = ['Failure!', 'The entered password is incorrect.'];

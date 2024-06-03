@@ -8,15 +8,6 @@ export const ProcessEnv = {
   CTP_API_URL: 'https://api.europe-west1.gcp.commercetools.com',
   CTP_SCOPES: 'manage_project:ecommerce-app-f-devs',
 };
-// export const ProcessEnv = {
-//   CTP_PROJECT_KEY: 'ecommerce-app-f-devs',
-//   CTP_CLIENT_SECRET: '3_H4mVCvUdI20gsjOgk-g1ItHRYWSBUI',
-//   CTP_CLIENT_ID: 'vdKc7wDKkfWRytQ8EN1DqH9-',
-//   CTP_AUTH_URL: 'https://auth.europe-west1.gcp.commercetools.com',
-//   CTP_API_URL: 'https://api.europe-west1.gcp.commercetools.com',
-//   CTP_SCOPES:
-//     'create_anonymous_token:ecommerce-app-f-devs view_orders:ecommerce-app-f-devs manage_my_business_units:ecommerce-app-f-devs manage_my_profile:ecommerce-app-f-devs manage_categories:ecommerce-app-f-devs manage_my_quote_requests:ecommerce-app-f-devs manage_api_clients:ecommerce-app-f-devs manage_customers:ecommerce-app-f-devs manage_my_quotes:ecommerce-app-f-devs introspect_oauth_tokens:ecommerce-app-f-devs',
-// };
 
 const projectKey = ProcessEnv.CTP_PROJECT_KEY as string;
 const scopes = [ProcessEnv.CTP_SCOPES] as string[];

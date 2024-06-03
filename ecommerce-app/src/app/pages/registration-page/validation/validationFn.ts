@@ -88,3 +88,15 @@ export const condEmailPersonal = [
   (value: string) =>
     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*([.]\w{2,3})+$/.test(value) && /[@]{1}/.test(value) && !/\s/.test(value),
 ];
+
+export const condOldPswrdPersonal = [(value: string) => value.length >= 8];
+
+export const condPswrdPersonal = [
+  (value: string) =>
+    /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(value) &&
+    /(?=.*[A-Z])/.test(value) &&
+    /(?=.*[a-z])/.test(value) &&
+    /(?=.*\d)/.test(value) &&
+    /^\S*$/.test(value) &&
+    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(value),
+];
