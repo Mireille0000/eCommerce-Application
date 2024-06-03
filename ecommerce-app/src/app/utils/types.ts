@@ -69,3 +69,9 @@ export type CustomerDataUpdate = CustomerData;
 export interface FieldsEdit {
   [key: string]: string;
 }
+
+export type AdrsObj = 'id' | 'streetName' | 'streetNumber' | 'postalCode' | 'city' | 'country';
+//  | 'addressType';
+export interface AdrsMap {
+  [key: string]: AdrsObj;
+}

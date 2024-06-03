@@ -13,6 +13,7 @@ import {
   Address,
   AddressTypes,
   Addresses,
+  // AdrsObj,
   CurrAdrs,
   CustomerData,
   FieldsEdit,
@@ -23,6 +24,7 @@ import {
   AdrsType,
   ClssNms,
   Txt,
+  // adrsFieldMap,
   fieldMapping,
   msgPassFail,
   msgPassSuccess,
@@ -38,11 +40,17 @@ import {
   condEmailPersonal,
   condOldPswrdPersonal,
   condPswrdPersonal,
+  conditionHouseNumber,
+  conditionPostcode,
+  conditionStreet,
   conditionWord,
 } from '../registration-page/validation/validationFn';
 import {
   errBirthPersonal,
   errEmailPersonal,
+  errMsgsHouseNumber,
+  errMsgsPostcode,
+  errMsgsStreet,
   errMsgsWord,
   errNewPswdPersonal,
   errOldPswdPersonal,
@@ -139,6 +147,7 @@ class PersonalRender extends Page {
     email: string;
     currentPassword: string;
     newPassword: string;
+    addresses: Addresses;
   };
 
   constructor(id: string) {
@@ -166,6 +175,7 @@ class PersonalRender extends Page {
   }
 
   private createSaveBtn(fields: FieldsUser, isPass = false) {
+    // isAddress = false
     const PIContainerSave = createDivElement('PI__container-save');
     const UInfoBtnSave = createButtonElement('user-info__btn-save', 'Save', [{ name: 'disabled', value: 'true' }]);
     UInfoBtnSave.addEventListener('click', async (event) => {
@@ -280,7 +290,6 @@ class PersonalRender extends Page {
             this.UserData[fieldName] = inputValue;
           }
 
-          console.log('this.UserData:', this.UserData);
           currField.value = openEditInput.value;
           openEditInput.remove();
           const userInfoContent = createSpanElement(ClssNms.U_INFO_CONTENT, currField.value);
@@ -300,6 +309,45 @@ class PersonalRender extends Page {
     return container;
   }
 
+  // private createSaveBtnAdrs(fields: FieldsUser) {
+  //   // isAddress = false
+  //   const PIContainerSave = createDivElement('PI__container-save');
+  //   const UInfoBtnSave = createButtonElement('user-info__btn-save', 'Save', [{ name: 'disabled', value: 'true' }]);
+  //   UInfoBtnSave.addEventListener('click', async (event) => {
+  //     event.preventDefault();
+
+  //     const editFields: FieldsEdit = {};
+  //     fields.forEach(({ field }) => {
+  //       const fieldName = fieldMapping[field];
+  //       if (fieldName && this.UserDataInit[fieldName] !== this.UserData[fieldName]) {
+  //         if (this.UserData[fieldName]) {
+  //           editFields[fieldName] = this.UserData[fieldName] || '';
+  //         }
+  //       }
+  //     });
+
+  //     // if (isPass) {
+  //     updatePasswordField(this.UserData, editFields)
+  //       .then(() => {
+  //         this.UserData.version += 1;
+  //         setTimeout(() => createMsgRegAcc(msgPassSuccess), 0);
+  //         checkCustomer(this.UserData.email, this.UserData.newPassword || '', 'auth-error-message').catch(
+  //           (err) => err.message
+  //         );
+  //       })
+  //       .catch(() => setTimeout(() => createMsgRegAcc(msgPassFail), 0));
+  //     // } else {
+  //     updateCustomerField(this.UserData, editFields)
+  //       .then(() => setTimeout(() => createMsgRegAcc(msgUpdateData), 0))
+  //       .catch(() => setTimeout(() => createMsgRegAcc(msgUpdateFail), 0));
+  //     // }
+  //     UInfoBtnSave.setAttribute('disabled', 'true');
+  //   });
+
+  //   PIContainerSave.appendChild(UInfoBtnSave);
+  //   return PIContainerSave;
+  // }
+
   private createAdrsContainer(currAdrs: Address) {
     const { city, streetName, streetNumber, postalCode, addressType } = currAdrs;
     const UInfoAdrsContainer = createDivElement(ClssNms.U_INFO_ADRS_CONTAINER);
@@ -318,11 +366,32 @@ class PersonalRender extends Page {
     return UInfoAdrsContainer;
   }
 
+  private checkAdrsType(UInfoEditBtn: HTMLButtonElement, container: HTMLDivElement, isActive = false) {
+    const errElem = container.querySelector('.user-info__err-msg-type') as HTMLElement | null;
+    const errMsg = 'The field must not be empty.';
+    const emptyType = container.querySelector('.user-info__content-adrs-type-wrap');
+    if (errElem) {
+      if (!emptyType || isActive) {
+        errElem.textContent = errMsg;
+        errElem.style.display = 'block';
+        UInfoEditBtn.classList.add(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+        UInfoEditBtn.setAttribute('disabled', 'true');
+      } else {
+        errElem.textContent = '';
+        errElem.style.display = '';
+        UInfoEditBtn.classList.remove(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+        UInfoEditBtn.removeAttribute('disabled');
+      }
+    }
+  }
+
   private addType(
     typeCont: HTMLDivElement | HTMLInputElement,
     openBtnListType: HTMLButtonElement | null,
     typeAdd: string,
-    arrCurrTypes: string[]
+    arrCurrTypes: string[],
+    UInfoEditBtn: HTMLButtonElement,
+    container: HTMLDivElement
   ) {
     if (typeAdd) {
       const UInfoCntntAdrsTypeWrap = createDivElement(ClssNms.U_INFO_CONTENT_ADRS_TYPE_WRAP);
@@ -342,6 +411,7 @@ class PersonalRender extends Page {
           const indexTypeDefaultDel = arrCurrTypes.indexOf(typeDefault);
           arrCurrTypes.splice(indexTypeDefaultDel, 1);
         }
+        this.checkAdrsType(UInfoEditBtn, container);
       });
       UInfoCntntAdrsTypeWrap.append(UInfoCntntAdrsType, UInfoCntntAdrsTypeDelete);
       if (openBtnListType) {
@@ -385,7 +455,7 @@ class PersonalRender extends Page {
     });
   }
 
-  private openAdrs(DataAdrs: Address, index: number) {
+  private openAdrs(DataAdrs: Address, index: number, arrCondFn: arrConditionFn[], errMsgsWords: StringArr[]) {
     const { city, streetName, streetNumber, postalCode, addressType } = DataAdrs;
     const adrsType = addressType ? addressType.join(', ') : '';
     const currAddrs: CurrAdrs = {
@@ -398,7 +468,7 @@ class PersonalRender extends Page {
     };
 
     const UInfoAdrsOpen = createDivElement(ClssNms.U_INFO_ADRS_OPEN);
-    Object.entries(currAddrs).forEach(([key, value]) => {
+    Object.entries(currAddrs).forEach(([key, value], indexField) => {
       const currValue: string | undefined = value;
       const currValueObj = { currValue };
       let currValueTypes: string[] = [];
@@ -411,7 +481,8 @@ class PersonalRender extends Page {
 
       const UInfoContentWrap = createDivElement(ClssNms.U_INFO_CONTENT_WRAP);
       const UInfoContent = createSpanElement(ClssNms.U_INFO_CONTENT, currValueObj.currValue);
-      UInfoContentWrap.appendChild(UInfoContent);
+      const errMsgElem = createLabelElement('user-info__err-msg-type');
+      UInfoContentWrap.append(UInfoContent, errMsgElem);
       UInfoFieldWrap.append(UInfoDescrWrap, UInfoContentWrap);
 
       const UInfoEdit = createDivElement(ClssNms.U_INFO_EDIT);
@@ -421,6 +492,7 @@ class PersonalRender extends Page {
         UInfoEditBtn.classList.add('disabled-country');
       }
       UInfoEditBtn.addEventListener('click', (event: Event) => {
+        console.log('после редакции this.UserData:', this.UserData);
         event.preventDefault();
         const UInfoOpenListType = UInfoFieldWrap.querySelector(`.${ClssNms.U_INFO_OPEN_LIST_TYPE}`);
 
@@ -434,7 +506,7 @@ class PersonalRender extends Page {
             (this.UserData.addresses[index].addressType as string[]).forEach((adrs) => {
               if (adrs !== ', ' && adrs) {
                 currValueTypes.push(adrs);
-                this.addType(inputUserInfoCntnt, null, adrs, currValueTypes);
+                this.addType(inputUserInfoCntnt, null, adrs, currValueTypes, UInfoEditBtn, UInfoContentWrap);
               }
             });
 
@@ -458,10 +530,23 @@ class PersonalRender extends Page {
                     UInfoOpenNoOptions?.remove();
                     const typeElem = createDivElement(ClssNms.U_INFO_OPEN_TYPE_ELEM, type);
                     typeElem.addEventListener('click', () => {
+                      this.checkAdrsType(UInfoEditBtn, UInfoContentWrap, false);
+
+                      errMsgElem.textContent = '';
+                      errMsgElem.style.display = 'none';
+                      UInfoEditBtn.classList.remove(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                      UInfoEditBtn.removeAttribute('disabled');
                       const addTypeForDefault = type.split(' ')[1];
                       currValueTypes.push(type);
 
-                      this.addType(inputUserInfoCntnt, UInfoCntntInpOpenBtn, type, currValueTypes);
+                      this.addType(
+                        inputUserInfoCntnt,
+                        UInfoCntntInpOpenBtn,
+                        type,
+                        currValueTypes,
+                        UInfoEditBtn,
+                        UInfoContentWrap
+                      );
 
                       if (type === AdrsType.BILLING_DEFAULT || type === AdrsType.SHIPPING_DEFAULT) {
                         if (!currValueTypes.includes(addTypeForDefault)) {
@@ -469,7 +554,14 @@ class PersonalRender extends Page {
                             UInfoFieldWrap.querySelectorAll(`.${ClssNms.U_INFO_OPEN_TYPE_ELEM}`)
                           ).filter((currTypeElem) => currTypeElem.textContent === addTypeForDefault)[0];
                           typeElemDelete?.remove();
-                          this.addType(inputUserInfoCntnt, UInfoCntntInpOpenBtn, addTypeForDefault, currValueTypes);
+                          this.addType(
+                            inputUserInfoCntnt,
+                            UInfoCntntInpOpenBtn,
+                            addTypeForDefault,
+                            currValueTypes,
+                            UInfoEditBtn,
+                            UInfoContentWrap
+                          );
                           currValueTypes.push(addTypeForDefault);
                         }
                       }
@@ -487,6 +579,26 @@ class PersonalRender extends Page {
             inputUserInfoCntnt.appendChild(UInfoCntntInpOpenBtn);
           } else {
             inputUserInfoCntnt = createInputElement(ClssNms.U_INFO_CONTENT_INPUT);
+            UInfoContentWrap.appendChild(errMsgElem);
+            inputUserInfoCntnt.addEventListener('input', () => {
+              for (let i = 0; i < arrCondFn[indexField].length; i += 1) {
+                const inptValue = (inputUserInfoCntnt as HTMLInputElement).value;
+                const errMsg = errMsgsWords[indexField][i];
+                if (!arrCondFn[indexField][i](inptValue)) {
+                  errMsgElem.textContent = errMsg;
+                  errMsgElem.style.display = 'block';
+                  UInfoEditBtn.classList.add(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                  UInfoEditBtn.setAttribute('disabled', 'true');
+                  break;
+                } else {
+                  errMsgElem.textContent = '';
+                  errMsgElem.style.display = '';
+                  UInfoEditBtn.classList.remove(`${ClssNms.U_INFO_EDIT_BTN_DISABLED}`);
+                  UInfoEditBtn.removeAttribute('disabled');
+                }
+              }
+            });
+
             inputUserInfoCntnt.setAttribute('value', currValueObj.currValue || '');
           }
 
@@ -537,7 +649,7 @@ class PersonalRender extends Page {
     return UInfoAdrsOpen;
   }
 
-  private createPIContainerAddress(DataAddresses: Addresses) {
+  private createPIContainerAddress(DataAddresses: Addresses, arrCondFn: arrConditionFn[], errMsgsWords: StringArr[]) {
     const container = this.createContainer(Txt.ADRSS_TITLE);
 
     DataAddresses.forEach((DataAdrs, index) => {
@@ -563,7 +675,7 @@ class PersonalRender extends Page {
 
       const UInfoToggle = createDivElement(ClssNms.U_INFO_TOGGLE);
       const UInfoToggleBtn = createButtonElement(ClssNms.U_INFO_TOGGLE_BTN);
-      let currOpenAdress = this.openAdrs(DataAdrs, index);
+      let currOpenAdress = this.openAdrs(DataAdrs, index, arrCondFn, errMsgsWords);
 
       UInfoToggleBtn.addEventListener('click', (event) => {
         console.log('DataAdrs:', DataAdrs);
@@ -583,7 +695,7 @@ class PersonalRender extends Page {
           setTimeout(() => currOpenAdress.classList.add(ClssNms.ADRS_OPEN), 10);
         } else {
           openAdrsElem.style.overflow = 'hidden';
-          currOpenAdress = this.openAdrs(DataAdrs, index);
+          currOpenAdress = this.openAdrs(DataAdrs, index, arrCondFn, errMsgsWords);
           const currUInfoAdrsContainer = this.createAdrsContainer(this.UserData.addresses[index]);
           openAdrsElem.classList.remove(ClssNms.ADRS_OPEN);
           UInfoToggleBtn.setAttribute('disabled', 'true');
@@ -609,6 +721,7 @@ class PersonalRender extends Page {
       container.append(userAddress);
     });
 
+    // const saveBtn = this.createSaveBtnAdrs();
     return container;
   }
 
@@ -730,6 +843,26 @@ class PersonalRender extends Page {
   render(allUserData: CustomerData) {
     this.UserData = getPersonalData(allUserData);
 
+    const adrssesInit: Addresses = [];
+    this.UserData.addresses.forEach((adrs) => {
+      const objAdrs: Address = {
+        id: '',
+        streetName: '',
+        streetNumber: '',
+        postalCode: '',
+        city: '',
+        country: '',
+      };
+      objAdrs.addressType = JSON.parse(JSON.stringify(adrs.addressType));
+      objAdrs.city = adrs.city;
+      objAdrs.country = adrs.country;
+      objAdrs.id = adrs.id;
+      objAdrs.postalCode = adrs.postalCode;
+      objAdrs.streetName = adrs.streetName;
+      objAdrs.streetNumber = adrs.streetNumber;
+      adrssesInit.push(objAdrs);
+    });
+
     this.UserDataInit = {
       firstName: this.UserData.firstName,
       lastName: this.UserData.lastName,
@@ -737,8 +870,11 @@ class PersonalRender extends Page {
       email: this.UserData.email,
       currentPassword: '',
       newPassword: '',
+      addresses: adrssesInit,
     };
-    console.log(this.UserData);
+
+    console.log('this.UserData:', this.UserData);
+    console.log('this.UserDataInit:', this.UserDataInit);
 
     const basicFields = [
       {
@@ -766,7 +902,7 @@ class PersonalRender extends Page {
     const contactCondFn = [condEmailPersonal];
     const contErr = [errEmailPersonal];
 
-    const securityFields = [
+    const securFields = [
       {
         field: 'Old Password',
         value: '••••••••',
@@ -776,33 +912,25 @@ class PersonalRender extends Page {
         value: '••••••••',
       },
     ];
-    const securityCondFn = [condOldPswrdPersonal, condPswrdPersonal];
-    const securityErr = [errOldPswdPersonal, errNewPswdPersonal];
+    const securCondFn = [condOldPswrdPersonal, condPswrdPersonal];
+    const securErr = [errOldPswdPersonal, errNewPswdPersonal];
+
+    // const adrsFields = [{}];
+    const adrsCondFn = [conditionStreet, conditionWord, conditionStreet, conditionHouseNumber, conditionPostcode];
+    const adrsErr = [errMsgsStreet, errMsgsWord, errMsgsStreet, errMsgsHouseNumber, errMsgsPostcode];
 
     const titlePersonalPage = this.createTitlePage();
     const basicInfContainer = this.createPIContainer(Txt.BASIC_TITLE, basicFields, basicCondFn, basicErr);
     const contactInfContainer = this.createPIContainer(Txt.CONTACT_INF_TITLE, contactFields, contactCondFn, contErr);
-    const addressesContainer = this.createPIContainerAddress(this.UserData.addresses);
-    // const securityContainer = this.createPIContainer(
-    //   'Security Information (change password)',
-    //   securityFields,
-    //   securityCondFn,
-    //   securityErr
-    // );
-    const test123 = this.createSecurityContainer(
-      'Security Information (change password)',
-      securityFields,
-      securityCondFn,
-      securityErr
-    );
+    const addressesContainer = this.createPIContainerAddress(this.UserData.addresses, adrsCondFn, adrsErr);
+    const securContainer = this.createSecurityContainer(Txt.SECURITY_TITLE, securFields, securCondFn, securErr);
 
     this.mainWrapper.append(
       titlePersonalPage,
       basicInfContainer,
       contactInfContainer,
       addressesContainer,
-      // securityContainer,
-      test123
+      securContainer
     );
     this.main.appendChild(this.mainWrapper);
     this.pageWrapper.appendChild(this.main);

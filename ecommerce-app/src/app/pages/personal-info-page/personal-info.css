@@ -223,6 +223,14 @@ body {
     font-size: 0.875rem;
     color: red;
 }
+.user-info__err-msg-type {
+    display: none;
+    position: absolute;
+    top: 95%;
+    /* height: 16px; */
+    font-size: 0.875rem;
+    color: red;
+}
 
 .user-info__content-input-open-btn {
     margin-left: auto;

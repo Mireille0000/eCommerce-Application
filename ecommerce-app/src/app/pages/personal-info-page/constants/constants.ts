@@ -1,4 +1,4 @@
-import { FieldsMap } from '../../../utils/types';
+import { AdrsMap, FieldsMap } from '../../../utils/types';
 
 export const enum ClssNms {
   WRAPPER = 'wrapper',
@@ -63,6 +63,7 @@ export const enum ClssNms {
 export const enum Txt {
   MAIN_TITLE = 'Personal information',
   BASIC_TITLE = 'Basic information',
+  SECURITY_TITLE = 'Security Information (change password)',
   FIRST_NAME_DSCR = 'First Name',
   LAST_NAME_DSCR = 'Last Name',
   DATE_OF_BIRTH_DSCR = 'Date-of-birth',
@@ -103,6 +104,14 @@ export const fieldMapping: FieldsMap = {
   [Txt.EMAIL_DSCR]: 'email',
   'Old Password': 'currentPassword',
   'New Password': 'newPassword',
+};
+
+export const adrsFieldMap: AdrsMap = {
+  [Txt.SITY_DSCR]: 'city',
+  [Txt.STREET_DSCR]: 'streetName',
+  [Txt.STREET_NUMB_DSCR]: 'streetNumber',
+  [Txt.POSTAL_CODE_DSCR]: 'postalCode',
+  [Txt.COUNTRY_DSCR]: 'country',
 };
 
 export const msgUpdateData = ['Success!', 'Data updated successfully.'];
