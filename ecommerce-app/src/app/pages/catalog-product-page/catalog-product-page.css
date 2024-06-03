@@ -83,9 +83,20 @@
 
 /* manipulating with product list */
 
+.manipulatings {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.manipulating-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
 .manipulating-buttons, .filter-buttons-container {
     display: flex;
-    justify-content: center;
+    /* justify-content: center; */
     flex-wrap: wrap;
     gap: 10px;
     margin: 10px;
@@ -190,10 +201,35 @@
 }
 
 .search-input {
-    width: 220px;
+    /* width: 220px; */
     height: 25px;
     text-align: center;
     border-radius: 10px;
+}
+
+.nav-categories-container  {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.categories-title {
+    margin: 0;
+}
+
+.categories-list-item {
+    text-shadow: rgb(112, 139, 220) 1px 0 10px;
+    cursor: pointer;
+    transition: 1s;
+}
+
+.categories-list-item:hover {
+    transition: 1s;
+    text-shadow: rgb(224, 221, 125) 1px 0 10px;
+}
+
+.staff-category.active-category, .mage-robe-category.active-category, .cauldron-category.active-category {
+    text-shadow: rgb(224, 221, 125) 1px 0 10px;
 }
 
 @media screen and (max-width: 1040px) {

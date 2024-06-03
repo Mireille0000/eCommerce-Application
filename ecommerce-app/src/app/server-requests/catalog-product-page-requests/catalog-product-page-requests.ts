@@ -257,6 +257,7 @@ async function getSortedElements(token: string, requestOption: string) {
   }
 }
 
+// serching request
 async function getSearchedData(token: string, inputValue: string) {
   try {
     const responseSearched = await fetch(
@@ -283,6 +284,50 @@ async function getSearchedData(token: string, inputValue: string) {
   }
 }
 
+// navigation category
+async function getCategoryData(token: string, categoryId: string) {
+  try {
+    const responseCategoryData = await fetch(
+      `
+      https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-projections/search?filter=categories.id:${categoryId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${`${token}`}`,
+        },
+      }
+    );
+    const categoryData = await responseCategoryData.json();
+    if (categoryData.status === 400 || categoryData.status === 401) {
+      const error = new Error(categoryData.message);
+      throw error;
+    } else {
+      createFilteredProductCards(categoryData);
+      console.log(categoryData);
+    }
+    return categoryData;
+  } catch (err) {
+    return err;
+  }
+}
+
+// staff - e55c6123-6fc5-4dca-bd45-69b0da748f83
+// robe - 56e82db6-856a-4e06-9fa4-40f525e577d1
+// cauldron - ebf3ff31-53b8-4d9e-97ea-32632f276550
+
+function addRemoveActiveState(elemByClass: string) {
+  const activeToRemove = document.querySelector('.active-category') as HTMLElement;
+  if (activeToRemove) {
+    activeToRemove.classList.remove('active-category');
+  }
+  const elem = document.querySelector(`.${elemByClass}`) as HTMLElement;
+  // if (elem.classList.contains('active-category')) {
+  //   elem.classList.remove('active-category');
+  // } else {
+  elem.classList.add('active-category');
+  // }
+}
 export default async function getProductListByToken() {
   try {
     const response = await fetch(
@@ -367,6 +412,24 @@ export default async function getProductListByToken() {
         getSearchedData(data.access_token, searchInputValue.value);
         console.log(searchInputValue.value);
       });
+      // navigation categories data
+      const staffCategoryId = `"e55c6123-6fc5-4dca-bd45-69b0da748f83"`;
+      const mageRobeCategoryId = `"56e82db6-856a-4e06-9fa4-40f525e577d1"`;
+      const cauldronCategoryId = `"ebf3ff31-53b8-4d9e-97ea-32632f276550"`;
+
+      addEventHandler('staff-category', 'click', () => {
+        addRemoveActiveState('staff-category');
+        getCategoryData(data.access_token, staffCategoryId);
+      });
+      addEventHandler('mage-robe-category', 'click', () => {
+        addRemoveActiveState('mage-robe-category');
+        getCategoryData(data.access_token, mageRobeCategoryId);
+      });
+      addEventHandler('cauldron-category', 'click', () => {
+        addRemoveActiveState('cauldron-category');
+        getCategoryData(data.access_token, cauldronCategoryId);
+      });
+      console.log('Hey');
     }
   } catch (err) {
     console.log(err);
