@@ -3,7 +3,7 @@ import ctpClient, { ProcessEnv } from './BuildClient';
 
 const projectKey = ProcessEnv.CTP_PROJECT_KEY as string;
 
-const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
+export const apiRoot = createApiBuilderFromCtpClient(ctpClient).withProjectKey({ projectKey });
 
 export type Address = {
   streetName: string;

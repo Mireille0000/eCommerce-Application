@@ -2,7 +2,7 @@ import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement from '../../utils/functions';
 
-export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', 'profile-page']; // change profile page id if needed
+export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#profile-page']; // change profile page id if needed
 export default class MainPage extends Page {
   info: HTMLDivElement;
 

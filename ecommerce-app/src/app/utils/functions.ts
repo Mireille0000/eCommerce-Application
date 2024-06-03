@@ -35,6 +35,12 @@ export function createButtonElement(newClass = '', text = '', attributes: ElemAt
 export function createInputElement(newClass = '', text = '', attributes: ElemAttributes = []): HTMLInputElement {
   return createHtmlElement('input', newClass, text, attributes);
 }
+export function createH2Element(newClass = '', text = '', attributes: ElemAttributes = []): HTMLInputElement {
+  return createHtmlElement('h2', newClass, text, attributes);
+}
+export function createH3Element(newClass = '', text = '', attributes: ElemAttributes = []): HTMLInputElement {
+  return createHtmlElement('h3', newClass, text, attributes);
+}
 
 export function addEventHandler(element: string, eventType: string, callback = () => {}) {
   const target = document.querySelector(`.${element}`);
