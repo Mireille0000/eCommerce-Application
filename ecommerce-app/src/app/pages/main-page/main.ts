@@ -16,8 +16,12 @@ export default class MainPage extends Page {
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.header, this.main, this.footer);
     const headerCompInstance = new HeaderComponent();
-    const { appName, navBar, navigation, navItem, link } = headerCompInstance;
-    this.addElemsToHeader(appName, navBar);
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerCompInstance;
+    this.addElemsToHeader(appName, logoContainer, navBar);
+    // logo.src = iconRobe;
+    // logo.alt = 'icon Mage Robe';
+    console.log(logo);
+    logoContainer.append(logo);
     navBar.className = 'navigation-main-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);

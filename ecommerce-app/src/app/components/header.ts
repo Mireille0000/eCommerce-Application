@@ -1,5 +1,11 @@
+import iconRobe from '../../assets/images/icon-mage.svg';
+
 export default class HeaderComponent {
   appName: HTMLHeadingElement;
+
+  logoContainer: HTMLDivElement;
+
+  logo: HTMLImageElement;
 
   navBar: HTMLElement;
 
@@ -11,6 +17,12 @@ export default class HeaderComponent {
 
   constructor() {
     this.appName = document.createElement('h1');
+    this.logoContainer = document.createElement('div');
+    this.logoContainer.className = 'logo-container';
+    this.logo = document.createElement('img');
+    this.logo.className = 'icon-image';
+    this.logo.src = iconRobe;
+    this.logo.alt = 'icon Mage Robe';
     this.navBar = document.createElement('nav');
     this.navigation = document.createElement('ul');
     this.navItem = document.createElement('li');

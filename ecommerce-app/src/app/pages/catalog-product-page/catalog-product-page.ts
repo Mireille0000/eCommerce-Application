@@ -53,8 +53,9 @@ export default class CatalogProductPage extends Page {
     //   linkItem.innerHTML = navLinksNames[i];
     // });
 
-    const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
-    this.addElemsToHeader(appName, navBar);
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
+    this.addElemsToHeader(appName, logoContainer, this.pageTitle, navBar);
+    logoContainer.append(logo);
     navBar.className = 'nav-bar-catalog-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
@@ -81,7 +82,6 @@ export default class CatalogProductPage extends Page {
     for (let i = 0; i < navLinksArr.length; i += 1) {
       navLinksArr[i].innerHTML = linkName[i];
       navLinksArr[i].setAttribute('href', routes[i]);
-      console.log('I ran');
     }
 
     const logInLink = navLinksArr[0];
