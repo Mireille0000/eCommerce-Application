@@ -8,6 +8,8 @@ import SearchingForm from './product-list-manipulations/searching-form';
 import CategoriesNavigation from './product-list-manipulations/category-navigation-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
 
+const routes = ['#log-in-page', '#registration-page', '#main-page', 'profile-page']; // change profile page id if needed
+
 export default class CatalogProductPage extends Page {
   pageTitle: HTMLHeadingElement;
 
@@ -37,19 +39,64 @@ export default class CatalogProductPage extends Page {
     this.pageWrapper.append(this.header, this.main, this.footer);
     // header
     const catalogPageHeader = new HeaderComponent();
-    const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
-    navBar.className = 'nav-bar-catalog-page';
+    // const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
+    // navBar.className = 'nav-bar-catalog-page';
 
-    this.addElemsToHeader(appName, this.pageTitle, navBar);
-    appName.innerHTML = 'Ultimate  ScriptSmith';
+    // this.addElemsToHeader(appName, this.pageTitle, navBar);
+    // appName.innerHTML = 'Ultimate  ScriptSmith';
+    // navBar.append(navigation);
+    // catalogPageHeader.createNavigation(navigation, navItem, 4, link);
+    // const navLinksNames = ['Profile', 'Back to main', 'Log in', 'Register'];
+    // const navLinksArr = Array.from(document.querySelectorAll('.nav-link'));
+    // navLinksArr.forEach((item, i) => {
+    //   const linkItem = item;
+    //   linkItem.innerHTML = navLinksNames[i];
+    // });
+
+    const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
+    this.addElemsToHeader(appName, navBar);
+    navBar.className = 'nav-bar-catalog-page';
     navBar.append(navigation);
-    catalogPageHeader.createNavigation(navigation, navItem, 4, link);
-    const navLinksNames = ['Profile', 'Back to main', 'Log in', 'Register'];
-    const navLinksArr = Array.from(document.querySelectorAll('.nav-link'));
-    navLinksArr.forEach((item, i) => {
-      const linkItem = item;
-      linkItem.innerHTML = navLinksNames[i];
+    const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
+    const profileLink = isUserLoggedIn ? 'Profile' : false;
+    console.log(isUserLoggedIn, logLink, profileLink);
+    const linkName = [logLink, 'Register', 'Back to main', 'Profile'];
+    navigation.append(navItem);
+    navItem.className = 'nav-item';
+    for (let i = 0; i < 2; i += 1) {
+      navigation.appendChild(navItem.cloneNode(true));
+    }
+
+    if (profileLink) {
+      navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
+    }
+    const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
+
+    for (let i = 0; i < navListItemsArr.length; i += 1) {
+      navListItemsArr[i].appendChild(link.cloneNode(true));
+    }
+    const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
+
+    for (let i = 0; i < navLinksArr.length; i += 1) {
+      navLinksArr[i].innerHTML = linkName[i];
+      navLinksArr[i].setAttribute('href', routes[i]);
+      console.log('I ran');
+    }
+
+    const logInLink = navLinksArr[0];
+
+    logInLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      if (isUserLoggedIn) {
+        localStorage.clear();
+        window.location.hash = '';
+        window.location.hash = 'main-page';
+      } else {
+        window.location.hash = 'log-in-page';
+      }
     });
+    appName.innerHTML = 'Ultimate ScriptSmith';
 
     // main
     const filteringForm = new FilterForm();
