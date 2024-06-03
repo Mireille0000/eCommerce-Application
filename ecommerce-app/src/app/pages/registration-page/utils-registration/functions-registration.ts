@@ -63,14 +63,14 @@ function goToMainPageWindow(result: ClientResponse) {
   }
 }
 
-function customerAuth() {
-  if (window.location.hash === '#main-page') {
-    const element = document.querySelector('a[href="#log-in-page"]');
-    if (element) {
-      element.textContent = 'Log out';
-    }
-  }
-}
+// function customerAuth() {
+//   if (window.location.hash === '#main-page') {
+//     const element = document.querySelector('a[href="#log-in-page"]');
+//     if (element) {
+//       element.textContent = 'Log out';
+//     }
+//   }
+// }
 
 function getAddress(addressType: string) {
   const address = document.querySelector(`.${addressType}-wrapper`);
@@ -187,9 +187,8 @@ export function btnEventHandler(event: Event) {
 
     createCustomer(customerDraftData)
       .then((res) => {
-        goToMainPageWindow(res);
         checkCustomer(customerDraftData.email, customerDraftData.password, 'auth-error-message')
-          .then(customerAuth)
+          .then(() => goToMainPageWindow(res))
           .catch((err) => err.message);
       })
       .catch((errRes) => {

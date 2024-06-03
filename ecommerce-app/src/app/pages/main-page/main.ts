@@ -2,7 +2,7 @@ import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement from '../../utils/functions';
 
-export const routes = ['#log-in-page', '#registration-page'];
+export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', 'profile-page']; // change profile page id if needed
 export default class MainPage extends Page {
   info: HTMLDivElement;
 
@@ -16,24 +16,28 @@ export default class MainPage extends Page {
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.header, this.main, this.footer);
     const headerCompInstance = new HeaderComponent();
-    const headerElems = [
-      headerCompInstance.appName,
-      headerCompInstance.navBar,
-      headerCompInstance.navigation,
-      headerCompInstance.navItem,
-      headerCompInstance.link,
-    ];
-    const [title, navigation, navList, navListItem, link] = headerElems;
-    this.addElemsToHeader(title, navigation);
-    navigation.className = 'navigation-main-page';
-    navigation.append(navList);
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerCompInstance;
+    this.addElemsToHeader(appName, logoContainer, navBar);
+    // logo.src = iconRobe;
+    // logo.alt = 'icon Mage Robe';
+    console.log(logo);
+    logoContainer.append(logo);
+    navBar.className = 'navigation-main-page';
+    navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
-    const linkName = [logLink, 'Register'];
-    navList.append(navListItem);
-    navListItem.className = 'nav-item';
-    for (let i = 0; i < 1; i += 1) {
-      navList.appendChild(navListItem.cloneNode(true));
+    const profileLink = isUserLoggedIn ? 'Profile' : false;
+    console.log(isUserLoggedIn, logLink, profileLink);
+    const linkName = [logLink, 'Register', 'Catalog', 'Profile'];
+    navigation.append(navItem);
+    navItem.className = 'nav-item';
+    for (let i = 0; i < 2; i += 1) {
+      navigation.appendChild(navItem.cloneNode(true));
+    }
+
+    if (profileLink) {
+      console.log('appending');
+      navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
     }
     const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
 
@@ -45,6 +49,7 @@ export default class MainPage extends Page {
     for (let i = 0; i < navLinksArr.length; i += 1) {
       navLinksArr[i].innerHTML = linkName[i];
       navLinksArr[i].setAttribute('href', routes[i]);
+      console.log('I ran');
     }
 
     const logInLink = navLinksArr[0];
@@ -60,7 +65,7 @@ export default class MainPage extends Page {
       }
     });
 
-    title.innerHTML = 'Ultimate ScriptSmith';
+    appName.innerHTML = 'Ultimate ScriptSmith';
 
     this.addElemsToMain(this.info);
 

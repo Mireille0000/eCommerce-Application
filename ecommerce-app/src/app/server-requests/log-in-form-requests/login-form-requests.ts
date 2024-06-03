@@ -70,7 +70,10 @@ export default async function checkCustomer(email: string, password: string, err
       refresh_token: `${passwordFlowData.refresh_token}`,
     };
 
-    localStorage.setItem('data', JSON.stringify(tokens));
+    if (passwordFlowData.access_token && passwordFlowData.refresh_token) {
+      localStorage.setItem('data', JSON.stringify(tokens));
+    }
+
     getCustomerToken(passwordFlowData.access_token);
   } catch (err) {
     const mute = err;

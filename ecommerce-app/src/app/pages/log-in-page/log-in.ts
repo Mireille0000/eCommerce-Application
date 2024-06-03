@@ -51,14 +51,24 @@ export default class LogInPage extends Page {
     this.main.className = 'log-in-main';
     // header
     const headerComponent = new HeaderComponent();
-    const { appName, navBar, navigation, navItem, link } = headerComponent;
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerComponent;
     headerComponent.navBar.className = 'nav-bar';
-    this.addElemsToHeader(appName, navBar);
+    this.addElemsToHeader(appName, logoContainer, navBar);
+    logoContainer.append(logo);
     navBar.append(navigation);
     navigation.append(navItem);
     navItem.append(link);
-    link.innerHTML = 'Back to Main';
-    link.setAttribute('href', '#main-page');
+    navItem.className = 'nav-item';
+    const linkText = ['Back to Main', 'Catalog'];
+    const linkHrefs = ['#main-page', '#catalog-product-page'];
+    navigation.appendChild(navItem.cloneNode(true));
+
+    const links = Array.from(document.querySelectorAll('.nav-item a'));
+    links.forEach((item, i) => {
+      const linkItm = item;
+      linkItm.innerHTML = linkText[i];
+      linkItm.setAttribute('href', linkHrefs[i]);
+    });
     appName.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
