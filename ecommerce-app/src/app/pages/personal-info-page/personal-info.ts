@@ -23,36 +23,26 @@ import {
   AdrsType,
   ClssNms,
   Txt,
+  adrsCondFn,
+  adrsErr,
+  adrsFieldMap,
+  basicCondFn,
+  basicErr,
+  contErr,
+  contactCondFn,
   fieldMapping,
   msgPassFail,
   msgPassSuccess,
   msgUpdateData,
   msgUpdateFail,
+  securCondFn,
+  securErr,
+  securFields,
 } from './constants/constants';
 
 import edit from '../../../assets/images/edit.svg';
 import deleteAddress from '../../../assets/images/delete_address.svg';
 import toogle from '../../../assets/images/toggle.svg';
-import {
-  condBirthPersonal,
-  condEmailPersonal,
-  condOldPswrdPersonal,
-  condPswrdPersonal,
-  conditionHouseNumber,
-  conditionPostcode,
-  conditionStreet,
-  conditionWord,
-} from '../registration-page/validation/validationFn';
-import {
-  errBirthPersonal,
-  errEmailPersonal,
-  errMsgsHouseNumber,
-  errMsgsPostcode,
-  errMsgsStreet,
-  errMsgsWord,
-  errNewPswdPersonal,
-  errOldPswdPersonal,
-} from '../registration-page/validation/validationMsgs';
 import CustomerLoader from '../../server-requests/personal-info-request/getPersonalData';
 import updateCustomerField, {
   updatePasswordField,
@@ -61,7 +51,8 @@ import { createMsgRegAcc } from '../registration-page/utils-registration/functio
 import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 import HeaderComponent from '../../components/header';
 import { routes } from '../main-page/main';
-// import { routes } from '../main-page/main';
+import { Action, ActionEdit, ActionsEdit, AdrsEdit, AdrssEdit } from './constants/types';
+import { updateAdrssFields } from '../../server-requests/personal-info-request/updateAdrs';
 
 interface FieldUser {
   field: string;
@@ -156,6 +147,7 @@ class PersonalRender extends Page {
     this.pageWrapper.classList.add(ClssNms.WRAPPER_PI);
     this.main.classList.add(ClssNms.MAIN);
     this.mainWrapper.classList.add(ClssNms.WRAPPER_MAIN_PI);
+    this.headerWrapper.classList.add('header-personal');
     this.numberAddrs = 0;
   }
 
@@ -309,44 +301,154 @@ class PersonalRender extends Page {
     return container;
   }
 
-  // private createSaveBtnAdrs(fields: FieldsUser) {
-  //   // isAddress = false
-  //   const PIContainerSave = createDivElement('PI__container-save');
-  //   const UInfoBtnSave = createButtonElement('user-info__btn-save', 'Save', [{ name: 'disabled', value: 'true' }]);
-  //   UInfoBtnSave.addEventListener('click', async (event) => {
-  //     event.preventDefault();
+  private copyInitData() {
+    const adrssesInit: Addresses = [];
 
-  //     const editFields: FieldsEdit = {};
-  //     fields.forEach(({ field }) => {
-  //       const fieldName = fieldMapping[field];
-  //       if (fieldName && this.UserDataInit[fieldName] !== this.UserData[fieldName]) {
-  //         if (this.UserData[fieldName]) {
-  //           editFields[fieldName] = this.UserData[fieldName] || '';
-  //         }
-  //       }
-  //     });
+    this.UserData.addresses.forEach((adrs) => {
+      const objAdrs: Address = {
+        addressType: JSON.parse(JSON.stringify(adrs.addressType)),
+        id: adrs.id,
+        streetName: adrs.streetName,
+        streetNumber: adrs.streetNumber,
+        postalCode: adrs.postalCode,
+        city: adrs.city,
+        country: adrs.country,
+      };
+      adrssesInit.push(objAdrs);
+    });
 
-  //     // if (isPass) {
-  //     updatePasswordField(this.UserData, editFields)
-  //       .then(() => {
-  //         this.UserData.version += 1;
-  //         setTimeout(() => createMsgRegAcc(msgPassSuccess), 0);
-  //         checkCustomer(this.UserData.email, this.UserData.newPassword || '', 'auth-error-message').catch(
-  //           (err) => err.message
-  //         );
-  //       })
-  //       .catch(() => setTimeout(() => createMsgRegAcc(msgPassFail), 0));
-  //     // } else {
-  //     updateCustomerField(this.UserData, editFields)
-  //       .then(() => setTimeout(() => createMsgRegAcc(msgUpdateData), 0))
-  //       .catch(() => setTimeout(() => createMsgRegAcc(msgUpdateFail), 0));
-  //     // }
-  //     UInfoBtnSave.setAttribute('disabled', 'true');
-  //   });
+    this.UserDataInit = {
+      firstName: this.UserData.firstName,
+      lastName: this.UserData.lastName,
+      dateOfBirth: this.UserData.dateOfBirth,
+      email: this.UserData.email,
+      currentPassword: '',
+      newPassword: '',
+      addresses: adrssesInit,
+    };
+  }
 
-  //   PIContainerSave.appendChild(UInfoBtnSave);
-  //   return PIContainerSave;
-  // }
+  private createSaveBtnAdrs() {
+    const PIContainerSave = createDivElement('PI__container-save');
+    const UInfoBtnSave = createButtonElement('user-info__btn-save-adrs', 'Save', [{ name: 'disabled', value: 'true' }]);
+    const fields = ['id', 'streetName', 'streetNumber', 'postalCode', 'city', 'addressType'];
+    const adrsFieldMapKey = Object.keys(adrsFieldMap);
+    const successEditAdrs = ['Success!', 'Data updated successfully.'];
+    const failEditAdrs = ['Failure :(', 'Something went wrong...'];
+
+    UInfoBtnSave.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const addressesEdit: AdrssEdit = [];
+      const addressesTypeEdit: ActionsEdit = [];
+
+      this.UserData.addresses.forEach((currAdrs, index) => {
+        const currTypes = currAdrs.addressType as string[];
+        const initTypes = this.UserDataInit.addresses[index].addressType as string[];
+        if (JSON.stringify(currTypes) !== JSON.stringify(initTypes)) {
+          currTypes.forEach((currType) => {
+            let action: Action;
+            if (!initTypes.includes(currType)) {
+              if (currType === 'Billing') {
+                action = 'addBillingAddressId';
+              } else if (currType === 'Shipping') {
+                action = 'addShippingAddressId';
+              } else if (currType === 'Default Shipping') {
+                action = 'setDefaultShippingAddress';
+              } else {
+                action = 'setDefaultBillingAddress';
+              }
+              const typeAction = {
+                action,
+                addressId: this.UserData.addresses[index].id,
+              };
+              addressesTypeEdit.push(typeAction);
+            }
+          });
+
+          initTypes.forEach((currType) => {
+            let action: Action;
+            if (!currTypes.includes(currType)) {
+              if (currType === 'Billing') {
+                action = 'removeBillingAddressId';
+              } else if (currType === 'Shipping') {
+                action = 'removeShippingAddressId';
+              } else if (currType === 'Default Shipping') {
+                action = 'setDefaultShippingAddress';
+              } else {
+                action = 'setDefaultBillingAddress';
+              }
+              const typeAction: ActionEdit = {
+                action,
+                addressId: this.UserData.addresses[index].id,
+              };
+              if (action === 'setDefaultBillingAddress' || action === 'setDefaultShippingAddress') {
+                delete typeAction.addressId;
+              }
+
+              addressesTypeEdit.push(typeAction);
+            }
+          });
+        }
+
+        const adrsObj: AdrsEdit = {};
+
+        for (let i = 0; i < fields.length; i += 1) {
+          const fieldName = adrsFieldMap[adrsFieldMapKey[i]];
+          const userDataValue = currAdrs[fieldName];
+          const initDataValue = this.UserDataInit.addresses[index][fieldName];
+          if (userDataValue !== initDataValue) {
+            adrsObj.city = currAdrs.city;
+            adrsObj.postalCode = currAdrs.postalCode;
+            adrsObj.streetName = currAdrs.streetName;
+            adrsObj.streetNumber = currAdrs.streetNumber;
+            adrsObj.id = currAdrs.id;
+            break;
+          }
+        }
+        if (Object.keys(adrsObj).length) {
+          addressesEdit.push(adrsObj);
+        }
+      });
+      const { id: idUser } = this.UserData;
+
+      updateAdrssFields(addressesEdit, addressesTypeEdit, this.UserData, idUser)
+        .then(() => {
+          this.copyInitData();
+          setTimeout(() => createMsgRegAcc(successEditAdrs), 0);
+        })
+        .catch(() => {
+          setTimeout(() => createMsgRegAcc(failEditAdrs), 0);
+        });
+
+      UInfoBtnSave.setAttribute('disabled', 'true');
+    });
+    // const UInfoBtnNewAdrs = createButtonElement('user-info_btn-new-adrs', 'New Adress');
+    // UInfoBtnNewAdrs.addEventListener('click', (event) => {
+    //   event.preventDefault();
+    //   const adrsCont = document.querySelector('.adress-container') as HTMLDivElement;
+    //   // const
+    //   // DataAddresses: Addresses,
+    //   // arrCondFn: arrConditionFn[],
+    //   // errMsgsWords: StringArr[],
+    //   // container: HTMLDivElement
+    //   const DataAdrs = [
+    //     {
+    //       id: '',
+    //       streetName: '',
+    //       streetNumber: '',
+    //       postalCode: '',
+    //       city: '',
+    //       country: 'Germany',
+    //       // addressType?: string[],
+    //     },
+    //   ];
+    //   this.createFieldAdrss(DataAdrs, adrsCondFn, adrsErr, adrsCont);
+    // });
+
+    // PIContainerSave.append(UInfoBtnNewAdrs, UInfoBtnSave);
+    PIContainerSave.appendChild(UInfoBtnSave);
+    return PIContainerSave;
+  }
 
   private createAdrsContainer(currAdrs: Address) {
     const { city, streetName, streetNumber, postalCode, addressType } = currAdrs;
@@ -492,7 +594,6 @@ class PersonalRender extends Page {
         UInfoEditBtn.classList.add('disabled-country');
       }
       UInfoEditBtn.addEventListener('click', (event: Event) => {
-        console.log('после редакции this.UserData:', this.UserData);
         event.preventDefault();
         const UInfoOpenListType = UInfoFieldWrap.querySelector(`.${ClssNms.U_INFO_OPEN_LIST_TYPE}`);
 
@@ -626,6 +727,10 @@ class PersonalRender extends Page {
               break;
           }
           const currAdrsType = (openEditInput as HTMLInputElement).value || currValueTypes.join(', ');
+          if (currAdrsType !== currValueObj.currValue) {
+            const btnSaveAdrs = document.querySelector('.user-info__btn-save-adrs') as HTMLButtonElement | null;
+            btnSaveAdrs?.removeAttribute('disabled');
+          }
 
           currValueObj.currValue = currAdrsType;
           if (currValueTypes.length) {
@@ -649,9 +754,12 @@ class PersonalRender extends Page {
     return UInfoAdrsOpen;
   }
 
-  private createPIContainerAddress(DataAddresses: Addresses, arrCondFn: arrConditionFn[], errMsgsWords: StringArr[]) {
-    const container = this.createContainer(Txt.ADRSS_TITLE);
-
+  private createFieldAdrss(
+    DataAddresses: Addresses,
+    arrCondFn: arrConditionFn[],
+    errMsgsWords: StringArr[],
+    container: HTMLDivElement
+  ) {
     DataAddresses.forEach((DataAdrs, index) => {
       const userAddress = createDivElement(ClssNms.U_ADRS);
       const userInfo = createDivElement(ClssNms.U_INFO);
@@ -672,14 +780,36 @@ class PersonalRender extends Page {
       const imgDelAdrs = createImage(deleteAddress, Txt.ALT_DELETE_ADRS, ClssNms.IMG_DELETE_ADRS);
       UInfoDelAdrsBtn.appendChild(imgDelAdrs);
       UInfoDelAdrs.appendChild(UInfoDelAdrsBtn);
+      UInfoDelAdrsBtn.addEventListener('click', (event) => {
+        event.preventDefault();
+        const indxDelete = index;
+        const { id } = this.UserData.addresses[indxDelete];
+        const { id: idUser } = this.UserData;
+        const successEditAdrs = ['Success!', 'Data updated successfully.'];
+        const failEditAdrs = ['Failure :(', 'Something went wrong...'];
+
+        const actionDelete: ActionEdit = {
+          action: 'removeAddress',
+          addressId: id,
+        };
+
+        updateAdrssFields([], [actionDelete], this.UserData, idUser)
+          .then(() => {
+            userAddress.remove();
+            this.UserData.addresses.splice(indxDelete, 1);
+            this.UserDataInit.addresses.splice(indxDelete, 1);
+            setTimeout(() => createMsgRegAcc(successEditAdrs), 0);
+          })
+          .catch(() => {
+            setTimeout(() => createMsgRegAcc(failEditAdrs), 0);
+          });
+      });
 
       const UInfoToggle = createDivElement(ClssNms.U_INFO_TOGGLE);
       const UInfoToggleBtn = createButtonElement(ClssNms.U_INFO_TOGGLE_BTN);
       let currOpenAdress = this.openAdrs(DataAdrs, index, arrCondFn, errMsgsWords);
 
       UInfoToggleBtn.addEventListener('click', (event) => {
-        console.log('DataAdrs:', DataAdrs);
-        console.log('this.UserData.addresses:', this.UserData.addresses);
         event.preventDefault();
         const updateAdrsType = currOpenAdress.querySelectorAll(`.${ClssNms.U_INFO_CONTENT}`)[5];
         if (updateAdrsType) {
@@ -720,8 +850,17 @@ class PersonalRender extends Page {
       userAddress.appendChild(userInfo);
       container.append(userAddress);
     });
+  }
 
-    // const saveBtn = this.createSaveBtnAdrs();
+  private createPIContainerAddress(DataAddresses: Addresses, arrCondFn: arrConditionFn[], errMsgsWords: StringArr[]) {
+    const container = this.createContainer(Txt.ADRSS_TITLE);
+    container.classList.add('adress-container');
+
+    this.createFieldAdrss(DataAddresses, arrCondFn, errMsgsWords, container);
+
+    const saveBtn = this.createSaveBtnAdrs();
+    container.appendChild(saveBtn);
+
     return container;
   }
 
@@ -815,7 +954,6 @@ class PersonalRender extends Page {
             btnSave?.removeAttribute('disabled');
           }
 
-          console.log('this.UserData:', this.UserData);
           currField.value = openEditInput.value;
           openEditInput.remove();
           let userInfoContent: HTMLSpanElement;
@@ -847,39 +985,7 @@ class PersonalRender extends Page {
 
     window.location.hash = 'profile-page';
     this.UserData = getPersonalData(allUserData);
-
-    const adrssesInit: Addresses = [];
-    this.UserData.addresses.forEach((adrs) => {
-      const objAdrs: Address = {
-        id: '',
-        streetName: '',
-        streetNumber: '',
-        postalCode: '',
-        city: '',
-        country: '',
-      };
-      objAdrs.addressType = JSON.parse(JSON.stringify(adrs.addressType));
-      objAdrs.city = adrs.city;
-      objAdrs.country = adrs.country;
-      objAdrs.id = adrs.id;
-      objAdrs.postalCode = adrs.postalCode;
-      objAdrs.streetName = adrs.streetName;
-      objAdrs.streetNumber = adrs.streetNumber;
-      adrssesInit.push(objAdrs);
-    });
-
-    this.UserDataInit = {
-      firstName: this.UserData.firstName,
-      lastName: this.UserData.lastName,
-      dateOfBirth: this.UserData.dateOfBirth,
-      email: this.UserData.email,
-      currentPassword: '',
-      newPassword: '',
-      addresses: adrssesInit,
-    };
-
-    console.log('this.UserData:', this.UserData);
-    console.log('this.UserDataInit:', this.UserDataInit);
+    this.copyInitData();
 
     const basicFields = [
       {
@@ -895,8 +1001,6 @@ class PersonalRender extends Page {
         value: this.UserData.dateOfBirth,
       },
     ];
-    const basicCondFn = [conditionWord, conditionWord, condBirthPersonal];
-    const basicErr = [errMsgsWord, errMsgsWord, errBirthPersonal];
 
     const contactFields = [
       {
@@ -904,25 +1008,6 @@ class PersonalRender extends Page {
         value: this.UserData.email,
       },
     ];
-    const contactCondFn = [condEmailPersonal];
-    const contErr = [errEmailPersonal];
-
-    const securFields = [
-      {
-        field: 'Old Password',
-        value: '••••••••',
-      },
-      {
-        field: 'New Password',
-        value: '••••••••',
-      },
-    ];
-    const securCondFn = [condOldPswrdPersonal, condPswrdPersonal];
-    const securErr = [errOldPswdPersonal, errNewPswdPersonal];
-
-    // const adrsFields = [{}];
-    const adrsCondFn = [conditionStreet, conditionWord, conditionStreet, conditionHouseNumber, conditionPostcode];
-    const adrsErr = [errMsgsStreet, errMsgsWord, errMsgsStreet, errMsgsHouseNumber, errMsgsPostcode];
 
     const titlePersonalPage = this.createTitlePage();
     const basicInfContainer = this.createPIContainer(Txt.BASIC_TITLE, basicFields, basicCondFn, basicErr);
@@ -941,7 +1026,6 @@ class PersonalRender extends Page {
 
     const catalogPageHeader = new HeaderComponent();
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
-    console.log('link:', link);
     this.addElemsToHeader(appName, logoContainer, navBar);
     logoContainer.append(logo);
     navBar.className = 'nav-bar-catalog-page';
@@ -949,24 +1033,19 @@ class PersonalRender extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
     const linkName = [logLink, 'Register', 'Back to main', 'Catalog'];
-    // console.log(linkName);
     navigation.append(navItem);
     navItem.className = 'nav-item';
-    console.log('navItem:', navItem);
     for (let i = 0; i < 2; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 
     if (profileLink) {
-      navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
+      navigation.append(navItem.cloneNode(true));
     }
     const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
-    console.log('navListItemsArr:', navListItemsArr);
 
     for (let i = 0; i < navListItemsArr.length; i += 1) {
-      // console.log('link:', link);
       navListItemsArr[i].appendChild(link.cloneNode(true));
     }
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
