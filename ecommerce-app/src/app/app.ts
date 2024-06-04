@@ -4,6 +4,7 @@ import MainPage from './pages/main-page/main';
 import RegistrationPage from './pages/registration-page/registration';
 import ErrorPage from './pages/error-page/error-page';
 import CatalogProductPage from './pages/catalog-product-page/catalog-product-page';
+import PersonalRender from './pages/personal-info-page/personal-info';
 // import { routes } from './pages/main-page/main';
 
 const enum Pages {
@@ -38,7 +39,7 @@ export default class App {
     } else if (id === Pages.DetailedProductPageId && productid) {
       // insert detailedProductPage
     } else if (id === Pages.ProfilePageId && isUserLoggedIn) {
-      // insert  profile page here
+      page = new PersonalRender(id);
     } else {
       page = new ErrorPage('error-page');
     }

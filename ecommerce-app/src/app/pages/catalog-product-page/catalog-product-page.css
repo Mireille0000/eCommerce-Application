@@ -86,6 +86,7 @@
 .manipulatings {
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
 }
 
@@ -128,6 +129,7 @@
 
 .filtering-options fieldset div {
     display: flex;
+    flex-wrap: wrap;
     /* justify-content: space-around; */
 }
 
