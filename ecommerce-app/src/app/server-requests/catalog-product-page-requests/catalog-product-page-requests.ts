@@ -3,7 +3,7 @@ import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
 // import CategoriesNavigation from '../../pages/catalog-product-page/product-list-manipulations/category-navigation-menu';
 
-const enum ProcessEnvCatalog {
+export const enum ProcessEnvCatalog {
   PROJECT_KEY = 'ecommerce-app-f-devs',
 
   CLIENT_ID = 'fGkJ1K9vPXR6Vee9E-SIkaJC',
