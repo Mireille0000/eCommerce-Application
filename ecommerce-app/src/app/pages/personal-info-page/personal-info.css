@@ -9,7 +9,12 @@ body {
     background-color: #9c9c9c83;
     overflow-y: scroll;
 }
-
+header {
+    width: 100%;
+}
+.header-personal {
+    width: 100%;
+}
 .wrapper {
     max-width: 1980px;
     height: 100svh;
@@ -64,7 +69,6 @@ body {
     padding: 0 24px;
     position: relative;
     max-height: 0;
-    /* overflow: hidden; */
     transition: max-height 0.5s ease;
 }
 .user-info__address-open.address-open {
@@ -91,9 +95,6 @@ body {
     height: 1px;
     background-color: #e1e3e1;
 }
-/* .PI__container .user-info:last-child::after {
-    height: 0;
-} */
 .user-address:not(:last-child) .user-info::after,
 .user-address:not(:last-child) .user-info__address-open::after {
     position: absolute;
@@ -111,7 +112,9 @@ body {
     padding: 14px 30px 14px 24px;
     display: flex;
 }
-.user-info__btn-save {
+
+.user-info__btn-save,
+.user-info__btn-save-adrs {
     cursor: pointer;
     margin-left: auto;
     font-size: 1rem;
@@ -121,14 +124,16 @@ body {
     color: rgb(240, 240, 240);
     background-color: #1677ff;
     box-shadow: rgba(0, 0, 0, 0.2) 1px 1px 4px 0px;
-
 }
 .user-info__btn-save:hover,
-.user-info__btn-save:focus {
+.user-info__btn-save:focus,
+.user-info__btn-save-adrs:hover,
+.user-info__btn-save-adrs:focus {
     background-color: #4096ff;
     box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 4px 0px;
 }
-.user-info__btn-save:disabled {
+.user-info__btn-save:disabled,
+.user-info__btn-save-adrs:disabled {
     cursor: default;
     color: rgba(31, 31, 31, 0.38);
     background-color: rgba(31, 31, 31, 0.12);
@@ -219,7 +224,6 @@ body {
     display: none;
     position: absolute;
     top: 95%;
-    /* height: 16px; */
     font-size: 0.875rem;
     color: red;
 }
@@ -227,7 +231,6 @@ body {
     display: none;
     position: absolute;
     top: 95%;
-    /* height: 16px; */
     font-size: 0.875rem;
     color: red;
 }
@@ -263,7 +266,6 @@ body {
     width: 100%;
     border-radius: 4px;
     background-color: rgb(250, 250, 255);
-    /* box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.5); */
     box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px 0px;
 }
 .user-info__open-no-options {
