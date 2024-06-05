@@ -30,8 +30,11 @@ export default class ProductCardPage extends Page {
 
   discountPrice: HTMLSpanElement;
 
-  constructor(id: string) {
+  key: string;
+
+  constructor(id: string, key: string) {
     super(id);
+    this.key = key;
     this.pageWrapper.id = 'product-card-page';
     this.productCardContainer = createHtmlElement('div', 'product-card-container');
     this.imageElem = createHtmlElement('div', 'product-card-image');
@@ -96,11 +99,11 @@ export default class ProductCardPage extends Page {
     this.addElemsToMain(this.productCardContainer);
     this.productCardContainer.append(this.imageElem, this.productCardContent, this.productPrices);
     this.productCardContent.append(this.productDetails, this.productCardSlider);
-    this.productCardSlider.innerHTML = 'THE SLIDER';
+    this.productCardSlider.innerHTML = 'A slider should be here';
     this.imageElem.append(this.image);
     this.productDetails.append(this.productName, this.productDescription);
     this.productPrices.append(this.price, this.discount, this.discountPrice);
-    getToken();
+    getToken(`${this.key}`);
 
     return this.pageWrapper;
   }

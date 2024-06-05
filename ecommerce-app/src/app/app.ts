@@ -5,6 +5,7 @@ import RegistrationPage from './pages/registration-page/registration';
 import ErrorPage from './pages/error-page/error-page';
 import CatalogProductPage from './pages/catalog-product-page/catalog-product-page';
 import PersonalRender from './pages/personal-info-page/personal-info';
+import ProductCardPage from './pages/product-card-page/product-card-page';
 // import { routes } from './pages/main-page/main';
 
 const enum Pages {
@@ -19,7 +20,7 @@ const enum Pages {
 export default class App {
   initialPage: MainPage;
 
-  static renderAppPage(id: string, productid?: string) {
+  static renderAppPage(id: string, productKey?: string) {
     document.body.innerHTML = '';
     let page: Page | null = null;
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
@@ -36,8 +37,9 @@ export default class App {
       page = new MainPage(id);
     } else if (id === Pages.CatalogPageId) {
       page = new CatalogProductPage(id);
-    } else if (id === Pages.DetailedProductPageId && productid) {
-      // insert detailedProductPage
+    } else if (id === Pages.DetailedProductPageId && productKey) {
+      console.log('I happened');
+      page = new ProductCardPage(id, productKey);
     } else if (id === Pages.ProfilePageId && isUserLoggedIn) {
       page = new PersonalRender(id);
     } else {
@@ -57,6 +59,11 @@ export default class App {
   changeRoute() {
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.slice(1);
+      console.log(hash);
+      if (hash.includes('/')) {
+        const [hashname, productKey] = hash.split('/');
+        return App.renderAppPage(hashname, productKey);
+      }
       console.log(this);
       return App.renderAppPage(hash);
     });

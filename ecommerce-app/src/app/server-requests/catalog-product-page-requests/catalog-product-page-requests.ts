@@ -1,6 +1,7 @@
 import { ProductsListData, Prices } from './interfaces-catalog-page';
 import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
+// import getToken from '../detailed-product-page-requests/detailed-product-page-requests';
 // import CategoriesNavigation from '../../pages/catalog-product-page/product-list-manipulations/category-navigation-menu';
 
 export const enum ProcessEnvCatalog {
@@ -11,6 +12,15 @@ export const enum ProcessEnvCatalog {
   SECRET = 'o-i1eGtuwKbH0T8FgH4Gq-Elbbr6sBEf',
 
   DISCOUNT_KEY = 'staff-discount-key',
+}
+
+function getDataKey(productContainer: string) {
+  const cards = Array.from(document.querySelectorAll(`${productContainer}`)) as Array<HTMLElement>;
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      window.location.hash = `${`detailed-product-page/${card.dataset.key}`}`;
+    });
+  });
 }
 
 function createProductCards(dataProducts: ProductsListData) {
@@ -26,13 +36,17 @@ function createProductCards(dataProducts: ProductsListData) {
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
+  getDataKey('.product-container');
 
   for (let i = 0; i < numOfProducts; i += 1) {
     const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
+    const productCards = Array.from(document.querySelectorAll('.product-container')); // is it necessary
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
+
+    productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
     productImagesArr[i].src = `${masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
@@ -73,6 +87,7 @@ interface ProductsArrF {
     sku: string;
   };
   name: { 'en-US': string };
+  key: string;
 }
 
 interface filteredData {
@@ -99,13 +114,15 @@ function createFilteredProductCards(dataProducts: filteredData) {
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
-
+  getDataKey('.product-container');
   for (let i = 0; i < numOfProducts; i += 1) {
     const { name, description } = dataProducts.results[i];
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
+    const productCards = Array.from(document.querySelectorAll('.product-container'));
+    productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
     productImagesArr[i].src = `${dataProducts.results[i].masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;

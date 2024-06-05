@@ -225,7 +225,6 @@ export default class CatalogProductPage extends Page {
       inputsArr.forEach((item: HTMLInputElement) => {
         const inputItem = item;
         inputItem.checked = false;
-        console.log(inputItem.checked);
       });
     });
 

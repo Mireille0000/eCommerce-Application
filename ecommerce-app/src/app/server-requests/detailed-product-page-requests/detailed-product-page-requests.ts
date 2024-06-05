@@ -34,16 +34,13 @@ interface Product {
 }
 
 function displayDataOnPage(data: Product) {
-  /* data: Product image: string, name: string, desctiption: string, price: number, discount?: number, discountedPrice?: number */
   const { name, description } = data.masterData.staged;
   const { prices, images } = data.masterData.staged.masterVariant;
-  console.log(data.key);
 
   const image = document.querySelector('.product-card-image img') as HTMLImageElement;
   image.src = images[0].url;
   image.alt = 'Product image';
   const productName = document.querySelector('.product-card-name') as HTMLDivElement;
-  console.log(productName);
   productName.innerHTML = name['en-US'];
   const productDescription = document.querySelector('.product-card-description') as HTMLDivElement;
   productDescription.innerHTML = description['en-US'];
@@ -51,35 +48,35 @@ function displayDataOnPage(data: Product) {
   productPrice.innerHTML = `Price: ${prices[0].value.centAmount / 100}€`;
 }
 
-async function getKeys(token: string) {
-  try {
-    const response = await fetch(
-      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/products`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${`${token}`}`,
-        },
-      }
-    );
-    const data = await response.json();
-    if (data.status === 400) {
-      const error = new Error(`${data.message}`);
-      throw error;
-    } else {
-      const keys: Array<string> = [];
-      for (let i = 0; i < data.results.length; i += 1) {
-        keys.push(data.results[i].key);
-      }
-      console.log(data, keys);
-      return data;
-    }
-  } catch (err) {
-    console.log(err);
-    return err;
-  }
-}
+// async function getKeys(token: string) {
+//   try {
+//     const response = await fetch(
+//       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/products`,
+//       {
+//         method: 'GET',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${`${token}`}`,
+//         },
+//       }
+//     );
+//     const data = await response.json();
+//     if (data.status === 400) {
+//       const error = new Error(`${data.message}`);
+//       throw error;
+//     } else {
+//       const keys: Array<string> = [];
+//       for (let i = 0; i < data.results.length; i += 1) {
+//         keys.push(data.results[i].key);
+//       }
+//       // console.log(data, keys); //
+//       return data;
+//     }
+//   } catch (err) {
+//     console.log(err);
+//     return err;
+//   }
+// }
 
 async function getProductByKey(token: string, key: string) {
   try {
@@ -99,7 +96,6 @@ async function getProductByKey(token: string, key: string) {
       const error = new Error(productData.message);
       throw error;
     } else {
-      //   console.log(productData);
       displayDataOnPage(productData);
       return productData;
     }
@@ -108,7 +104,7 @@ async function getProductByKey(token: string, key: string) {
   }
 }
 
-export default async function getToken() {
+export default async function getToken(key: string) {
   try {
     const response = await fetch(
       `https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials`,
@@ -125,8 +121,8 @@ export default async function getToken() {
       const error = new Error(responseToken.message);
       throw error;
     } else {
-      getProductByKey(responseToken.access_token, 'staff-4');
-      getKeys(responseToken.access_token);
+      getProductByKey(responseToken.access_token, key); //
+      // getKeys(responseToken.access_token);
       return responseToken;
     }
   } catch (err) {
