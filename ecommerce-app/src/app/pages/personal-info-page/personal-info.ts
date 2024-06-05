@@ -50,9 +50,12 @@ import updateCustomerField, {
 import { createMsgRegAcc } from '../registration-page/utils-registration/functions-registration';
 import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 import HeaderComponent from '../../components/header';
-import { routes } from '../main-page/main';
+
+const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#main-page'];
+
 import { Action, ActionEdit, ActionsEdit, AdrsEdit, AdrssEdit } from './constants/types';
 import { updateAdrssFields } from '../../server-requests/personal-info-request/updateAdrs';
+
 
 interface FieldUser {
   field: string;
@@ -1033,7 +1036,9 @@ class PersonalRender extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Back to main', 'Catalog'];
+    console.log(isUserLoggedIn, logLink, profileLink);
+    const linkName = [logLink, 'Register', 'Catalog', 'Back to main'];
+   
     navigation.append(navItem);
     navItem.className = 'nav-item';
     for (let i = 0; i < 2; i += 1) {

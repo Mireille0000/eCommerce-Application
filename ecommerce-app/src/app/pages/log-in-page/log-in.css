@@ -14,8 +14,12 @@ body {
     margin: 0 auto;
 }
 
+header {
+    width: 100%;
+}
+
 .wrapper-header {
-    width: 100vw;
+    width: 100%;
     display: flex;
     justify-content: space-evenly;
 }

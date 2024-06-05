@@ -8,7 +8,7 @@ import SearchingForm from './product-list-manipulations/searching-form';
 import CategoriesNavigation from './product-list-manipulations/category-navigation-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
 
-const routes = ['#log-in-page', '#registration-page', '#main-page', 'profile-page']; // change profile page id if needed
+const routes = ['#log-in-page', '#registration-page', '#main-page', '#profile-page']; // change profile page id if needed
 
 export default class CatalogProductPage extends Page {
   pageTitle: HTMLHeadingElement;
@@ -225,7 +225,6 @@ export default class CatalogProductPage extends Page {
       inputsArr.forEach((item: HTMLInputElement) => {
         const inputItem = item;
         inputItem.checked = false;
-        console.log(inputItem.checked);
       });
     });
 
