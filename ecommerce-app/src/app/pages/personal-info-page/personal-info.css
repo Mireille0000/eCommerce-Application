@@ -95,7 +95,6 @@ header {
     height: 1px;
     background-color: #e1e3e1;
 }
-
 .user-address:not(:last-child) .user-info::after,
 .user-address:not(:last-child) .user-info__address-open::after {
     position: absolute;
