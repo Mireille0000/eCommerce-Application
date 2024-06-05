@@ -1,4 +1,24 @@
 import { AdrsMap, FieldsMap } from '../../../utils/types';
+import {
+  condBirthPersonal,
+  condEmailPersonal,
+  condOldPswrdPersonal,
+  condPswrdPersonal,
+  conditionHouseNumber,
+  conditionPostcode,
+  conditionStreet,
+  conditionWord,
+} from '../../registration-page/validation/validationFn';
+import {
+  errBirthPersonal,
+  errEmailPersonal,
+  errMsgsHouseNumber,
+  errMsgsPostcode,
+  errMsgsStreet,
+  errMsgsWord,
+  errNewPswdPersonal,
+  errOldPswdPersonal,
+} from '../../registration-page/validation/validationMsgs';
 
 export const enum ClssNms {
   WRAPPER = 'wrapper',
@@ -107,14 +127,37 @@ export const fieldMapping: FieldsMap = {
 };
 
 export const adrsFieldMap: AdrsMap = {
-  [Txt.SITY_DSCR]: 'city',
-  [Txt.STREET_DSCR]: 'streetName',
-  [Txt.STREET_NUMB_DSCR]: 'streetNumber',
-  [Txt.POSTAL_CODE_DSCR]: 'postalCode',
-  [Txt.COUNTRY_DSCR]: 'country',
+  city: 'city',
+  streetName: 'streetName',
+  streetNumber: 'streetNumber',
+  postalCode: 'postalCode',
+  country: 'country',
+  // addressType: 'addressType',
 };
 
 export const msgUpdateData = ['Success!', 'Data updated successfully.'];
 export const msgUpdateFail = ['Failure!', 'Something went wrong :('];
 export const msgPassSuccess = ['Success!', 'Password successfully updated.'];
 export const msgPassFail = ['Failure!', 'The entered password is incorrect.'];
+
+export const basicCondFn = [conditionWord, conditionWord, condBirthPersonal];
+export const basicErr = [errMsgsWord, errMsgsWord, errBirthPersonal];
+
+export const contactCondFn = [condEmailPersonal];
+export const contErr = [errEmailPersonal];
+
+export const securFields = [
+  {
+    field: 'Old Password',
+    value: '••••••••',
+  },
+  {
+    field: 'New Password',
+    value: '••••••••',
+  },
+];
+export const securCondFn = [condOldPswrdPersonal, condPswrdPersonal];
+export const securErr = [errOldPswdPersonal, errNewPswdPersonal];
+
+export const adrsCondFn = [conditionStreet, conditionWord, conditionStreet, conditionHouseNumber, conditionPostcode];
+export const adrsErr = [errMsgsStreet, errMsgsWord, errMsgsStreet, errMsgsHouseNumber, errMsgsPostcode];
