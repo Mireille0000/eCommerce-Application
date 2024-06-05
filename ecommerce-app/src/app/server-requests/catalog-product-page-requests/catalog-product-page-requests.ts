@@ -365,7 +365,7 @@ async function getSearchedData(token: string, inputValue: string) {
         SKUArr.push(dataSearched.results[i].masterVariant.sku);
       }
       getDiscountsInfoFilteredList(token, dataSearched, SKUArr);
-      console.log(dataSearched);
+      // console.log(dataSearched);
     }
     return dataSearched;
   } catch (err) {
@@ -394,7 +394,7 @@ async function getSubcategoryData(token: string, subcategoryId: string) {
       throw error;
     } else {
       createFilteredProductCards(subcategoryData);
-      console.log(subcategoryData);
+      // console.log(subcategoryData);
     }
     return subcategoryData;
   } catch (err) {
@@ -426,7 +426,7 @@ async function getCategoryDataById(token: string, categoryId: string) {
         SKUArr.push(categoryData.results[i].masterVariant.sku);
       }
       getDiscountsInfoFilteredList(token, categoryData, SKUArr);
-      console.log(categoryData);
+      // console.log(categoryData);
     }
     return categoryData;
   } catch (err) {
@@ -466,7 +466,7 @@ async function getCategories(token: string) {
       const elemDamageSubcategory = document.querySelector('.elemental-damage-category') as HTMLElement;
       const enchantedRobeSubcategory = document.querySelector('.enchanted-robes-category') as HTMLElement;
       const foggyCauldronSubcategory = document.querySelector('.foggy-cauldron-category') as HTMLElement;
-      console.log(elemDamageSubcategory, enchantedRobeSubcategory, foggyCauldronSubcategory);
+      // console.log(elemDamageSubcategory, enchantedRobeSubcategory, foggyCauldronSubcategory);
 
       addEventHandler('all-categories', 'click', () => {
         elemDamageSubcategory.innerHTML = '';
@@ -474,7 +474,7 @@ async function getCategories(token: string) {
         foggyCauldronSubcategory.innerHTML = '';
         addRemoveActiveState('all-categories');
         getProductList(token);
-        console.log('All categories');
+        // console.log('All categories');
       });
 
       // Staff category
@@ -487,14 +487,14 @@ async function getCategories(token: string) {
       });
 
       addEventHandler('elemental-damage-category', 'click', () => {
-        console.log('Elemental damage');
+        // console.log('Elemental damage');
         addRemoveActiveState('elemental-damage-category');
         getSubcategoryData(token, `"${elementalDamageSubcId}"`);
       });
 
       // Mage robe category
       addEventHandler('mage-robe-category', 'click', () => {
-        console.log('mage-robe');
+        // console.log('mage-robe');
         elemDamageSubcategory.innerHTML = '';
         enchantedRobeSubcategory.innerHTML = 'Enchanted mage robe';
         foggyCauldronSubcategory.innerHTML = '';
@@ -503,7 +503,7 @@ async function getCategories(token: string) {
       });
 
       addEventHandler('enchanted-robes-category', 'click', () => {
-        console.log('Enchanted robes');
+        // console.log('Enchanted robes');
         addRemoveActiveState('enchanted-robes-category');
         getSubcategoryData(token, `"${enchantedRobesSubcId}"`);
       });
@@ -518,7 +518,7 @@ async function getCategories(token: string) {
       });
 
       addEventHandler('foggy-cauldron-category', 'click', () => {
-        console.log('Foggy cauldron');
+        // console.log('Foggy cauldron');
         addRemoveActiveState('foggy-cauldron-category');
         getSubcategoryData(token, `"${foggyCauldronSubcId}"`);
       });
@@ -578,7 +578,7 @@ export default async function getProductListByToken() {
       });
       // sorted data
       addEventHandler('sort-name', 'click', () => {
-        console.log('works');
+        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -588,7 +588,7 @@ export default async function getProductListByToken() {
         getSortedElements(data.access_token, '?sort=name.en-US+asc');
       });
       addEventHandler('sort-price-lowest', 'click', () => {
-        console.log('works');
+        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -598,7 +598,7 @@ export default async function getProductListByToken() {
         getSortedElements(data.access_token, 'search?sort=price+asc');
       });
       addEventHandler('sort-price-highest', 'click', () => {
-        console.log('works');
+        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -611,7 +611,7 @@ export default async function getProductListByToken() {
       const searchInputValue = document.querySelector('.search-input') as HTMLInputElement;
       addEventHandler('search-button', 'click', () => {
         getSearchedData(data.access_token, searchInputValue.value);
-        console.log(searchInputValue.value);
+        // console.log(searchInputValue.value);
       });
 
       getCategories(data.access_token);

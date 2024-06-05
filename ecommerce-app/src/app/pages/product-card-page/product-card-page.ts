@@ -1,6 +1,7 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import createHtmlElement from '../../utils/functions';
+import CardImageModalWindow from './modal-windows/card-image'; //
+import createHtmlElement, { addEventHandler } from '../../utils/functions';
 import getToken from '../../server-requests/detailed-product-page-requests/detailed-product-page-requests';
 
 const routes = ['#log-in-page', '#registration-page', '#main-page', '#catalog-product-page', '#profile-page'];
@@ -96,7 +97,17 @@ export default class ProductCardPage extends Page {
     });
 
     // main
-    this.addElemsToMain(this.productCardContainer);
+    const cardImageModalWindow = new CardImageModalWindow('');
+    const { modalWindowWrapper, modalWindowContentWrapper, imageWrapper, img, buttonContainer, closeModalWindowBtn } =
+      cardImageModalWindow;
+    this.addElemsToMain(modalWindowWrapper, this.productCardContainer);
+    modalWindowWrapper.append(modalWindowContentWrapper);
+    modalWindowContentWrapper.append(imageWrapper, buttonContainer);
+
+    // modal window card image
+    imageWrapper.append(img);
+    buttonContainer.append(closeModalWindowBtn);
+
     this.productCardContainer.append(this.imageElem, this.productCardContent, this.productPrices);
     this.productCardContent.append(this.productDetails, this.productCardSlider);
     this.productCardSlider.innerHTML = 'A slider should be here';
@@ -104,6 +115,18 @@ export default class ProductCardPage extends Page {
     this.productDetails.append(this.productName, this.productDescription);
     this.productPrices.append(this.price, this.discount, this.discountPrice);
     getToken(`${this.key}`);
+
+    const modalImageWrapper = document.querySelector('.modal-window-wrapper-img') as HTMLDivElement;
+    const pageBody = document.querySelector('body') as HTMLElement;
+    addEventHandler('close-modal-button', 'click', () => {
+      modalImageWrapper.classList.remove('active');
+      pageBody.classList.remove('active');
+    });
+
+    addEventHandler('product-card-image', 'click', () => {
+      modalImageWrapper.classList.add('active');
+      pageBody.classList.add('active');
+    });
 
     return this.pageWrapper;
   }
