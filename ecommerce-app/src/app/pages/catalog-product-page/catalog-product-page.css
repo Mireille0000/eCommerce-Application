@@ -1,0 +1,280 @@
+#catalog-product-page.wrapper {
+    max-width: unset;
+    height: fit-content;
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+}
+
+#catalog-product-page .wrapper-main{
+    width: auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    /* flex-direction: row; */
+    align-items: center;
+    gap: 45px;
+
+    margin-right: 50px;
+    margin-left: 50px;
+}
+
+.nav-bar-catalog-page {
+    display: flex;
+    align-items: center;
+}
+
+.product-container {
+    width: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: 1px solid #000;
+    border-radius: 20px;
+}
+
+.product-image {
+    overflow: hidden;
+    height: 410px;
+    border-radius: 20px;
+}
+
+.product-image img {
+    width: 310px;
+    height: 410px;
+    cursor: pointer;
+    border-radius: 20px;
+    transform: scale(1);
+    transition: 2s;
+}
+
+.product-image img:hover {
+    transform: scale(1.1);
+    transition: 2s;
+    border-radius: 20px;
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.product-name {
+    margin: 5px 0 10px 0;
+}
+
+.product-prices {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+}
+
+.product-wrapper  {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+
+/* manipulating with product list */
+
+.manipulatings {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.manipulating-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.manipulating-buttons, .filter-buttons-container {
+    display: flex;
+    /* justify-content: center; */
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px;
+}
+
+.filter-button, .sort-button {
+    width: 150px;
+    height: 35px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 1s;
+}
+
+.filter-button:hover,
+.sort-button:hover,
+.apply-button:hover,
+.clear-button:hover,
+.search-button:hover {
+    transition: 1s;
+    background-color: rgb(227, 204, 168);
+}
+
+.apply-button, .clear-button {
+    width: 100px;
+    height: 25px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.filtering-options fieldset div {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: space-around; */
+}
+
+/* filtering form */
+
+.filter-container {
+    display: none;
+}
+
+.filter-container.active  {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.filtering-options  {
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-template-rows: auto auto;
+    gap: 10px;
+}
+
+.filter {
+    width: 200px;
+    padding: 5px;
+    border: 3px solid #1e8356;
+    text-align: center;
+}
+
+/* sorting */
+.sorting-menu {
+    display: none;
+}
+
+.sorting-menu.active  {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    border: 2px solid #c1711ce7;
+}
+
+.sort-option {
+    text-align: center;
+    cursor: pointer;
+}
+
+.sort-name.active, .sort-price-lowest.active, .sort-price-highest.active {
+    font-weight: 800;
+    color: #1068c7;
+}
+
+/* searching */
+
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-button {
+    width: 150px;
+    height: 35px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 1s;
+}
+
+.search-input {
+    /* width: 220px; */
+    height: 25px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.nav-categories-container  {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.categories-title {
+    margin: 0;
+}
+
+.categories-list-item {
+    text-shadow: rgb(112, 139, 220) 1px 0 10px;
+    cursor: pointer;
+    transition: 1s;
+}
+
+.categories-list-item:hover {
+    transition: 1s;
+    text-shadow: rgb(179 95 34) 1px 0 10px;
+}
+
+.all-categories.active-category,
+.staff-category.active-category, 
+.elemental-damage-category.active-category,
+.mage-robe-category.active-category, 
+.enchanted-robes-category.active-category,
+.cauldron-category.active-category,
+.foggy-cauldron-category.active-category
+ {
+    color: rgb(112, 139, 220) 1px 0 10px;
+    text-shadow: rgb(179 95 34) 1px 0 10px;
+    cursor: auto;
+}
+
+@media screen and (max-width: 1040px) {
+    .filtering-options {
+        display: grid;
+        grid-template-columns: max-content;
+        grid-template-rows: auto auto;
+        gap: 10px;
+    }
+
+    .product-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+}
+
+@media screen and (max-width: 875px) {
+
+    .sorting-menu {
+        padding-right: 100px;
+        padding-left: 100px;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    #catalog-product-page .wrapper-main {
+        margin: 10px;
+    }
+
+    .filtering-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}

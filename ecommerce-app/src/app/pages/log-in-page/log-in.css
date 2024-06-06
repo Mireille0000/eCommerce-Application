@@ -4,7 +4,8 @@ body {
 }
 
 .wrapper {
-    max-width: 1980px;
+    /* max-width: 1980px; */
+    max-width: 1440px;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -13,8 +14,12 @@ body {
     margin: 0 auto;
 }
 
+header {
+    width: 100%;
+}
+
 .wrapper-header {
-    width: 100vw;
+    width: 100%;
     display: flex;
     justify-content: space-evenly;
 }

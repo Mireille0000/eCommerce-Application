@@ -1,7 +1,7 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import createHtmlElement, { addEventHandler, createImage } from '../../utils/functions';
-import checkCustomer from '../../server-requests/login-form-requests';
+import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 
 import {
   emailInputEventHandler,
@@ -51,22 +51,25 @@ export default class LogInPage extends Page {
     this.main.className = 'log-in-main';
     // header
     const headerComponent = new HeaderComponent();
-    const headerComponentItems = [
-      headerComponent.appName,
-      headerComponent.navBar,
-      headerComponent.navigation,
-      headerComponent.navItem,
-      headerComponent.link,
-    ];
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerComponent;
     headerComponent.navBar.className = 'nav-bar';
-    const [name, navigation, list, listItem, link] = headerComponentItems;
-    this.addElemsToHeader(name, navigation);
-    navigation.append(list);
-    list.append(listItem);
-    listItem.append(link);
-    link.innerHTML = 'Back to Main';
-    link.setAttribute('href', '#main-page');
-    name.innerHTML = 'Ultimate ScriptSmith';
+    this.addElemsToHeader(appName, logoContainer, navBar);
+    logoContainer.append(logo);
+    navBar.append(navigation);
+    navigation.append(navItem);
+    navItem.append(link);
+    navItem.className = 'nav-item';
+    const linkText = ['Back to Main', 'Catalog'];
+    const linkHrefs = ['#main-page', '#catalog-product-page'];
+    navigation.appendChild(navItem.cloneNode(true));
+
+    const links = Array.from(document.querySelectorAll('.nav-item a'));
+    links.forEach((item, i) => {
+      const linkItm = item;
+      linkItm.innerHTML = linkText[i];
+      linkItm.setAttribute('href', linkHrefs[i]);
+    });
+    appName.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
     const fieldset = createHtmlElement('fieldset', 'log-in-fieldset');

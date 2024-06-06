@@ -60,3 +60,43 @@ export const conditionPostcode = [
     return hasNoSpecialChars && hasOnlyDigits;
   },
 ];
+
+export const condBirthPersonal = [
+  (value: string) => {
+    const arr = value.split('-');
+    if (arr.length > 3) return false;
+
+    const [year, month, day] = arr.map((str) => Number(str));
+    const condition = !!(year > 999 && month > 0 && day > 0);
+    return condition;
+  },
+  (value: string) => {
+    const [year, month, day] = value.split('-').map((str) => Number(str));
+    if (year && month && day) {
+      const birthDate = new Date(value);
+      const today = new Date();
+      const age = today.getFullYear() - birthDate.getFullYear();
+      const isOldEnough =
+        age > 13 || (age === 13 && today.getMonth() >= birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+      return isOldEnough;
+    }
+    return true;
+  },
+];
+
+export const condEmailPersonal = [
+  (value: string) =>
+    /^\w+([.-]?\w+)*@\w+([.-]?\w+)*([.]\w{2,3})+$/.test(value) && /[@]{1}/.test(value) && !/\s/.test(value),
+];
+
+export const condOldPswrdPersonal = [(value: string) => value.length >= 8];
+
+export const condPswrdPersonal = [
+  (value: string) =>
+    /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(value) &&
+    /(?=.*[A-Z])/.test(value) &&
+    /(?=.*[a-z])/.test(value) &&
+    /(?=.*\d)/.test(value) &&
+    /^\S*$/.test(value) &&
+    /(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/.test(value),
+];

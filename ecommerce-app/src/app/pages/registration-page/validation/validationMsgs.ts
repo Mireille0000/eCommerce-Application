@@ -25,3 +25,13 @@ export const errMsgsStreet = ['The field must contain at least one character'];
 export const errMsgsHouseNumber = ['The value must start with a number', 'The value must not have special characters'];
 
 export const errMsgsPostcode = ['Postcode length must be 5 characters', 'Postal code must consist of numbers only'];
+
+export const errEmailPersonal = ['Your email is incorrectly formatted'];
+
+export const errBirthPersonal = ['Invalid input (YYYY-MM-DD)', 'You must be at least 13 years old'];
+
+export const errOldPswdPersonal = ['Incorrect password'];
+
+export const errNewPswdPersonal = [
+  'The password must contain a minimum of 8 characters, 1 uppercase letter, 1 lowercase letter and 1 number.',
+];
