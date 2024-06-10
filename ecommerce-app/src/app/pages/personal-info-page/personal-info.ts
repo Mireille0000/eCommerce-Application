@@ -51,11 +51,10 @@ import { createMsgRegAcc } from '../registration-page/utils-registration/functio
 import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 import HeaderComponent from '../../components/header';
 
-const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#main-page'];
-
 import { Action, ActionEdit, ActionsEdit, AdrsEdit, AdrssEdit } from './constants/types';
 import { updateAdrssFields } from '../../server-requests/personal-info-request/updateAdrs';
 
+const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#main-page'];
 
 interface FieldUser {
   field: string;
@@ -1038,7 +1037,7 @@ class PersonalRender extends Page {
     const profileLink = isUserLoggedIn ? 'Profile' : false;
     console.log(isUserLoggedIn, logLink, profileLink);
     const linkName = [logLink, 'Register', 'Catalog', 'Back to main'];
-   
+
     navigation.append(navItem);
     navItem.className = 'nav-item';
     for (let i = 0; i < 2; i += 1) {
