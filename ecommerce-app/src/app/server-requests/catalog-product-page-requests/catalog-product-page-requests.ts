@@ -36,11 +36,19 @@ function createProductCards(dataProducts: ProductsListData) {
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
-  getDataKey('.product-container');
+  getDataKey('.product-card-info'); //
+  const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
+  addToCartButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      console.log('At last');
+      btn.classList.add('disabled');
+    });
+  });
 
   for (let i = 0; i < numOfProducts; i += 1) {
     const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
-    const productCards = Array.from(document.querySelectorAll('.product-container')); // is it necessary
+    // const productCards = Array.from(document.querySelectorAll('.product-container')); // is it necessary
+    const productCards = Array.from(document.querySelectorAll('.product-card-info'));
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
@@ -114,14 +122,23 @@ function createFilteredProductCards(dataProducts: filteredData) {
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
-  getDataKey('.product-container');
+  getDataKey('.product-card-info');
+  const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
+  addToCartButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      console.log('At last');
+      btn.classList.add('disabled');
+    });
+  });
+
   for (let i = 0; i < numOfProducts; i += 1) {
     const { name, description } = dataProducts.results[i];
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
-    const productCards = Array.from(document.querySelectorAll('.product-container'));
+    // const productCards = Array.from(document.querySelectorAll('.product-container'));
+    const productCards = Array.from(document.querySelectorAll('.product-card-info'));
     productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
     productImagesArr[i].src = `${dataProducts.results[i].masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;

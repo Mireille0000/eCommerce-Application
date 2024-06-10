@@ -1,3 +1,4 @@
+// import * as library from '@fortawesome/fontawesome-svg-core';
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import FilterForm from './product-list-manipulations/filtering-form';
@@ -53,9 +54,14 @@ export default class CatalogProductPage extends Page {
     //   linkItem.innerHTML = navLinksNames[i];
     // });
 
+    const iconsScript = createHtmlElement('script') as HTMLScriptElement;
+    document.head.append(iconsScript);
+    iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
+    iconsScript.crossOrigin = 'anonymous';
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
     this.addElemsToHeader(appName, logoContainer, this.pageTitle, navBar);
     logoContainer.append(logo);
+
     navBar.className = 'nav-bar-catalog-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
@@ -143,7 +149,6 @@ export default class CatalogProductPage extends Page {
     ];
     categoriesNavigation.renderCategoriesNavElem(this.mainWrapper, categoriesNamesDefault, categoriesClassNamesDefault);
 
-    // const inputSearchField = document.querySelector('.search-input');
     addEventHandler('search-input', 'click', () => {
       searchFormInstance.searchButton.disabled = false;
     });
@@ -227,6 +232,12 @@ export default class CatalogProductPage extends Page {
         inputItem.checked = false;
       });
     });
+
+    // addToCartBtn.forEach((btn) => {
+    //   btn.addEventListener('click', () => {
+    //     console.log('work');
+    //   });
+    // });
 
     return this.pageWrapper;
   }
