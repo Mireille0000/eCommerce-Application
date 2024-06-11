@@ -8,7 +8,7 @@ const getProductByKey = async (productKey: string) => {
     return response.body.id;
   } catch (err) {
     console.log('Такого товара не существует');
-    return undefined;
+    throw new Error(`${err}`);
   }
 };
 
@@ -80,12 +80,12 @@ const createCart = async (customerId: string) => {
 const createOrGetCart = async () => {
   try {
     const data = await new CustomerLoader().getCustomerData();
-    const { id: customerId } = data;
+    const { id: customerId }: { id: string } = data;
 
     const existingCart = await getCartByCustomerById(customerId);
     if (existingCart) {
       console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
-      return existingCart;
+      return { cart: existingCart, customerId };
     }
 
     const newCart = await createCart(customerId);
@@ -93,7 +93,7 @@ const createOrGetCart = async () => {
     //   return new Error
     // }
     console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
-    return newCart;
+    return { cart: newCart, customerId };
   } catch (err) {
     console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', err);
     // return null;
@@ -141,37 +141,65 @@ export default createOrGetCart;
 
 // export default createOrGetCart;
 
-export const addLineItemToCart = async (cart: Cart | null, productKey: string, quantity: number = 1) => {
-  // try {
-  //   const cart = await createOrGetCart()
-  // }
-  if (cart) {
-    try {
-      const { version } = cart;
-      const productId = await getProductByKey(productKey);
-      const response = await apiRoot
-        .carts()
-        .withId({ ID: cart.id })
-        .post({
-          body: {
-            version,
-            actions: [
-              {
-                action: 'addLineItem',
-                productId,
-                variantId: 1,
-                quantity,
-              },
-            ],
-          },
-        })
-        .execute();
+export const editLineItemToCart = async (cart: Cart, quantity: number, index: number) => {
+  try {
+    const { version, lineItems } = cart;
+    const { id } = lineItems[index];
+    // const productId = await getProductByKey(productKey);
+    const response = await apiRoot
+      .carts()
+      .withId({ ID: cart.id })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              // action: 'addLineItem',
+              action: 'changeLineItemQuantity',
+              // productId,
+              // variantId: 1,
+              lineItemId: id,
+              quantity,
+            },
+          ],
+        },
+      })
+      .execute();
 
-      return response.body;
-    } catch (error) {
-      console.log('Ошибка при добавлении товара в корзину:', error);
-      return undefined;
-    }
+    return response.body;
+  } catch (error) {
+    throw new Error(`${error}`);
   }
-  return undefined;
+};
+
+export const addLineItemToCart = async (cart: Cart, quantity: number) => {
+  try {
+    const { version } = cart;
+    // const { id } = lineItems[index];
+    const productKey = 'staff-5';
+    const productId = await getProductByKey(productKey);
+    const response = await apiRoot
+      .carts()
+      .withId({ ID: cart.id })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'addLineItem',
+              // action: 'changeLineItemQuantity',
+              productId,
+              variantId: 1,
+              // lineItemId: id,
+              quantity,
+            },
+          ],
+        },
+      })
+      .execute();
+
+    return response.body;
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
 };

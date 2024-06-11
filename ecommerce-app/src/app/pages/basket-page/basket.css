@@ -1,3 +1,12 @@
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* input[type=number] {
+  -moz-appearance: textfield;
+} */
 .wrapper-main--bskt {
     flex-direction: row;
     gap: 30px;
@@ -18,6 +27,7 @@
 .bskt__count-total-product__increase-btn {
     padding: 0;
     border: 0;
+    cursor: pointer;
 }
 .img-product {
     max-width: 92px;
