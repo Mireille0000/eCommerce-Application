@@ -42,41 +42,13 @@ const createCart = async (customerId: string) => {
       })
       .execute();
 
-    // console.log('КОРЗИНА СОЗДАНА');
     return response.body;
   } catch (error) {
     console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', error);
-    // return null;
     throw new Error(`${error}`);
   }
 };
 
-// const createOrGetCart = async (customerId: string) => {
-// const createOrGetCart = () => {
-//   // try {
-//   return new Promise(() => {
-//     return new CustomerLoader()
-//       .getCustomerData()
-//       .then(async (data) => {
-//         try {
-//           const { id: customerId } = data;
-//           const existingCart = await getCartByCustomerById(customerId);
-
-//           if (existingCart) {
-//             console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
-//             return existingCart;
-//           }
-//           const newCart = await createCart(customerId);
-//           console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
-//           return newCart;
-//         } catch (err) {
-//           console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', err);
-//           return null;
-//         }
-//       })
-//       .catch(() => null);
-//   });
-// };
 const createOrGetCart = async () => {
   try {
     const data = await new CustomerLoader().getCustomerData();
@@ -89,63 +61,20 @@ const createOrGetCart = async () => {
     }
 
     const newCart = await createCart(customerId);
-    // if (newCart === null) {
-    //   return new Error
-    // }
     console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
     return { cart: newCart, customerId };
   } catch (err) {
     console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', err);
-    // return null;
     throw new Error(`${err}`);
   }
 };
 
 export default createOrGetCart;
 
-// new CustomerLoader()
-//   .getCustomerData()
-//   .then(async (data) => {
-//     try {
-//       const { id: customerId } = data;
-//       const existingCart = await getCartByCustomerById(customerId);
-
-//       if (existingCart) {
-//         console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
-//         return existingCart;
-//       }
-//       const newCart = await createCart(customerId);
-//       console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
-//       return newCart;
-//     } catch (err) {
-//       console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', err);
-//       return null;
-//     }
-//   })
-//   .catch(() => null);
-// const existingCart = await getCartByCustomerById(customerId);
-
-// if (existingCart) {
-//   console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
-//   return existingCart;
-// }
-
-// const newCart = await createCart(customerId);
-// console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
-// return newCart;
-// } catch (err) {
-//   console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', err);
-//   return null;
-// }
-// };
-
-// export default createOrGetCart;
-
 export const editLineItemToCart = async (cart: Cart, quantity: number, index: number) => {
   try {
     const { version, lineItems } = cart;
     const { id } = lineItems[index];
-    // const productId = await getProductByKey(productKey);
     const response = await apiRoot
       .carts()
       .withId({ ID: cart.id })
@@ -154,10 +83,7 @@ export const editLineItemToCart = async (cart: Cart, quantity: number, index: nu
           version,
           actions: [
             {
-              // action: 'addLineItem',
               action: 'changeLineItemQuantity',
-              // productId,
-              // variantId: 1,
               lineItemId: id,
               quantity,
             },
@@ -175,7 +101,6 @@ export const editLineItemToCart = async (cart: Cart, quantity: number, index: nu
 export const addLineItemToCart = async (cart: Cart, quantity: number) => {
   try {
     const { version } = cart;
-    // const { id } = lineItems[index];
     const productKey = 'staff-5';
     const productId = await getProductByKey(productKey);
     const response = await apiRoot
@@ -187,10 +112,8 @@ export const addLineItemToCart = async (cart: Cart, quantity: number) => {
           actions: [
             {
               action: 'addLineItem',
-              // action: 'changeLineItemQuantity',
               productId,
               variantId: 1,
-              // lineItemId: id,
               quantity,
             },
           ],

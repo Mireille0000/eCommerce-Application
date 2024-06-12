@@ -10,6 +10,8 @@ import {
 import decrease from '../../../assets/images/decrease.svg';
 import increase from '../../../assets/images/increase.svg';
 import createOrGetCart, { editLineItemToCart } from '../../server-requests/basket-requests/basket-request';
+import deleteProduct from '../../../assets/images/delete_address_copy.svg';
+import { createMsgRegAcc } from '../registration-page/utils-registration/functions-registration';
 
 interface LineItemCustom {
   id: string;
@@ -26,7 +28,6 @@ class Basket extends Page {
 
   clickTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  // CartItems!: LineItem[];
   CartItems!: LineItemCustom[];
 
   constructor(id: string) {
@@ -85,16 +86,16 @@ class Basket extends Page {
 
   private editItemCount(index: number, editCount: number, event: Event) {
     event.preventDefault();
-    if (editCount > 0) {
-      editLineItemToCart(this.DataCart, editCount, index)
-        .then((dataCart) => {
-          console.log('Обновились данные:', dataCart);
-          this.DataCart = dataCart;
-          this.addCartItems(dataCart);
-          this.updateTemplate(dataCart);
-        })
-        .catch((err) => console.log('Провал при обновлении данных', err));
-    }
+    // if (editCount > 0) {
+    editLineItemToCart(this.DataCart, editCount, index)
+      .then((dataCart) => {
+        console.log('Обновились данные:', dataCart);
+        this.DataCart = dataCart;
+        this.addCartItems(dataCart);
+        this.updateTemplate(dataCart);
+      })
+      .catch((err) => console.log('Провал при обновлении данных', err));
+    // }
   }
 
   private handleButtonClick(index: number, editCount: number, event: Event) {
@@ -123,13 +124,11 @@ class Basket extends Page {
 
   private addOneItem(countInput: HTMLInputElement, index: number, event: Event) {
     const numbEdit = 1;
-    // console.log('addOneIndx:', index);
     this.editOneItem(countInput, index, numbEdit, event);
   }
 
   private removeOneItem(countInput: HTMLInputElement, index: number, event: Event) {
     const numbEdit = -1;
-    // console.log('removeOneIndx:', index);
     this.editOneItem(countInput, index, numbEdit, event);
   }
 
@@ -141,6 +140,14 @@ class Basket extends Page {
     } else {
       editCountItem.value = `${this.CartItems[index].quantity}`;
     }
+  }
+
+  private deleteProduct(productContainer: HTMLDivElement, index: number, event: Event) {
+    this.editItemCount(index, 0, event);
+    this.CartItems.splice(index);
+    productContainer.remove();
+    const descrMsg = ['Success!', 'Product removed from cart'];
+    createMsgRegAcc(descrMsg);
   }
 
   private createProductContainer(
@@ -194,7 +201,14 @@ class Basket extends Page {
     priceWrapOne.appendChild(priceOne);
     priceWrapProduct.append(priceTotalProduct, countTotalProduct, priceWrapOne);
 
-    priceContProduct.append(priceWrapProduct, priceWrapOne);
+    const wrapDeleteProductBtn = createDivElement('bskt__delete-product-wrap');
+    const deleteProductBtn = createButtonElement('bskt__delete-product-btn');
+    deleteProductBtn.addEventListener('click', this.deleteProduct.bind(this, prdctContainer, index));
+    const imageBtnDelete = createImage(deleteProduct, 'delete-current-product', 'delete-current-product-img');
+    deleteProductBtn.appendChild(imageBtnDelete);
+    wrapDeleteProductBtn.appendChild(deleteProductBtn);
+
+    priceContProduct.append(priceWrapProduct, priceWrapOne, wrapDeleteProductBtn);
     prdctContainer.append(imgWrapProduct, dscrContProduct, priceContProduct);
     return prdctContainer;
   }
