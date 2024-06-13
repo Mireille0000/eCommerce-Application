@@ -9,7 +9,10 @@ import {
 } from '../../utils/functions';
 import decrease from '../../../assets/images/decrease.svg';
 import increase from '../../../assets/images/increase.svg';
-import createOrGetCart, { editLineItemToCart } from '../../server-requests/basket-requests/basket-request';
+import createOrGetCart, {
+  editLineItemToCart,
+  removeAllLineItemsFromCart,
+} from '../../server-requests/basket-requests/basket-request';
 import deleteProduct from '../../../assets/images/delete_address_copy.svg';
 import { createMsgRegAcc } from '../registration-page/utils-registration/functions-registration';
 
@@ -65,8 +68,14 @@ class Basket extends Page {
         this.CartItems.push(lineItem);
       });
     } else {
-      this.DataCart.lineItems.forEach(({ quantity }, index) => {
-        this.CartItems[index].quantity = quantity;
+      this.DataCart.lineItems.forEach(({ quantity, id }, index) => {
+        for (let i = 0; i < this.CartItems.length; i += 1) {
+          if (this.CartItems[i].id === id) {
+            this.CartItems[index].quantity = quantity;
+            break;
+          }
+        }
+        // this.CartItems[index].quantity = quantity;
       });
     }
   }
@@ -75,27 +84,76 @@ class Basket extends Page {
     const totalPriceItems = Array.from(document.querySelectorAll('.bskt__price-total'));
     const totalCost = document.querySelector('.bskt__total-price-content') as HTMLElement;
     const { centAmount } = cart.totalPrice;
-    totalCost.textContent = `${centAmount / 100} €`;
+    let isDiscountCurr = false;
+    let currPriceUpdate = 0;
 
     totalPriceItems.forEach((totalPriceItem, index) => {
+      const { variant, totalPrice } = cart.lineItems[index];
+      const isDiscount = variant.attributes ? variant.attributes[4].value : false;
+      if (!isDiscountCurr) {
+        isDiscountCurr = isDiscount;
+      }
       const elemPrice = totalPriceItem;
-      const currPrice = cart.lineItems[index].totalPrice.centAmount;
+      const currPrice = isDiscount ? totalPrice.centAmount * 0.7 : totalPrice.centAmount;
+      currPriceUpdate += currPrice;
       elemPrice.textContent = `${currPrice / 100} €`;
     });
+
+    if (isDiscountCurr) {
+      totalCost.textContent = `${currPriceUpdate / 100} €`;
+    } else {
+      totalCost.textContent = `${centAmount / 100} €`;
+    }
+  }
+
+  private createTemplateEmptyCart() {
+    const containerEmptyCart = createDivElement('bskt__empty-cart-container');
+    const emptyTitleWrap = createDivElement('bskt__empty-title-wrap');
+    const emptyTitle = createSpanElement('bskt__empty-title', 'Cart is empty');
+    emptyTitleWrap.appendChild(emptyTitle);
+
+    const emptyDescrWrap = createDivElement('bskt__empty-descr-wrap');
+    const emptyDescr = createSpanElement('bskt__empty-descr', 'Go to the catalog page to find everything you need');
+    emptyDescrWrap.appendChild(emptyDescr);
+
+    const emptyGoCatalogBtn = createButtonElement('bskt__empty-go-catalog-btn', 'Start shopping');
+    emptyGoCatalogBtn.addEventListener('click', this.GoCatalogBtn);
+
+    containerEmptyCart.append(emptyTitleWrap, emptyDescrWrap, emptyGoCatalogBtn);
+    return containerEmptyCart;
+  }
+
+  private updateSuccesEditItemCount(cart: Cart) {
+    const itemsContainer = document.querySelector('.bskt__products-container');
+    const totalCostContainer = document.querySelector('.bskt__total-price-container');
+    const templateEmptycart = this.createTemplateEmptyCart();
+
+    this.DataCart = cart;
+    this.addCartItems(cart);
+    this.updateTemplate(cart);
+    if (!this.DataCart.lineItems.length) {
+      itemsContainer?.remove();
+      totalCostContainer?.remove();
+      this.mainWrapper.appendChild(templateEmptycart);
+    }
   }
 
   private editItemCount(index: number, editCount: number, event: Event) {
     event.preventDefault();
-    // if (editCount > 0) {
-    editLineItemToCart(this.DataCart, editCount, index)
+    let itemIndex = index;
+    const itemId = this.CartItems[index].id;
+    for (let i = 0; i < this.DataCart.lineItems.length; i += 1) {
+      if (this.DataCart.lineItems[i].id === itemId) {
+        itemIndex = i;
+      }
+    }
+    console.log('itemIndex:', itemIndex);
+    editLineItemToCart(this.DataCart, editCount, itemIndex)
       .then((dataCart) => {
         console.log('Обновились данные:', dataCart);
-        this.DataCart = dataCart;
-        this.addCartItems(dataCart);
-        this.updateTemplate(dataCart);
+        this.updateSuccesEditItemCount(dataCart);
       })
       .catch((err) => console.log('Провал при обновлении данных', err));
-    // }
   }
 
   private handleButtonClick(index: number, editCount: number, event: Event) {
@@ -144,7 +202,6 @@ class Basket extends Page {
 
   private deleteProduct(productContainer: HTMLDivElement, index: number, event: Event) {
     this.editItemCount(index, 0, event);
-    this.CartItems.splice(index);
     productContainer.remove();
     const descrMsg = ['Success!', 'Product removed from cart'];
     createMsgRegAcc(descrMsg);
@@ -213,15 +270,81 @@ class Basket extends Page {
     return prdctContainer;
   }
 
+  private GoCatalogBtn(event: Event) {
+    event.preventDefault();
+    window.location.hash = 'catalog-product-page';
+    // new CatalogProductPage('catalog-product-page').renderPage();
+    // this.pageWrapper.remove();
+  }
+
+  private handlerCancelDeleteItems(containerDelete: HTMLDivElement, event: Event) {
+    event.preventDefault();
+    containerDelete.remove();
+  }
+
+  private deleteTemplateProducts(containerDelete: HTMLDivElement) {
+    const itemsContainer = document.querySelector('.bskt__products-container');
+    const totalCostContainer = document.querySelector('.bskt__total-price-container');
+    itemsContainer?.remove();
+    totalCostContainer?.remove();
+    containerDelete.remove();
+
+    const templateEmptycart = this.createTemplateEmptyCart();
+    this.mainWrapper.appendChild(templateEmptycart);
+  }
+
+  private handleDeleteAllItems(containerDelete: HTMLDivElement, event: Event) {
+    event.preventDefault();
+    removeAllLineItemsFromCart(this.DataCart)
+      .then(() => this.deleteTemplateProducts(containerDelete))
+      .catch();
+  }
+
+  private createMsgClearCart() {
+    const windowconfirmDelete = createDivElement('bskt__window-confirm-delete');
+    const bsktDeleteWrap = createDivElement('bskt__delete-wrap');
+    const cancelDeleteBtn = createButtonElement('bskt__cancel-delete-btn');
+    cancelDeleteBtn.addEventListener('click', this.handlerCancelDeleteItems.bind(this, windowconfirmDelete));
+    const confirmDeleteWrap = createDivElement('bskt__confirm-delete-wrap');
+    const titleConfirmDelete = createDivElement('bskt__confirm-delete-title', 'Remove products');
+    const descrConfirmDelete = createDivElement(
+      'bskt__confirm-delete-descr',
+      'Are you sure you want to remove all items from your cart? It will be impossible to cancel this action.'
+    );
+
+    const confirmDelete = createDivElement('bskt__confirm-delete');
+    const confirmDeleteBtn = createButtonElement('bskt__confirm-delete-btn', 'Delete');
+    confirmDelete.addEventListener('click', this.handleDeleteAllItems.bind(this, windowconfirmDelete));
+    confirmDelete.appendChild(confirmDeleteBtn);
+    confirmDeleteWrap.append(titleConfirmDelete, descrConfirmDelete, confirmDelete);
+
+    bsktDeleteWrap.append(cancelDeleteBtn, confirmDeleteWrap);
+    windowconfirmDelete.append(bsktDeleteWrap);
+    document.body.appendChild(windowconfirmDelete);
+  }
+
+  private handleClearCart(event: Event) {
+    event.preventDefault();
+    this.createMsgClearCart();
+  }
+
   private createProductsContainer(lineItems: LineItem[]) {
     // TODO: добавить описание продукта
     const prdctsContainer = createDivElement('bskt__products-container');
+    const deleteAllProducts = createDivElement('bskt__delete-products');
+    const deleteAllProductsBtn = createButtonElement('bskt__delete-products-btn', 'Clear Shopping Cart');
+    deleteAllProductsBtn.addEventListener('click', this.handleClearCart.bind(this));
+    deleteAllProducts.appendChild(deleteAllProductsBtn);
+    prdctsContainer.appendChild(deleteAllProducts);
+
     lineItems.forEach(({ variant, name, totalPrice, quantity, price }, index) => {
+      const { attributes } = variant;
+      const isDiscount: boolean = attributes ? attributes[4].value : false;
       const imgUrl = variant.images ? variant.images[0].url : '';
       const imgName = name['en-US'];
-      const totalCurrPrice = totalPrice.centAmount;
+      const totalCurrPrice = isDiscount ? totalPrice.centAmount * 0.7 : totalPrice.centAmount;
       const countProduct = quantity;
-      const currPrice = price.value.centAmount;
+      const currPrice = isDiscount ? price.value.centAmount * 0.7 : price.value.centAmount;
       const currProduct = this.createProductContainer(imgUrl, imgName, totalCurrPrice, countProduct, currPrice, index);
       prdctsContainer.appendChild(currProduct);
     });
@@ -242,18 +365,47 @@ class Basket extends Page {
     return totalPriceContainer;
   }
 
+  private renderBasketFromAnonim() {
+    window.location.hash = 'basket-page';
+    const templateEmptycart = this.createTemplateEmptyCart();
+    this.mainWrapper.appendChild(templateEmptycart);
+    this.main.appendChild(this.mainWrapper);
+    this.pageWrapper.append(this.main);
+    document.body.appendChild(this.pageWrapper);
+  }
+
+  private getTotalCost(cart: Cart) {
+    const { lineItems } = cart;
+    let totalCost = 0;
+    lineItems.forEach(({ variant, totalPrice }) => {
+      const { attributes } = variant;
+      const { centAmount } = totalPrice;
+      const isDiscount: boolean = attributes ? attributes[4].value : false;
+      const currPrice = isDiscount ? centAmount * 0.7 : centAmount;
+      totalCost += currPrice;
+    });
+    return totalCost;
+  }
+
   render(cart: { cart: Cart; customerId: string }) {
+    window.location.hash = 'basket-page';
     this.DataCart = cart.cart;
     this.customerId = cart.customerId;
     console.log('this.customerId:', this.customerId);
     this.addCartItems(cart.cart);
-    const { lineItems, totalPrice } = cart.cart;
-    const { centAmount: totalCost } = totalPrice;
+    const { lineItems } = cart.cart;
+    // const { centAmount: totalCost } = totalPrice;
+    const totalCost = this.getTotalCost(cart.cart);
 
-    const productsContainer = this.createProductsContainer(lineItems);
-    const totalPriceContainer = this.createTotalPriceContainer(totalCost);
+    if (lineItems.length) {
+      const productsContainer = this.createProductsContainer(lineItems);
+      const totalPriceContainer = this.createTotalPriceContainer(totalCost);
+      this.mainWrapper.append(productsContainer, totalPriceContainer);
+    } else {
+      const templateEmptycart = this.createTemplateEmptyCart();
+      this.mainWrapper.appendChild(templateEmptycart);
+    }
 
-    this.mainWrapper.append(productsContainer, totalPriceContainer);
     this.main.appendChild(this.mainWrapper);
     this.pageWrapper.append(this.main);
     document.body.appendChild(this.pageWrapper);
@@ -264,8 +416,9 @@ class Basket extends Page {
       .then((cart) => {
         console.log('Данные корзины:', cart);
         this.render(cart);
+        // addLineItemToCart(cart.cart, 2);
       })
-      .catch((err) => console.log('Ошибка получения корзины:', err));
+      .catch(() => this.renderBasketFromAnonim());
 
     return this.pageWrapper;
   }

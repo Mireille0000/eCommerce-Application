@@ -7,7 +7,15 @@ class CustomerLoader {
   private token: string;
 
   constructor() {
-    this.token = JSON.parse(localStorage.getItem('data') as string).access_token;
+    this.token = this.getToken();
+  }
+
+  private getToken() {
+    const dataToken = localStorage.getItem('data');
+    const currToken = dataToken
+      ? JSON.parse(localStorage.getItem('data') as string).access_token
+      : JSON.parse(sessionStorage.getItem('data') as string).access_token;
+    return currToken;
   }
 
   private errorHandler(res: Response) {

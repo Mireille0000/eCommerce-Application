@@ -1,10 +1,11 @@
-import { Cart } from '@commercetools/platform-sdk';
+import { Cart, CartUpdateAction } from '@commercetools/platform-sdk';
 import { apiRoot } from '../registration-form-request/clients';
 import CustomerLoader from '../personal-info-request/getPersonalData';
 
 const getProductByKey = async (productKey: string) => {
   try {
     const response = await apiRoot.products().withKey({ key: productKey }).get().execute();
+    console.log('ПРОДУКТ:', response);
     return response.body.id;
   } catch (err) {
     console.log('Такого товара не существует');
@@ -64,7 +65,6 @@ const createOrGetCart = async () => {
     console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
     return { cart: newCart, customerId };
   } catch (err) {
-    console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', err);
     throw new Error(`${err}`);
   }
 };
@@ -98,10 +98,36 @@ export const editLineItemToCart = async (cart: Cart, quantity: number, index: nu
   }
 };
 
+export const removeAllLineItemsFromCart = async (cart: Cart) => {
+  try {
+    const { version, lineItems } = cart;
+
+    const actions: CartUpdateAction[] = lineItems.map((lineItem) => ({
+      action: 'removeLineItem',
+      lineItemId: lineItem.id,
+    }));
+
+    const response = await apiRoot
+      .carts()
+      .withId({ ID: cart.id })
+      .post({
+        body: {
+          version,
+          actions,
+        },
+      })
+      .execute();
+
+    return response.body;
+  } catch (error) {
+    throw new Error(`${error}`);
+  }
+};
+
 export const addLineItemToCart = async (cart: Cart, quantity: number) => {
   try {
     const { version } = cart;
-    const productKey = 'staff-5';
+    const productKey = 'staff-4';
     const productId = await getProductByKey(productKey);
     const response = await apiRoot
       .carts()
