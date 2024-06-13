@@ -20,14 +20,12 @@ export default class MainPage extends Page {
     this.addElemsToHeader(appName, logoContainer, navBar);
     // logo.src = iconRobe;
     // logo.alt = 'icon Mage Robe';
-    console.log(logo);
     logoContainer.append(logo);
     navBar.className = 'navigation-main-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
     const linkName = [logLink, 'Register', 'Catalog', 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
@@ -36,7 +34,6 @@ export default class MainPage extends Page {
     }
 
     if (profileLink) {
-      console.log('appending');
       navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
     }
     const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
@@ -49,7 +46,6 @@ export default class MainPage extends Page {
     for (let i = 0; i < navLinksArr.length; i += 1) {
       navLinksArr[i].innerHTML = linkName[i];
       navLinksArr[i].setAttribute('href', routes[i]);
-      console.log('I ran');
     }
 
     const logInLink = navLinksArr[0];

@@ -1,3 +1,5 @@
+import { ProcessEnvCartManipulationgs } from '../cart-catalog-requests/cart-catalog-requests'; // new API
+
 const ProcessEnv = {
   PROJECT_KEY: 'ecommerce-app-f-devs',
 
@@ -6,15 +8,20 @@ const ProcessEnv = {
   SECRET: 'fUQ87UVBzwinq_JJYBbqsJGFOuYBZGQk',
 };
 
+console.log(ProcessEnv);
+
 async function getCustomerToken(passwordFlowDataParam: string) {
   try {
-    const response = await fetch(`https://api.europe-west1.gcp.commercetools.com/${ProcessEnv.PROJECT_KEY}/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Authorization: `Bearer ${`${passwordFlowDataParam}`}`,
-      },
-    });
+    const response = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCartManipulationgs.PROJECT_KEY}/me`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Bearer ${`${passwordFlowDataParam}`}`,
+        },
+      }
+    );
 
     if (response.status === 401) {
       throw new Error('Sign up');
@@ -32,12 +39,12 @@ async function getCustomerToken(passwordFlowDataParam: string) {
 async function getPasswordFlow(email: string, password: string, errorMessageElem: string) {
   try {
     const response1 = await fetch(
-      `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnv.PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
+      `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnvCartManipulationgs.PROJECT_KEY}/customers/token?grant_type=password&username=${email}&password=${password}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${btoa(`${ProcessEnv.CLIENT_ID}:${ProcessEnv.SECRET}`)}`,
+          Authorization: `Basic ${btoa(`${ProcessEnvCartManipulationgs.CLIENT_ID}:${ProcessEnvCartManipulationgs.SECRET}`)}`,
         },
       }
     );

@@ -40,7 +40,6 @@ function displayDataOnPage(data: Product) {
   const image = document.querySelector('.product-card-image img') as HTMLImageElement;
   // modal
   const imageModal = document.querySelector('.image-container img') as HTMLImageElement;
-  console.log(imageModal);
   image.src = images[0].url;
   imageModal.src = images[0].url;
   imageModal.alt = 'Modal product image';

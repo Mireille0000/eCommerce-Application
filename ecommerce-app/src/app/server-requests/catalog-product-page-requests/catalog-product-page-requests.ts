@@ -1,8 +1,7 @@
 import { ProductsListData, Prices } from './interfaces-catalog-page';
 import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
-// import getToken from '../detailed-product-page-requests/detailed-product-page-requests';
-// import CategoriesNavigation from '../../pages/catalog-product-page/product-list-manipulations/category-navigation-menu';
+import { getAnonymousSessionToken, getCartById, getMyCartInfo } from '../cart-catalog-requests/cart-catalog-requests';
 
 export const enum ProcessEnvCatalog {
   PROJECT_KEY = 'ecommerce-app-f-devs',
@@ -23,7 +22,7 @@ function getDataKey(productContainer: string) {
   });
 }
 
-function createProductCards(dataProducts: ProductsListData) {
+function createProductCards(token: string, dataProducts: ProductsListData) {
   const numOfProducts = dataProducts.total;
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
@@ -40,8 +39,25 @@ function createProductCards(dataProducts: ProductsListData) {
   const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
   addToCartButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      console.log('At last');
-      btn.classList.add('disabled');
+      if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        getAnonymousSessionToken(btn.id);
+        console.log(token);
+      } else if (localStorage.getItem('data') && !sessionStorage.getItem('cartDataAnon')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        console.log(JSON.parse(localStorage.getItem('data') as string).access_token);
+        getMyCartInfo(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
+        console.log('work');
+      } else if (sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
+        getCartById(cartId.id, token, btn.id);
+        console.log(token);
+      } else {
+        console.log('error');
+      }
     });
   });
 
@@ -55,6 +71,7 @@ function createProductCards(dataProducts: ProductsListData) {
     const productPrices = Array.from(document.querySelectorAll('.price'));
 
     productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
+    addToCartButtons[i].setAttribute('id', `${dataProducts.results[i].key}`);
     productImagesArr[i].src = `${masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
@@ -106,7 +123,7 @@ interface filteredData {
   total: number;
 }
 
-function createFilteredProductCards(dataProducts: filteredData) {
+function createFilteredProductCards(token: string, dataProducts: filteredData) {
   const numOfProducts = dataProducts.total;
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
@@ -126,8 +143,22 @@ function createFilteredProductCards(dataProducts: filteredData) {
   const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
   addToCartButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      console.log('At last');
-      btn.classList.add('disabled');
+      console.log(btn.id);
+      if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        getAnonymousSessionToken(btn.id);
+        console.log(token);
+      } else if (localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        // console.log('hey');
+      } else if (sessionStorage.getItem('cartDataAnon')) {
+        btn.classList.add('disabled');
+        const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
+        getCartById(cartId.id, token, btn.id);
+        // console.log(token);
+      }
     });
   });
 
@@ -139,7 +170,9 @@ function createFilteredProductCards(dataProducts: filteredData) {
     const productPrices = Array.from(document.querySelectorAll('.price'));
     // const productCards = Array.from(document.querySelectorAll('.product-container'));
     const productCards = Array.from(document.querySelectorAll('.product-card-info'));
+
     productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
+    addToCartButtons[i].setAttribute('id', `${dataProducts.results[i].key}`);
     productImagesArr[i].src = `${dataProducts.results[i].masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
@@ -281,7 +314,7 @@ async function getProductList(token: string) {
       const error = new Error(`${data.message}`);
       throw error;
     } else {
-      createProductCards(data);
+      createProductCards(token, data);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < data.total; i += 1) {
         SKUArr.push(data.results[i].masterData.staged.masterVariant.sku);
@@ -314,7 +347,7 @@ async function getFilteredList(token: string, attributes: string) {
       const error = new Error(filteredData.message);
       throw error;
     } else {
-      createFilteredProductCards(filteredData);
+      createFilteredProductCards(token, filteredData);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < filteredData.total; i += 1) {
         SKUArr.push(filteredData.results[i].masterVariant.sku);
@@ -345,7 +378,7 @@ async function getSortedElements(token: string, requestOption: string) {
       const error = new Error(dataSorted.message);
       throw error;
     } else {
-      createFilteredProductCards(dataSorted);
+      createFilteredProductCards(token, dataSorted);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < dataSorted.total; i += 1) {
         SKUArr.push(dataSorted.results[i].masterVariant.sku);
@@ -376,7 +409,7 @@ async function getSearchedData(token: string, inputValue: string) {
       const error = new Error(dataSearched.message);
       throw error;
     } else {
-      createFilteredProductCards(dataSearched);
+      createFilteredProductCards(token, dataSearched);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < dataSearched.total; i += 1) {
         SKUArr.push(dataSearched.results[i].masterVariant.sku);
@@ -410,7 +443,7 @@ async function getSubcategoryData(token: string, subcategoryId: string) {
       const error = new Error(subcategoryData.message);
       throw error;
     } else {
-      createFilteredProductCards(subcategoryData);
+      createFilteredProductCards(token, subcategoryData);
       // console.log(subcategoryData);
     }
     return subcategoryData;
@@ -437,7 +470,7 @@ async function getCategoryDataById(token: string, categoryId: string) {
       const error = new Error(categoryData.message);
       throw error;
     } else {
-      createFilteredProductCards(categoryData);
+      createFilteredProductCards(token, categoryData);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < categoryData.total; i += 1) {
         SKUArr.push(categoryData.results[i].masterVariant.sku);
@@ -587,11 +620,11 @@ export default async function getProductListByToken() {
           },
           {} as { [key: string]: string[] }
         );
-        const test = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
+        const dataCheckboxesEntries = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
           acc.push(`filter=variants.attributes.${item[0]}-attribute:${item[1].join(',')}`);
           return acc;
         }, []);
-        getFilteredList(data.access_token, test.join('&'));
+        getFilteredList(data.access_token, dataCheckboxesEntries.join('&'));
       });
       // sorted data
       addEventHandler('sort-name', 'click', () => {

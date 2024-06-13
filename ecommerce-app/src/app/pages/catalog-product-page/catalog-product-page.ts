@@ -67,7 +67,6 @@ export default class CatalogProductPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
     const linkName = [logLink, 'Register', 'Back to main', 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
@@ -214,12 +213,10 @@ export default class CatalogProductPage extends Page {
     addEventHandler('filter-button', 'click', () => {
       const filters = document.querySelector('.filter-container') as HTMLDivElement;
       filters.classList.toggle('active');
-      console.log('Change active state of the elem');
     });
 
     // sort button
     addEventHandler('sort-button', 'click', () => {
-      console.log('click');
       const sortMenu = document.querySelector('.sorting-menu') as HTMLDivElement;
       sortMenu.classList.toggle('active');
     });
