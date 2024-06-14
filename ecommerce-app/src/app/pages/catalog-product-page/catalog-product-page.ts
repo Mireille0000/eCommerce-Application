@@ -8,6 +8,7 @@ import SortingMenu from './product-list-manipulations/sorting-menu';
 import SearchingForm from './product-list-manipulations/searching-form';
 import CategoriesNavigation from './product-list-manipulations/category-navigation-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
+import ModalWindowIndicator from './modal-window-indicator/modal-window-indicator';
 
 const routes = ['#log-in-page', '#registration-page', '#main-page', '#profile-page']; // change profile page id if needed
 
@@ -40,19 +41,6 @@ export default class CatalogProductPage extends Page {
     this.pageWrapper.append(this.header, this.main, this.footer);
     // header
     const catalogPageHeader = new HeaderComponent();
-    // const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
-    // navBar.className = 'nav-bar-catalog-page';
-
-    // this.addElemsToHeader(appName, this.pageTitle, navBar);
-    // appName.innerHTML = 'Ultimate  ScriptSmith';
-    // navBar.append(navigation);
-    // catalogPageHeader.createNavigation(navigation, navItem, 4, link);
-    // const navLinksNames = ['Profile', 'Back to main', 'Log in', 'Register'];
-    // const navLinksArr = Array.from(document.querySelectorAll('.nav-link'));
-    // navLinksArr.forEach((item, i) => {
-    //   const linkItem = item;
-    //   linkItem.innerHTML = navLinksNames[i];
-    // });
 
     const iconsScript = createHtmlElement('script') as HTMLScriptElement;
     document.head.append(iconsScript);
@@ -60,6 +48,7 @@ export default class CatalogProductPage extends Page {
     iconsScript.crossOrigin = 'anonymous';
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
     this.addElemsToHeader(appName, logoContainer, this.pageTitle, navBar);
+
     logoContainer.append(logo);
 
     navBar.className = 'nav-bar-catalog-page';
@@ -119,7 +108,12 @@ export default class CatalogProductPage extends Page {
       clearButton,
     } = filteringForm;
 
-    this.addElemsToMain(this.productListManipulatings, this.productsWrapper);
+    const indicatorModalWindow = new ModalWindowIndicator('progress-indicator');
+    const { modalWindowWrapper, modalWindowContentWrapper, text, indicator } = indicatorModalWindow;
+    modalWindowWrapper.append(modalWindowContentWrapper);
+    modalWindowContentWrapper.append(text, indicator);
+
+    this.addElemsToMain(modalWindowWrapper, this.productListManipulatings, this.productsWrapper);
     this.productListManipulatings.append(this.manipulationgButtons, filterContainer);
     this.manipulationgButtons.append(this.filterButton, this.sortButton);
     const sortMenuInstance = new SortingMenu();

@@ -36,22 +36,29 @@ function createProductCards(token: string, dataProducts: ProductsListData) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
   getDataKey('.product-card-info'); //
+
   const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
+  const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
+  console.log(modalprogressIndicator);
   addToCartButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
         btn.classList.add('disabled');
         btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
         getAnonymousSessionToken(btn.id);
         console.log(token);
       } else if (localStorage.getItem('data') && !sessionStorage.getItem('cartDataAnon')) {
         btn.classList.add('disabled');
         btn.setAttribute('disabled', '');
-        console.log(JSON.parse(localStorage.getItem('data') as string).access_token);
+        modalprogressIndicator.classList.add('active');
+        // createMyCart(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
         getMyCartInfo(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
         console.log('work');
       } else if (sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
         btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
         const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
         getCartById(cartId.id, token, btn.id);
         console.log(token);
@@ -140,24 +147,31 @@ function createFilteredProductCards(token: string, dataProducts: filteredData) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
   getDataKey('.product-card-info');
+  const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
   const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
   addToCartButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
-      console.log(btn.id);
       if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
         btn.classList.add('disabled');
         btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
         getAnonymousSessionToken(btn.id);
         console.log(token);
-      } else if (localStorage.getItem('data')) {
+      } else if (localStorage.getItem('data') && !sessionStorage.getItem('cartDataAnon')) {
         btn.classList.add('disabled');
         btn.setAttribute('disabled', '');
-        // console.log('hey');
-      } else if (sessionStorage.getItem('cartDataAnon')) {
+        modalprogressIndicator.classList.add('active');
+        getMyCartInfo(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
+        console.log('work');
+      } else if (sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
         btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
         const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
         getCartById(cartId.id, token, btn.id);
-        // console.log(token);
+        console.log(token);
+      } else {
+        console.log('error');
       }
     });
   });

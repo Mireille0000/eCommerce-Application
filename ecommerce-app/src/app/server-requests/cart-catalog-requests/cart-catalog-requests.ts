@@ -127,12 +127,16 @@ export async function getProductByKey(token: string, key: string, cartVersion: n
       ],
     };
     if (!localStorage.getItem('data')) {
+      const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
+      setTimeout(() => modalprogressIndicator.classList.remove('active'), 2000);
       addProduct(accessTokenAnon.access_token, cartId.id, productToAdd);
     } else {
-      console.log('hey');
+      const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
+      setTimeout(() => modalprogressIndicator.classList.remove('active'), 2000);
+      console.log('here?');
       addMyProduct(accessTokenLogedIn.access_token, myCartId as string, productToAdd);
+      console.log(productToAdd);
     }
-
     return dataChosenProduct;
   } catch (err) {
     return err;
@@ -181,8 +185,8 @@ export async function createMyCart(token: string, key: string) {
       const error = new Error(`${dataMyCartCreated.message}`);
       throw error;
     } else {
-      console.log(dataMyCartCreated.lineItems.length);
-      getProductByKey(token, key, dataMyCartCreated.id);
+      console.log(dataMyCartCreated);
+      getProductByKey(token, key, dataMyCartCreated.version, dataMyCartCreated.id);
       return dataMyCartCreated;
     }
   } catch (err) {
@@ -190,7 +194,7 @@ export async function createMyCart(token: string, key: string) {
   }
 }
 
-export async function createAnonymousUserCart(tokenAnonymousSessions: string, key: string) {
+async function createAnonymousUserCart(tokenAnonymousSessions: string, key: string) {
   try {
     const responseAnonymousUserCart = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCartManipulationgs.PROJECT_KEY}/carts`,
@@ -241,20 +245,20 @@ export async function getMyCartInfo(tokenPasswordFlow: string, key: string) {
       }
     );
     const dataMyCartInfo = await responseMyCartInfo.json();
-    if (dataMyCartInfo.results[0].lineItems.length >= 0) {
+    console.log(dataMyCartInfo.results.length);
+    if (dataMyCartInfo.results.length > 0) {
       console.log(key, tokenPasswordFlow);
       getProductByKey(tokenPasswordFlow, key, dataMyCartInfo.results[0].version, dataMyCartInfo.results[0].id); //
-    } else {
+    } else if (dataMyCartInfo.results.length === 0) {
       createMyCart(tokenPasswordFlow, key);
     }
-    console.log(dataMyCartInfo.results[0].id);
     return dataMyCartInfo;
   } catch (err) {
     return err;
   }
 }
 
-// a token for loged out users (save  it in SS when loading the app)
+// a token for anonymous users (in this function we invoke createAnonymousUserCart)
 export async function getAnonymousSessionToken(key: string) {
   try {
     const responseToken = await fetch(

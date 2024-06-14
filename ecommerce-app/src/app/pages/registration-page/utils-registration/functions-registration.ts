@@ -58,6 +58,7 @@ function goToMainPageWindow(result: ClientResponse) {
 
   if (result.statusCode === 201) {
     registrationPage?.remove();
+    window.sessionStorage.clear();
     window.location.hash = '#main-page';
     setTimeout(() => createMsgRegAcc(msgReg), 0);
   }
@@ -188,7 +189,9 @@ export function btnEventHandler(event: Event) {
     createCustomer(customerDraftData)
       .then((res) => {
         checkCustomer(customerDraftData.email, customerDraftData.password, 'auth-error-message')
-          .then(() => goToMainPageWindow(res))
+          .then(() => {
+            goToMainPageWindow(res);
+          })
           .catch((err) => err.message);
       })
       .catch((errRes) => {
