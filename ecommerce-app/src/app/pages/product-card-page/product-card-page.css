@@ -16,6 +16,7 @@
     justify-content: space-around;
     text-align: center;
     padding: 20px;
+    font-family: 'The Hoca Font Family';
 }
 
 .product-card-details {
@@ -49,6 +50,7 @@
 .product-card-prices {
     display: flex;
     flex-wrap: wrap;
+    font-family: 'The Hoca Font Family';
 }
 
 .product-card-price {

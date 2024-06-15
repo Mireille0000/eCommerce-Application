@@ -1,8 +1,7 @@
-// import * as library from '@fortawesome/fontawesome-svg-core';
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import FilterForm from './product-list-manipulations/filtering-form';
-import createHtmlElement, { createButtonElement, addEventHandler } from '../../utils/functions';
+import createHtmlElement, { createDivElement, createButtonElement, addEventHandler } from '../../utils/functions';
 import getProductListByToken from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 import SortingMenu from './product-list-manipulations/sorting-menu';
 import SearchingForm from './product-list-manipulations/searching-form';
@@ -25,6 +24,12 @@ export default class CatalogProductPage extends Page {
 
   productsWrapper: HTMLDivElement;
 
+  paginationButtons: HTMLDivElement;
+
+  prevButton: HTMLButtonElement;
+
+  nextButton: HTMLButtonElement;
+
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'catalog-product-page';
@@ -34,6 +39,10 @@ export default class CatalogProductPage extends Page {
     this.filterButton = createButtonElement('filter-button', 'Filter');
     this.sortButton = createButtonElement('sort-button', 'Sort');
     this.productsWrapper = createHtmlElement('div', 'product-wrapper');
+
+    this.paginationButtons = createDivElement('pagination-buttons');
+    this.prevButton = createButtonElement('prev-button', 'Previous');
+    this.nextButton = createButtonElement('next-button', 'Next');
   }
 
   renderPage() {
@@ -201,6 +210,10 @@ export default class CatalogProductPage extends Page {
     filteringForm.addInputs('color-option', input, label, filterAttributes.color.length, filterAttributes, 'color');
 
     productContainerElem(this.productsWrapper);
+    this.addElemsToMain(this.paginationButtons);
+    this.paginationButtons.append(this.prevButton, this.nextButton);
+    const sparkles = createHtmlElement('i', 'fa-solid fa-wand-sparkles fa-shake');
+    this.nextButton.prepend(sparkles);
     getProductListByToken();
 
     // fiter button
@@ -223,12 +236,6 @@ export default class CatalogProductPage extends Page {
         inputItem.checked = false;
       });
     });
-
-    // addToCartBtn.forEach((btn) => {
-    //   btn.addEventListener('click', () => {
-    //     console.log('work');
-    //   });
-    // });
 
     return this.pageWrapper;
   }

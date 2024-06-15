@@ -222,7 +222,7 @@ async function createAnonymousUserCart(tokenAnonymousSessions: string, key: stri
         sessionStorage.setItem('cartDataAnon', JSON.stringify(cartData));
         console.log(dataAnonymousUserCart.id);
       } else {
-        sessionStorage.clear();
+        window.sessionStorage.clear();
       }
       return dataAnonymousUserCart;
     }

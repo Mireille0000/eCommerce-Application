@@ -24,6 +24,7 @@ function getDataKey(productContainer: string) {
 
 function createProductCards(token: string, dataProducts: ProductsListData) {
   const numOfProducts = dataProducts.total;
+  console.log(numOfProducts);
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
   const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
@@ -70,7 +71,6 @@ function createProductCards(token: string, dataProducts: ProductsListData) {
 
   for (let i = 0; i < numOfProducts; i += 1) {
     const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
-    // const productCards = Array.from(document.querySelectorAll('.product-container')); // is it necessary
     const productCards = Array.from(document.querySelectorAll('.product-card-info'));
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
