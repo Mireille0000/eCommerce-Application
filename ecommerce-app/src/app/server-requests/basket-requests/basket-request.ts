@@ -5,10 +5,8 @@ import CustomerLoader from '../personal-info-request/getPersonalData';
 const getProductByKey = async (productKey: string) => {
   try {
     const response = await apiRoot.products().withKey({ key: productKey }).get().execute();
-    console.log('ПРОДУКТ:', response);
     return response.body.id;
   } catch (err) {
-    console.log('Такого товара не существует');
     throw new Error(`${err}`);
   }
 };
@@ -26,7 +24,6 @@ const getCartByCustomerById = async (customerId: string) => {
 
     return response.body.results[0];
   } catch {
-    console.log('Корзины пока ещё нет');
     return null;
   }
 };
@@ -45,25 +42,44 @@ const createCart = async (customerId: string) => {
 
     return response.body;
   } catch (error) {
-    console.log('ОШИБКА ПРИ СОЗДАНИИ КОРЗИНЫ:', error);
     throw new Error(`${error}`);
+  }
+};
+
+const getCartById = async () => {
+  try {
+    const cartIdSession = sessionStorage.getItem('cartDataAnon');
+    let cartId = '';
+    if (cartIdSession) {
+      cartId = JSON.parse(cartIdSession).id;
+    }
+    const response = await apiRoot.carts().withId({ ID: cartId }).get().execute();
+
+    return response.body;
+  } catch (err) {
+    throw new Error(`${err}`);
   }
 };
 
 const createOrGetCart = async () => {
   try {
-    const data = await new CustomerLoader().getCustomerData();
-    const { id: customerId }: { id: string } = data;
+    if (localStorage.getItem('data')) {
+      const data = await new CustomerLoader().getCustomerData();
+      // console.log('DATA_USER:', data);
+      const { id: customerId }: { id: string } = data;
 
-    const existingCart = await getCartByCustomerById(customerId);
-    if (existingCart) {
-      console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
-      return { cart: existingCart, customerId };
+      const existingCart = await getCartByCustomerById(customerId);
+      if (existingCart) {
+        // console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
+        return { cart: existingCart, customerId };
+      }
+
+      const newCart = await createCart(customerId);
+      // console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
+      return { cart: newCart, customerId };
     }
-
-    const newCart = await createCart(customerId);
-    console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
-    return { cart: newCart, customerId };
+    const dataCart = await getCartById();
+    return { cart: dataCart, customerId: '' };
   } catch (err) {
     throw new Error(`${err}`);
   }
@@ -127,7 +143,7 @@ export const removeAllLineItemsFromCart = async (cart: Cart) => {
 export const addLineItemToCart = async (cart: Cart, quantity: number) => {
   try {
     const { version } = cart;
-    const productKey = 'staff-4';
+    const productKey = 'staff-2';
     const productId = await getProductByKey(productKey);
     const response = await apiRoot
       .carts()
@@ -150,5 +166,58 @@ export const addLineItemToCart = async (cart: Cart, quantity: number) => {
     return response.body;
   } catch (error) {
     throw new Error(`${error}`);
+  }
+};
+
+export const addDiscountCode = async (code: string, cart: Cart) => {
+  try {
+    const { version, id } = cart;
+    const response = await apiRoot
+      .carts()
+      .withId({ ID: id })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'addDiscountCode',
+              code,
+            },
+          ],
+        },
+      })
+      .execute();
+
+    return response.body;
+  } catch (err) {
+    throw new Error(`${err}`);
+  }
+};
+
+export const removeDiscountCode = async (code: string, cart: Cart) => {
+  try {
+    const { version, id } = cart;
+    const response = await apiRoot
+      .carts()
+      .withId({ ID: id })
+      .post({
+        body: {
+          version,
+          actions: [
+            {
+              action: 'removeDiscountCode',
+              discountCode: {
+                typeId: 'discount-code',
+                id: 'f05a57eb-03dc-46b0-8872-08cf76b92999',
+              },
+            },
+          ],
+        },
+      })
+      .execute();
+
+    return response.body;
+  } catch (err) {
+    throw new Error(`${err}`);
   }
 };

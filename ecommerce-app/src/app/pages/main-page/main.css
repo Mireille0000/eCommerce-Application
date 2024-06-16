@@ -7,3 +7,28 @@
     display: flex;
     align-items: center;
 }
+.main__promo-code-wrap {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 16px;
+    background-color: #fff;
+}
+.main__promo-code-title {
+    color: rgb(16, 196, 76);
+    text-align: center;
+    font-size: 1.25rem;
+}
+.main__promo-code-descr {
+    font-size: 1.5rem;
+    text-align: center;
+    font-weight: 700;
+    color: #005bff;
+}
+.main__promo-code-content {
+    padding: 10px;
+    text-align: center;
+    background-color: rgb(249, 17, 85);
+    color: #fff
+}
