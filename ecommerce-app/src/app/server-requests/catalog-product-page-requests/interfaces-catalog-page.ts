@@ -60,11 +60,41 @@ interface ProductsArr {
   versionModifiedAt?: Date;
 }
 
+interface ProductArrItem {
+  //
+  description: { 'en-US': string };
+  key: string;
+  masterVariant: {
+    images: Array<{ url: string }>;
+    prices: Array<{
+      id: string;
+      key: string;
+      value: {
+        centAmount: number;
+        currencyCode: string;
+        fractionDigits: number;
+        type: string;
+      };
+    }>;
+    sku: string;
+  };
+  name: { 'en-US': string };
+}
+
 export interface ProductsListData {
   count: number;
   limit: 20;
   offset: number;
   results: Array<ProductsArr>;
+  total: number;
+}
+
+export interface ProductsListDataNew {
+  //
+  count: number;
+  limit: 20;
+  offset: number;
+  results: Array<ProductArrItem>;
   total: number;
 }
 

@@ -16,6 +16,7 @@
     justify-content: space-around;
     text-align: center;
     padding: 20px;
+    font-family: 'The Hoca Font Family';
 }
 
 .product-card-details {
@@ -26,14 +27,14 @@
 }
 
 .product-card-image {
-    width: 300px;
+    width: 250px;
     display: flex;
     overflow: hidden;
     border-radius: 20px;
 }
 
 .product-card-image img {
-    width: 300px;
+    width: 250px;
     border-radius: 20px;
     transition: 2s;
     transform: scale(1);
@@ -41,7 +42,7 @@
 }
 
 .product-card-image img:hover {
-    width: 300px;
+    /* width: 300px; */
     transition: 2s;
     transform: scale(1.1);
 }
@@ -49,6 +50,11 @@
 .product-card-prices {
     display: flex;
     flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    font-family: 'The Hoca Font Family';
+    gap: 10px;
+    text-align: center;
 }
 
 .product-card-price {

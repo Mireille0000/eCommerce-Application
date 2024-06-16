@@ -65,7 +65,6 @@ export default class ProductCardPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
     const linkName = [logLink, 'Register', 'Back to main', 'Catalog'];
 
     navBar.className = 'nav-bar-catalog-page';

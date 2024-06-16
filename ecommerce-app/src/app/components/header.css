@@ -6,6 +6,8 @@
 .nav-item a {
     color: #2cb482;
     text-decoration: none;
+    font-family: 'The Hoca Font Family';
+    font-size: 12px;
     font-weight: 700;
     transition: 1s;
 }
