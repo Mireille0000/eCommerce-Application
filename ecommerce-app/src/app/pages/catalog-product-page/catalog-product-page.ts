@@ -8,6 +8,7 @@ import SearchingForm from './product-list-manipulations/searching-form';
 import CategoriesNavigation from './product-list-manipulations/category-navigation-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
 import ModalWindowIndicator from './modal-window-indicator/modal-window-indicator';
+// import { getProductsPartByToken } from '../../server-requests/catalog-product-page-requests/pagination-requests/pagination-requests';
 
 const routes = ['#log-in-page', '#registration-page', '#main-page', '#profile-page']; // change profile page id if needed
 
@@ -215,6 +216,7 @@ export default class CatalogProductPage extends Page {
     const sparkles = createHtmlElement('i', 'fa-solid fa-wand-sparkles fa-shake');
     this.nextButton.prepend(sparkles);
     getProductListByToken();
+    // getProductsPartByToken();
 
     // fiter button
     addEventHandler('filter-button', 'click', () => {

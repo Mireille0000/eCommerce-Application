@@ -133,9 +133,7 @@ export async function getProductByKey(token: string, key: string, cartVersion: n
     } else {
       const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
       setTimeout(() => modalprogressIndicator.classList.remove('active'), 2000);
-      console.log('here?');
       addMyProduct(accessTokenLogedIn.access_token, myCartId as string, productToAdd);
-      console.log(productToAdd);
     }
     return dataChosenProduct;
   } catch (err) {
@@ -158,7 +156,6 @@ export async function getCartById(id: string, token: string, key: string) {
     );
     const dataCartInfo = await responseCartInfo.json();
     getProductByKey(token, key, dataCartInfo.version);
-    console.log(dataCartInfo.version);
     return dataCartInfo;
   } catch (err) {
     return err;
@@ -185,7 +182,6 @@ export async function createMyCart(token: string, key: string) {
       const error = new Error(`${dataMyCartCreated.message}`);
       throw error;
     } else {
-      console.log(dataMyCartCreated);
       getProductByKey(token, key, dataMyCartCreated.version, dataMyCartCreated.id);
       return dataMyCartCreated;
     }
@@ -220,7 +216,6 @@ async function createAnonymousUserCart(tokenAnonymousSessions: string, key: stri
       getProductByKey(tokenAnonymousSessions, key, dataAnonymousUserCart.version);
       if (!localStorage.getItem('data')) {
         sessionStorage.setItem('cartDataAnon', JSON.stringify(cartData));
-        console.log(dataAnonymousUserCart.id);
       } else {
         window.sessionStorage.clear();
       }
@@ -245,9 +240,7 @@ export async function getMyCartInfo(tokenPasswordFlow: string, key: string) {
       }
     );
     const dataMyCartInfo = await responseMyCartInfo.json();
-    console.log(dataMyCartInfo.results.length);
     if (dataMyCartInfo.results.length > 0) {
-      console.log(key, tokenPasswordFlow);
       getProductByKey(tokenPasswordFlow, key, dataMyCartInfo.results[0].version, dataMyCartInfo.results[0].id); //
     } else if (dataMyCartInfo.results.length === 0) {
       createMyCart(tokenPasswordFlow, key);
@@ -284,7 +277,6 @@ export async function getAnonymousSessionToken(key: string) {
 
       if (!sessionStorage.getItem('anonymousTokensData')) {
         sessionStorage.setItem('anonymousTokensData', JSON.stringify(anonymousTokensObj));
-        console.log(dataToken.access_token);
       } else {
         console.log(sessionStorage.getItem('anonymousTokensData'));
       }

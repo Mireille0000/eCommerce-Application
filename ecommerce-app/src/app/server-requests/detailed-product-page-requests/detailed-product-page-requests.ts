@@ -1,4 +1,5 @@
 import { ProcessEnvCatalog } from '../catalog-product-page-requests/catalog-product-page-requests';
+// import { ProductsListDataNew } from '../catalog-product-page-requests/interfaces-catalog-page';
 
 interface MasterVariantData {
   sku: string;
@@ -33,6 +34,52 @@ interface Product {
   key: string;
 }
 
+export async function getDiscountProductInfo(token: string, data: Product, elem: string) {
+  try {
+    const responseDiscounts = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-discounts/key=${ProcessEnvCatalog.DISCOUNT_KEY}/`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8',
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const discountsData = await responseDiscounts.json();
+    if (discountsData.status === 400) {
+      const error = new Error(`${discountsData.message}`);
+      throw error;
+    } else {
+      const discountAmount = discountsData.predicate;
+      const productPrice = document.querySelector('.product-card-price') as HTMLElement;
+      const productDiscount = document.querySelector('.product-card-discount') as HTMLElement;
+      const productDiscountPrice = document.querySelector('.product-card-discount-price') as HTMLElement;
+      // get skus of the discounted products
+      const SKUData: Array<string> = discountAmount.split('"');
+      const skuArr = SKUData.reduce((acc: Array<string>, sku, _, arr) => {
+        if (arr.indexOf(sku) % 2 !== 0) {
+          acc.push(sku);
+        }
+        return acc;
+      }, []);
+
+      //  display discount and price with discount
+      const discount = discountsData.value.permyriad / 100;
+      const originalPrice = data.masterData.staged.masterVariant.prices[0].value.centAmount / 100;
+      if (skuArr.includes(elem)) {
+        productDiscount.innerHTML = `Discount ${discount}%`;
+        productDiscountPrice.innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
+        productPrice.setAttribute('style', 'text-decoration: line-through');
+      }
+
+      return skuArr;
+    }
+  } catch (err) {
+    return err;
+  }
+}
+
 function displayDataOnPage(data: Product) {
   const { name, description } = data.masterData.staged;
   const { prices, images } = data.masterData.staged.masterVariant;
@@ -51,36 +98,6 @@ function displayDataOnPage(data: Product) {
   const productPrice = document.querySelector('.product-card-prices .product-card-price') as HTMLSpanElement;
   productPrice.innerHTML = `Price: ${prices[0].value.centAmount / 100}€`;
 }
-
-// async function getKeys(token: string) {
-//   try {
-//     const response = await fetch(
-//       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/products`,
-//       {
-//         method: 'GET',
-//         headers: {
-//           'Content-Type': 'application/json',
-//           Authorization: `Bearer ${`${token}`}`,
-//         },
-//       }
-//     );
-//     const data = await response.json();
-//     if (data.status === 400) {
-//       const error = new Error(`${data.message}`);
-//       throw error;
-//     } else {
-//       const keys: Array<string> = [];
-//       for (let i = 0; i < data.results.length; i += 1) {
-//         keys.push(data.results[i].key);
-//       }
-//       // console.log(data, keys); //
-//       return data;
-//     }
-//   } catch (err) {
-//     console.log(err);
-//     return err;
-//   }
-// }
 
 async function getProductByKey(token: string, key: string) {
   try {
@@ -101,6 +118,7 @@ async function getProductByKey(token: string, key: string) {
       throw error;
     } else {
       displayDataOnPage(productData);
+      getDiscountProductInfo(token, productData, productData.masterData.staged.masterVariant.sku);
       return productData;
     }
   } catch (err) {
@@ -126,7 +144,6 @@ export default async function getToken(key: string) {
       throw error;
     } else {
       getProductByKey(responseToken.access_token, key); //
-      // getKeys(responseToken.access_token);
       return responseToken;
     }
   } catch (err) {

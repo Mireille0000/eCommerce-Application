@@ -1,9 +1,10 @@
 import { ProcessEnvCartManipulationgs } from '../../cart-catalog-requests/cart-catalog-requests';
+import { createProductCards, getDiscountsInfo } from '../catalog-product-page-requests';
 
-export async function getProductsPartly(accessToken: string, skip: number, limit = 7) {
+export default async function getProductsPartly(accessToken: string, offset: number, limit = 4) {
   try {
     const reponseProductsPart = await fetch(
-      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCartManipulationgs.PROJECT_KEY}/product-projections/search?limit=${limit}&skip=${skip}`,
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCartManipulationgs.PROJECT_KEY}/product-projections/search?sort=createdAt+asc&limit=${limit}&offset=${offset}`,
       {
         method: 'GET',
         headers: {
@@ -16,40 +17,16 @@ export async function getProductsPartly(accessToken: string, skip: number, limit
 
     if (dataProductsPart.message) {
       const error = new Error(dataProductsPart.message);
-      console.log(dataProductsPart.message);
       throw error;
     } else {
-      console.log(dataProductsPart);
-      return dataProductsPart;
-    }
-  } catch (err) {
-    return err;
-  }
-}
+      createProductCards(accessToken, dataProductsPart);
+      const SKUArr: Array<string> = [];
 
-export async function getProductsPartByToken() {
-  try {
-    const reponseToken = await fetch(
-      `https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-          Authorization: `Basic ${btoa}(${ProcessEnvCartManipulationgs.CLIENT_ID}:${ProcessEnvCartManipulationgs.SECRET})`,
-        },
+      for (let i = 0; i < dataProductsPart.count; i += 1) {
+        SKUArr.push(dataProductsPart.results[i].masterVariant.sku);
       }
-    );
-    const dataToken = await reponseToken.json();
-
-    if (dataToken.message) {
-      const error = new Error(dataToken.message);
-      console.log(dataToken.message);
-      throw error;
-    } else {
-      const skipVar = 0; // will change once the page changes
-      getProductsPartly(dataToken, skipVar);
-      console.log(dataToken);
-      return dataToken;
+      getDiscountsInfo(accessToken, dataProductsPart, SKUArr);
+      return dataProductsPart;
     }
   } catch (err) {
     return err;

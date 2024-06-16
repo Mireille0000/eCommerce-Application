@@ -14,8 +14,8 @@
     align-items: center;
     gap: 45px;
 
-    margin-right: 50px;
-    margin-left: 50px;
+    margin-right: 150px;
+    margin-left: 150px;
 }
 
 .nav-bar-catalog-page {
@@ -85,6 +85,8 @@ h1, h2 {
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 50px;
 }
 
 .product-card-info {
@@ -147,7 +149,11 @@ h1, h2 {
 .prev-button, .next-button  {
     width: 100px;
     border: 0 none;
-    background-color: unset;
+    background-color: rgb(74 203 137 / 30%);
+}
+
+.prev-button:hover, .next-button:hover {
+    background-color: rgb(43 190 64);
 }
 
 .filter-button:hover,
@@ -155,9 +161,7 @@ h1, h2 {
 .apply-button:hover,
 .clear-button:hover,
 .search-button:hover,
-.add-to-cart-button:hover,
-.prev-button:hover,
-.next-button:hover {
+.add-to-cart-button:hover {
     transition: 1s;
     background-color: rgb(227, 204, 168);
 }

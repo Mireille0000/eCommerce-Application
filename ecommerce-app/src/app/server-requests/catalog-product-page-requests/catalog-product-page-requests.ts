@@ -1,7 +1,8 @@
-import { ProductsListData, Prices } from './interfaces-catalog-page';
+import { /* ProductsListData */ Prices, ProductsListDataNew } from './interfaces-catalog-page';
 import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
 import { getAnonymousSessionToken, getCartById, getMyCartInfo } from '../cart-catalog-requests/cart-catalog-requests';
+import getProductsPartly from './pagination-requests/pagination-requests';
 
 export const enum ProcessEnvCatalog {
   PROJECT_KEY = 'ecommerce-app-f-devs',
@@ -22,9 +23,8 @@ function getDataKey(productContainer: string) {
   });
 }
 
-function createProductCards(token: string, dataProducts: ProductsListData) {
-  const numOfProducts = dataProducts.total;
-  console.log(numOfProducts);
+export function createProductCards(token: string, dataProducts: ProductsListDataNew) {
+  const numOfProducts = dataProducts.count;
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
   const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
@@ -38,9 +38,8 @@ function createProductCards(token: string, dataProducts: ProductsListData) {
   }
   getDataKey('.product-card-info'); //
 
-  const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
+  const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button'));
   const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
-  console.log(modalprogressIndicator);
   addToCartButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
@@ -70,7 +69,7 @@ function createProductCards(token: string, dataProducts: ProductsListData) {
   });
 
   for (let i = 0; i < numOfProducts; i += 1) {
-    const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
+    const { masterVariant, name, description } = dataProducts.results[i];
     const productCards = Array.from(document.querySelectorAll('.product-card-info'));
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
@@ -84,7 +83,7 @@ function createProductCards(token: string, dataProducts: ProductsListData) {
     productNamesArr[i].innerHTML = `${name['en-US']}`;
     productDescriptionsArr[i].innerHTML = `${description['en-US']}`;
     if (masterVariant.prices.length > 0) {
-      productPrices[i].innerHTML = `Price: ${(masterVariant.prices[0] as Prices).value.centAmount / 100}€`;
+      productPrices[i].innerHTML = `Price: ${masterVariant.prices[0].value.centAmount / 100}€`;
     } else {
       productPrices[i].innerHTML = 'No price';
     }
@@ -200,7 +199,7 @@ function createFilteredProductCards(token: string, dataProducts: filteredData) {
   }
 }
 
-function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>) {
+export function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>) {
   return discounts.forEach((discount, i) => {
     if (discount.innerHTML) {
       prices[i].setAttribute('style', 'text-decoration: line-through');
@@ -217,7 +216,8 @@ function addRemoveActiveState(elemByClass: string) {
   elem.classList.add('active-category');
 }
 
-async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Array<string>) {
+export async function getDiscountsInfo(token: string, data: ProductsListDataNew, SKU: Array<string>) {
+  console.log('fetching discounts');
   try {
     const responseDiscounts = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-discounts/key=${ProcessEnvCatalog.DISCOUNT_KEY}/`,
@@ -246,17 +246,23 @@ async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Arra
         }
         return acc;
       }, []);
+      console.log(skuArr);
       //  display discounts and prices with discounts
       const discount = discountsData.value.permyriad / 100;
       for (let i = 0; i < SKU.length; i += 1) {
-        const originalPrice = data.results[i].masterData.staged.masterVariant.prices[0].value.centAmount / 100;
+        console.log('sku', SKU);
+        console.log('data', data);
+        const originalPrice = data.results[i].masterVariant.prices[0].value.centAmount / 100;
         if (skuArr.includes(SKU[i])) {
+          // console.log('sku', skuArr);
+          console.log('changing price');
           productDiscounts[i].innerHTML = `Discount ${discount}%`;
           productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
         }
       }
 
       overlinePrice(productPrices, productDiscounts);
+      console.log('done fetching discounts');
       return skuArr;
     }
   } catch (err) {
@@ -264,7 +270,7 @@ async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Arra
   }
 }
 
-async function getDiscountsInfoFilteredList(token: string, data: filteredData, SKU: Array<string>) {
+export async function getDiscountsInfoFilteredList(token: string, data: filteredData, SKU: Array<string>) {
   try {
     const responseDiscounts = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-discounts/key=${ProcessEnvCatalog.DISCOUNT_KEY}/`,
@@ -297,6 +303,7 @@ async function getDiscountsInfoFilteredList(token: string, data: filteredData, S
       const discount = discountsData.value.permyriad / 100;
       for (let i = 0; i < SKU.length; i += 1) {
         const originalPrice = data.results[i].masterVariant.prices[0].value.centAmount / 100;
+        console.log(originalPrice);
         if (skuArr.includes(SKU[i])) {
           productDiscounts[i].innerHTML = `Discount ${discount}%`;
           productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
@@ -311,7 +318,36 @@ async function getDiscountsInfoFilteredList(token: string, data: filteredData, S
   }
 }
 
-async function getProductList(token: string) {
+// pagination function
+function pagination(token: string) {
+  const previousBtn = document.querySelector('.prev-button') as HTMLButtonElement;
+  const nextBtn = document.querySelector('.next-button') as HTMLButtonElement;
+  let prevTest = 16;
+  let nextTest = 0;
+  getProductsPartly(token, nextTest);
+  previousBtn.addEventListener('click', () => {
+    if (prevTest === 16 && nextTest === 0) {
+      getProductsPartly(token, nextTest);
+      //   console.log(`${nextTest}`);
+    } else if (prevTest < 16 || prevTest >= 0) {
+      prevTest += 4;
+      nextTest -= 4;
+      getProductsPartly(token, nextTest);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (nextTest === 16 && prevTest === 0) {
+      getProductsPartly(token, nextTest);
+    } else if (nextTest < 16 || nextTest >= 0) {
+      nextTest += 4;
+      prevTest -= 4;
+      getProductsPartly(token, nextTest);
+    }
+  });
+}
+
+export async function getProductList(token: string) {
   try {
     const response = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/products`,
@@ -330,10 +366,11 @@ async function getProductList(token: string) {
     } else {
       createProductCards(token, data);
       const SKUArr: Array<string> = [];
-      for (let i = 0; i < data.total; i += 1) {
-        SKUArr.push(data.results[i].masterData.staged.masterVariant.sku);
+      for (let i = 0; i < data.count; i += 1) {
+        SKUArr.push(data.results[i].masterVariant.sku);
       }
       getDiscountsInfo(token, data, SKUArr);
+      console.log(SKUArr);
       return data;
     }
   } catch (err) {
@@ -537,8 +574,8 @@ async function getCategories(token: string) {
         enchantedRobeSubcategory.innerHTML = '';
         foggyCauldronSubcategory.innerHTML = '';
         addRemoveActiveState('all-categories');
-        getProductList(token);
-        // console.log('All categories');
+        pagination(token);
+        // getProductList(token);
       });
 
       // Staff category
@@ -610,7 +647,9 @@ export default async function getProductListByToken() {
       const error = new Error(data.message);
       throw error;
     } else {
-      getProductList(data.access_token);
+      pagination(data.access_token);
+      // getProductList(data.access_token);
+      console.log(data);
       // filtered data
       addEventHandler('apply-button', 'click', () => {
         const dataObjects = [];
@@ -652,7 +691,6 @@ export default async function getProductListByToken() {
         getSortedElements(data.access_token, '?sort=name.en-US+asc');
       });
       addEventHandler('sort-price-lowest', 'click', () => {
-        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -662,7 +700,6 @@ export default async function getProductListByToken() {
         getSortedElements(data.access_token, 'search?sort=price+asc');
       });
       addEventHandler('sort-price-highest', 'click', () => {
-        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -675,7 +712,6 @@ export default async function getProductListByToken() {
       const searchInputValue = document.querySelector('.search-input') as HTMLInputElement;
       addEventHandler('search-button', 'click', () => {
         getSearchedData(data.access_token, searchInputValue.value);
-        // console.log(searchInputValue.value);
       });
 
       getCategories(data.access_token);

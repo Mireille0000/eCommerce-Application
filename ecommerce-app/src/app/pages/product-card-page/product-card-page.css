@@ -50,7 +50,11 @@
 .product-card-prices {
     display: flex;
     flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
     font-family: 'The Hoca Font Family';
+    gap: 10px;
+    text-align: center;
 }
 
 .product-card-price {
