@@ -117,10 +117,13 @@ export default class LogInPage extends Page {
         checkCustomer(this.email.value, this.password.value, 'auth-error-message').catch((err) => err.message);
         const logInBtnDisabled = document.querySelector('.log-in');
         logInBtnDisabled?.setAttribute('disabled', '');
+
+        window.sessionStorage.clear(); //
+
         setTimeout(() => logInBtnDisabled?.removeAttribute('disabled'), 6000);
       } else {
         console.log('invalid cridentials');
-      } // TEST
+      }
 
       e.preventDefault();
     });

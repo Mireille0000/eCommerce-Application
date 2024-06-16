@@ -59,7 +59,6 @@ export default class App {
   changeRoute() {
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.slice(1);
-      console.log(hash);
       if (hash.includes('/')) {
         const [hashname, productKey] = hash.split('/');
         return App.renderAppPage(hashname, productKey);
@@ -70,7 +69,6 @@ export default class App {
   }
 
   renderPage() {
-    console.log('I got called');
     if (window.location.hash.slice(1) === 'main-page') {
       window.location.hash = '';
       window.location.hash = 'main-page';

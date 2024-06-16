@@ -1,12 +1,14 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import FilterForm from './product-list-manipulations/filtering-form';
-import createHtmlElement, { createButtonElement, addEventHandler } from '../../utils/functions';
+import createHtmlElement, { createDivElement, createButtonElement, addEventHandler } from '../../utils/functions';
 import getProductListByToken from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 import SortingMenu from './product-list-manipulations/sorting-menu';
 import SearchingForm from './product-list-manipulations/searching-form';
 import CategoriesNavigation from './product-list-manipulations/category-navigation-menu';
 import productContainerElem from './product-list-manipulations/functions-catalog-page';
+import ModalWindowIndicator from './modal-window-indicator/modal-window-indicator';
+// import { getProductsPartByToken } from '../../server-requests/catalog-product-page-requests/pagination-requests/pagination-requests';
 
 const routes = ['#log-in-page', '#registration-page', '#main-page', '#profile-page']; // change profile page id if needed
 
@@ -23,6 +25,12 @@ export default class CatalogProductPage extends Page {
 
   productsWrapper: HTMLDivElement;
 
+  paginationButtons: HTMLDivElement;
+
+  prevButton: HTMLButtonElement;
+
+  nextButton: HTMLButtonElement;
+
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'catalog-product-page';
@@ -32,6 +40,10 @@ export default class CatalogProductPage extends Page {
     this.filterButton = createButtonElement('filter-button', 'Filter');
     this.sortButton = createButtonElement('sort-button', 'Sort');
     this.productsWrapper = createHtmlElement('div', 'product-wrapper');
+
+    this.paginationButtons = createDivElement('pagination-buttons');
+    this.prevButton = createButtonElement('prev-button', 'Previous');
+    this.nextButton = createButtonElement('next-button', 'Next');
   }
 
   renderPage() {
@@ -39,29 +51,21 @@ export default class CatalogProductPage extends Page {
     this.pageWrapper.append(this.header, this.main, this.footer);
     // header
     const catalogPageHeader = new HeaderComponent();
-    // const { appName, navBar, navigation, navItem, link } = catalogPageHeader;
-    // navBar.className = 'nav-bar-catalog-page';
 
-    // this.addElemsToHeader(appName, this.pageTitle, navBar);
-    // appName.innerHTML = 'Ultimate  ScriptSmith';
-    // navBar.append(navigation);
-    // catalogPageHeader.createNavigation(navigation, navItem, 4, link);
-    // const navLinksNames = ['Profile', 'Back to main', 'Log in', 'Register'];
-    // const navLinksArr = Array.from(document.querySelectorAll('.nav-link'));
-    // navLinksArr.forEach((item, i) => {
-    //   const linkItem = item;
-    //   linkItem.innerHTML = navLinksNames[i];
-    // });
-
+    const iconsScript = createHtmlElement('script') as HTMLScriptElement;
+    document.head.append(iconsScript);
+    iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
+    iconsScript.crossOrigin = 'anonymous';
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
     this.addElemsToHeader(appName, logoContainer, this.pageTitle, navBar);
+
     logoContainer.append(logo);
+
     navBar.className = 'nav-bar-catalog-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
     const linkName = [logLink, 'Register', 'Back to main', 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
@@ -114,7 +118,12 @@ export default class CatalogProductPage extends Page {
       clearButton,
     } = filteringForm;
 
-    this.addElemsToMain(this.productListManipulatings, this.productsWrapper);
+    const indicatorModalWindow = new ModalWindowIndicator('progress-indicator');
+    const { modalWindowWrapper, modalWindowContentWrapper, text, indicator } = indicatorModalWindow;
+    modalWindowWrapper.append(modalWindowContentWrapper);
+    modalWindowContentWrapper.append(text, indicator);
+
+    this.addElemsToMain(modalWindowWrapper, this.productListManipulatings, this.productsWrapper);
     this.productListManipulatings.append(this.manipulationgButtons, filterContainer);
     this.manipulationgButtons.append(this.filterButton, this.sortButton);
     const sortMenuInstance = new SortingMenu();
@@ -143,7 +152,6 @@ export default class CatalogProductPage extends Page {
     ];
     categoriesNavigation.renderCategoriesNavElem(this.mainWrapper, categoriesNamesDefault, categoriesClassNamesDefault);
 
-    // const inputSearchField = document.querySelector('.search-input');
     addEventHandler('search-input', 'click', () => {
       searchFormInstance.searchButton.disabled = false;
     });
@@ -203,18 +211,21 @@ export default class CatalogProductPage extends Page {
     filteringForm.addInputs('color-option', input, label, filterAttributes.color.length, filterAttributes, 'color');
 
     productContainerElem(this.productsWrapper);
+    this.addElemsToMain(this.paginationButtons);
+    this.paginationButtons.append(this.prevButton, this.nextButton);
+    const sparkles = createHtmlElement('i', 'fa-solid fa-wand-sparkles fa-shake');
+    this.nextButton.prepend(sparkles);
     getProductListByToken();
+    // getProductsPartByToken();
 
     // fiter button
     addEventHandler('filter-button', 'click', () => {
       const filters = document.querySelector('.filter-container') as HTMLDivElement;
       filters.classList.toggle('active');
-      console.log('Change active state of the elem');
     });
 
     // sort button
     addEventHandler('sort-button', 'click', () => {
-      console.log('click');
       const sortMenu = document.querySelector('.sorting-menu') as HTMLDivElement;
       sortMenu.classList.toggle('active');
     });

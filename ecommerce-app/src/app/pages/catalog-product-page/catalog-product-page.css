@@ -11,12 +11,11 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    /* flex-direction: row; */
     align-items: center;
     gap: 45px;
 
-    margin-right: 50px;
-    margin-left: 50px;
+    margin-right: 150px;
+    margin-left: 150px;
 }
 
 .nav-bar-catalog-page {
@@ -24,11 +23,19 @@
     align-items: center;
 }
 
+h1, h2 {
+    font-family: 'Magical World Regular';
+}
+
 .product-container {
     width: 310px;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: center;
+
+    font-family: 'The Hoca Font Family';
+    font-size: 12px;
 
     border: 1px solid #000;
     border-radius: 20px;
@@ -68,9 +75,9 @@
 
 .product-prices {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     justify-content: center;
-    gap: 3px;
+    gap: 10px;
 }
 
 .product-wrapper  {
@@ -78,7 +85,35 @@
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 50px;
 }
+
+.product-card-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.add-to-cart-button {
+    width: 130px;
+    height: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    margin: 15px;
+    border-radius: 20px;
+    font-family: 'The Hoca Font Family';
+    cursor: pointer;
+    transition: 1s;
+}
+
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 
 
 /* manipulating with product list */
@@ -97,25 +132,36 @@
 
 .manipulating-buttons, .filter-buttons-container {
     display: flex;
-    /* justify-content: center; */
     flex-wrap: wrap;
     gap: 10px;
     margin: 10px;
 }
 
-.filter-button, .sort-button {
+.filter-button, .sort-button, .prev-button, .next-button {
     width: 150px;
     height: 35px;
     border-radius: 20px;
     cursor: pointer;
+    font-family: 'The Hoca Font Family';
     transition: 1s;
+}
+
+.prev-button, .next-button  {
+    width: 100px;
+    border: 0 none;
+    background-color: rgb(74 203 137 / 30%);
+}
+
+.prev-button:hover, .next-button:hover {
+    background-color: rgb(43 190 64);
 }
 
 .filter-button:hover,
 .sort-button:hover,
 .apply-button:hover,
 .clear-button:hover,
-.search-button:hover {
+.search-button:hover,
+.add-to-cart-button:hover {
     transition: 1s;
     background-color: rgb(227, 204, 168);
 }
@@ -124,6 +170,7 @@
     width: 100px;
     height: 25px;
     border-radius: 20px;
+    font-family: 'The Hoca Font Family';
     cursor: pointer;
 }
 
@@ -144,6 +191,8 @@
     justify-content: center;
     flex-direction: column;
     text-align: center;
+    font-family: 'The Hoca Font Family';
+    font-size: 10px;
 }
 
 .filtering-options  {
@@ -173,6 +222,9 @@
     justify-content: center;
     gap: 5px;
     border: 2px solid #c1711ce7;
+    font-family: 'The Hoca Font Family';
+    font-size: 10px;
+    line-height: 15px;
 }
 
 .sort-option {
@@ -199,20 +251,24 @@
     height: 35px;
     border-radius: 20px;
     cursor: pointer;
+    font-family: 'The Hoca Font Family';
     transition: 1s;
 }
 
 .search-input {
-    /* width: 220px; */
     height: 25px;
     text-align: center;
     border-radius: 10px;
+    font-family: 'The Hoca Font Family';
+    font-size: 10px;
 }
 
 .nav-categories-container  {
     display: flex;
     flex-direction: column;
     align-items: center;
+    font-family: 'The Hoca Font Family';
+    font-size: 12px;
 }
 
 .categories-title {
@@ -241,6 +297,15 @@
     color: rgb(112, 139, 220) 1px 0 10px;
     text-shadow: rgb(179 95 34) 1px 0 10px;
     cursor: auto;
+}
+
+/* pagintion */
+
+.pagination-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 @media screen and (max-width: 1040px) {

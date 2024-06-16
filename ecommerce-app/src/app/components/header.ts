@@ -34,7 +34,6 @@ export default class HeaderComponent {
       listItem.append(link);
       const linkItem = link;
       linkItem.className = 'nav-link';
-      console.log('linkItem:', linkItem);
       list.appendChild(listItem.cloneNode(true));
     }
   }

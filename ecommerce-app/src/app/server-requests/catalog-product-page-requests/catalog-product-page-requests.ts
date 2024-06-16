@@ -1,8 +1,8 @@
-import { ProductsListData, Prices } from './interfaces-catalog-page';
+import { /* ProductsListData */ Prices, ProductsListDataNew } from './interfaces-catalog-page';
 import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
-// import getToken from '../detailed-product-page-requests/detailed-product-page-requests';
-// import CategoriesNavigation from '../../pages/catalog-product-page/product-list-manipulations/category-navigation-menu';
+import { getAnonymousSessionToken, getCartById, getMyCartInfo } from '../cart-catalog-requests/cart-catalog-requests';
+import getProductsPartly from './pagination-requests/pagination-requests';
 
 export const enum ProcessEnvCatalog {
   PROJECT_KEY = 'ecommerce-app-f-devs',
@@ -23,8 +23,8 @@ function getDataKey(productContainer: string) {
   });
 }
 
-function createProductCards(dataProducts: ProductsListData) {
-  const numOfProducts = dataProducts.total;
+export function createProductCards(token: string, dataProducts: ProductsListDataNew) {
+  const numOfProducts = dataProducts.count;
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
   const productsWrapper = document.querySelector('.product-wrapper') as HTMLElement;
@@ -36,23 +36,54 @@ function createProductCards(dataProducts: ProductsListData) {
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
-  getDataKey('.product-container');
+  getDataKey('.product-card-info'); //
+
+  const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button'));
+  const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
+  addToCartButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
+        getAnonymousSessionToken(btn.id);
+        console.log(token);
+      } else if (localStorage.getItem('data') && !sessionStorage.getItem('cartDataAnon')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
+        // createMyCart(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
+        getMyCartInfo(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
+        console.log('work');
+      } else if (sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
+        const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
+        getCartById(cartId.id, token, btn.id);
+        console.log(token);
+      } else {
+        console.log('error');
+      }
+    });
+  });
 
   for (let i = 0; i < numOfProducts; i += 1) {
-    const { masterVariant, name, description } = dataProducts.results[i].masterData.staged;
-    const productCards = Array.from(document.querySelectorAll('.product-container')); // is it necessary
+    const { masterVariant, name, description } = dataProducts.results[i];
+    const productCards = Array.from(document.querySelectorAll('.product-card-info'));
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
 
     productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
+    addToCartButtons[i].setAttribute('id', `${dataProducts.results[i].key}`);
     productImagesArr[i].src = `${masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
     productDescriptionsArr[i].innerHTML = `${description['en-US']}`;
     if (masterVariant.prices.length > 0) {
-      productPrices[i].innerHTML = `Price: ${(masterVariant.prices[0] as Prices).value.centAmount / 100}€`;
+      productPrices[i].innerHTML = `Price: ${masterVariant.prices[0].value.centAmount / 100}€`;
     } else {
       productPrices[i].innerHTML = 'No price';
     }
@@ -98,7 +129,7 @@ interface filteredData {
   total: number;
 }
 
-function createFilteredProductCards(dataProducts: filteredData) {
+function createFilteredProductCards(token: string, dataProducts: filteredData) {
   const numOfProducts = dataProducts.total;
 
   const wrapperProductCarts = document.querySelector('.wrapper-main') as HTMLDivElement;
@@ -114,15 +145,47 @@ function createFilteredProductCards(dataProducts: filteredData) {
   for (let i = 0; i < numOfProducts - 1; i += 1) {
     productsWrapper.appendChild(productContainer.cloneNode(true));
   }
-  getDataKey('.product-container');
+  getDataKey('.product-card-info');
+  const modalprogressIndicator = document.querySelector('.wrapper-progress-indicator') as HTMLDivElement;
+  const addToCartButtons = Array.from(document.querySelectorAll('.add-to-cart-button')); //
+  addToCartButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (!sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
+        getAnonymousSessionToken(btn.id);
+        console.log(token);
+      } else if (localStorage.getItem('data') && !sessionStorage.getItem('cartDataAnon')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
+        getMyCartInfo(JSON.parse(localStorage.getItem('data') as string).access_token, btn.id);
+        console.log('work');
+      } else if (sessionStorage.getItem('cartDataAnon') && !localStorage.getItem('data')) {
+        btn.classList.add('disabled');
+        btn.setAttribute('disabled', '');
+        modalprogressIndicator.classList.add('active');
+        const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
+        getCartById(cartId.id, token, btn.id);
+        console.log(token);
+      } else {
+        console.log('error');
+      }
+    });
+  });
+
   for (let i = 0; i < numOfProducts; i += 1) {
     const { name, description } = dataProducts.results[i];
     const productImagesArr = Array.from(document.querySelectorAll('.product-image img')) as Array<HTMLImageElement>;
     const productNamesArr = Array.from(document.querySelectorAll('.product-name'));
     const productDescriptionsArr = Array.from(document.querySelectorAll('.product-description'));
     const productPrices = Array.from(document.querySelectorAll('.price'));
-    const productCards = Array.from(document.querySelectorAll('.product-container'));
+    // const productCards = Array.from(document.querySelectorAll('.product-container'));
+    const productCards = Array.from(document.querySelectorAll('.product-card-info'));
+
     productCards[i].setAttribute('data-key', `${dataProducts.results[i].key}`); //
+    addToCartButtons[i].setAttribute('id', `${dataProducts.results[i].key}`);
     productImagesArr[i].src = `${dataProducts.results[i].masterVariant.images[0].url}`;
     productImagesArr[i].alt = `${name['en-US']}`;
     productNamesArr[i].innerHTML = `${name['en-US']}`;
@@ -136,7 +199,7 @@ function createFilteredProductCards(dataProducts: filteredData) {
   }
 }
 
-function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>) {
+export function overlinePrice(prices: Array<HTMLElement>, discounts: Array<HTMLElement>) {
   return discounts.forEach((discount, i) => {
     if (discount.innerHTML) {
       prices[i].setAttribute('style', 'text-decoration: line-through');
@@ -153,7 +216,8 @@ function addRemoveActiveState(elemByClass: string) {
   elem.classList.add('active-category');
 }
 
-async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Array<string>) {
+export async function getDiscountsInfo(token: string, data: ProductsListDataNew, SKU: Array<string>) {
+  console.log('fetching discounts');
   try {
     const responseDiscounts = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-discounts/key=${ProcessEnvCatalog.DISCOUNT_KEY}/`,
@@ -182,17 +246,23 @@ async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Arra
         }
         return acc;
       }, []);
+      console.log(skuArr);
       //  display discounts and prices with discounts
       const discount = discountsData.value.permyriad / 100;
       for (let i = 0; i < SKU.length; i += 1) {
-        const originalPrice = data.results[i].masterData.staged.masterVariant.prices[0].value.centAmount / 100;
+        console.log('sku', SKU);
+        console.log('data', data);
+        const originalPrice = data.results[i].masterVariant.prices[0].value.centAmount / 100;
         if (skuArr.includes(SKU[i])) {
+          // console.log('sku', skuArr);
+          console.log('changing price');
           productDiscounts[i].innerHTML = `Discount ${discount}%`;
           productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
         }
       }
 
       overlinePrice(productPrices, productDiscounts);
+      console.log('done fetching discounts');
       return skuArr;
     }
   } catch (err) {
@@ -200,7 +270,7 @@ async function getDiscountsInfo(token: string, data: ProductsListData, SKU: Arra
   }
 }
 
-async function getDiscountsInfoFilteredList(token: string, data: filteredData, SKU: Array<string>) {
+export async function getDiscountsInfoFilteredList(token: string, data: filteredData, SKU: Array<string>) {
   try {
     const responseDiscounts = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/product-discounts/key=${ProcessEnvCatalog.DISCOUNT_KEY}/`,
@@ -233,6 +303,7 @@ async function getDiscountsInfoFilteredList(token: string, data: filteredData, S
       const discount = discountsData.value.permyriad / 100;
       for (let i = 0; i < SKU.length; i += 1) {
         const originalPrice = data.results[i].masterVariant.prices[0].value.centAmount / 100;
+        console.log(originalPrice);
         if (skuArr.includes(SKU[i])) {
           productDiscounts[i].innerHTML = `Discount ${discount}%`;
           productDiscountPrices[i].innerHTML = `New Price: ${originalPrice * (1 - discount / 100)}€`;
@@ -247,7 +318,36 @@ async function getDiscountsInfoFilteredList(token: string, data: filteredData, S
   }
 }
 
-async function getProductList(token: string) {
+// pagination function
+function pagination(token: string) {
+  const previousBtn = document.querySelector('.prev-button') as HTMLButtonElement;
+  const nextBtn = document.querySelector('.next-button') as HTMLButtonElement;
+  let prevTest = 16;
+  let nextTest = 0;
+  getProductsPartly(token, nextTest);
+  previousBtn.addEventListener('click', () => {
+    if (prevTest === 16 && nextTest === 0) {
+      getProductsPartly(token, nextTest);
+      //   console.log(`${nextTest}`);
+    } else if (prevTest < 16 || prevTest >= 0) {
+      prevTest += 4;
+      nextTest -= 4;
+      getProductsPartly(token, nextTest);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if (nextTest === 16 && prevTest === 0) {
+      getProductsPartly(token, nextTest);
+    } else if (nextTest < 16 || nextTest >= 0) {
+      nextTest += 4;
+      prevTest -= 4;
+      getProductsPartly(token, nextTest);
+    }
+  });
+}
+
+export async function getProductList(token: string) {
   try {
     const response = await fetch(
       `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/products`,
@@ -264,12 +364,13 @@ async function getProductList(token: string) {
       const error = new Error(`${data.message}`);
       throw error;
     } else {
-      createProductCards(data);
+      createProductCards(token, data);
       const SKUArr: Array<string> = [];
-      for (let i = 0; i < data.total; i += 1) {
-        SKUArr.push(data.results[i].masterData.staged.masterVariant.sku);
+      for (let i = 0; i < data.count; i += 1) {
+        SKUArr.push(data.results[i].masterVariant.sku);
       }
       getDiscountsInfo(token, data, SKUArr);
+      console.log(SKUArr);
       return data;
     }
   } catch (err) {
@@ -297,7 +398,7 @@ async function getFilteredList(token: string, attributes: string) {
       const error = new Error(filteredData.message);
       throw error;
     } else {
-      createFilteredProductCards(filteredData);
+      createFilteredProductCards(token, filteredData);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < filteredData.total; i += 1) {
         SKUArr.push(filteredData.results[i].masterVariant.sku);
@@ -328,7 +429,7 @@ async function getSortedElements(token: string, requestOption: string) {
       const error = new Error(dataSorted.message);
       throw error;
     } else {
-      createFilteredProductCards(dataSorted);
+      createFilteredProductCards(token, dataSorted);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < dataSorted.total; i += 1) {
         SKUArr.push(dataSorted.results[i].masterVariant.sku);
@@ -359,7 +460,7 @@ async function getSearchedData(token: string, inputValue: string) {
       const error = new Error(dataSearched.message);
       throw error;
     } else {
-      createFilteredProductCards(dataSearched);
+      createFilteredProductCards(token, dataSearched);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < dataSearched.total; i += 1) {
         SKUArr.push(dataSearched.results[i].masterVariant.sku);
@@ -393,7 +494,7 @@ async function getSubcategoryData(token: string, subcategoryId: string) {
       const error = new Error(subcategoryData.message);
       throw error;
     } else {
-      createFilteredProductCards(subcategoryData);
+      createFilteredProductCards(token, subcategoryData);
       // console.log(subcategoryData);
     }
     return subcategoryData;
@@ -420,7 +521,7 @@ async function getCategoryDataById(token: string, categoryId: string) {
       const error = new Error(categoryData.message);
       throw error;
     } else {
-      createFilteredProductCards(categoryData);
+      createFilteredProductCards(token, categoryData);
       const SKUArr: Array<string> = [];
       for (let i = 0; i < categoryData.total; i += 1) {
         SKUArr.push(categoryData.results[i].masterVariant.sku);
@@ -473,8 +574,8 @@ async function getCategories(token: string) {
         enchantedRobeSubcategory.innerHTML = '';
         foggyCauldronSubcategory.innerHTML = '';
         addRemoveActiveState('all-categories');
-        getProductList(token);
-        // console.log('All categories');
+        pagination(token);
+        // getProductList(token);
       });
 
       // Staff category
@@ -546,7 +647,9 @@ export default async function getProductListByToken() {
       const error = new Error(data.message);
       throw error;
     } else {
-      getProductList(data.access_token);
+      pagination(data.access_token);
+      // getProductList(data.access_token);
+      console.log(data);
       // filtered data
       addEventHandler('apply-button', 'click', () => {
         const dataObjects = [];
@@ -570,11 +673,11 @@ export default async function getProductListByToken() {
           },
           {} as { [key: string]: string[] }
         );
-        const test = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
+        const dataCheckboxesEntries = Object.entries(dataCheckboxes).reduce((acc: Array<string>, item) => {
           acc.push(`filter=variants.attributes.${item[0]}-attribute:${item[1].join(',')}`);
           return acc;
         }, []);
-        getFilteredList(data.access_token, test.join('&'));
+        getFilteredList(data.access_token, dataCheckboxesEntries.join('&'));
       });
       // sorted data
       addEventHandler('sort-name', 'click', () => {
@@ -588,7 +691,6 @@ export default async function getProductListByToken() {
         getSortedElements(data.access_token, '?sort=name.en-US+asc');
       });
       addEventHandler('sort-price-lowest', 'click', () => {
-        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -598,7 +700,6 @@ export default async function getProductListByToken() {
         getSortedElements(data.access_token, 'search?sort=price+asc');
       });
       addEventHandler('sort-price-highest', 'click', () => {
-        // console.log('works');
         const clickedButtonName = document.querySelector('.sort-name') as HTMLElement;
         const clickedButtonPriceL = document.querySelector('.sort-price-lowest') as HTMLElement;
         const clickedButtonPriceH = document.querySelector('.sort-price-highest') as HTMLElement;
@@ -611,7 +712,6 @@ export default async function getProductListByToken() {
       const searchInputValue = document.querySelector('.search-input') as HTMLInputElement;
       addEventHandler('search-button', 'click', () => {
         getSearchedData(data.access_token, searchInputValue.value);
-        // console.log(searchInputValue.value);
       });
 
       getCategories(data.access_token);
