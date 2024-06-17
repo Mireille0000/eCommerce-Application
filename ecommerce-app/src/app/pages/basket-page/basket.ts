@@ -577,6 +577,7 @@ class Basket extends Page {
   }
 
   render(cart: { cart: Cart; customerId: string }) {
+    console.log('cart:', cart.cart);
     window.location.hash = 'basket-page';
     this.DataCart = cart.cart;
     this.customerId = cart.customerId;
