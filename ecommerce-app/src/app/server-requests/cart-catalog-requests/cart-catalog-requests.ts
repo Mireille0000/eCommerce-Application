@@ -1,3 +1,5 @@
+import { getOneProductByKey } from '../basket-requests/basket-request';
+
 export enum ProcessEnvCartManipulationgs {
   PROJECT_KEY = 'ecommerce-app-f-devs',
 
@@ -84,6 +86,7 @@ export async function addMyProduct(tokenPasswordFlow: string, cartId: string, pr
         body: JSON.stringify(product),
       }
     );
+
     const dataMyNewProduct = await responseMyNewProduct.json();
 
     if (dataMyNewProduct.message === 401 || dataMyNewProduct.message === 400) {
@@ -100,18 +103,7 @@ export async function addMyProduct(tokenPasswordFlow: string, cartId: string, pr
 export async function getProductByKey(token: string, key: string, cartVersion: number, myCartId?: string) {
   // token should be a commun token or an anonymous user's token
   try {
-    const responseChosenProduct = await fetch(
-      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCartManipulationgs.PROJECT_KEY}/products/key=${key}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const dataChosenProduct = await responseChosenProduct.json();
+    const product = await getOneProductByKey(key);
     const cartId = JSON.parse(sessionStorage.getItem('cartDataAnon') as string);
     const accessTokenAnon = JSON.parse(sessionStorage.getItem('anonymousTokensData') as string);
     const accessTokenLogedIn = JSON.parse(localStorage.getItem('data') as string);
@@ -120,7 +112,7 @@ export async function getProductByKey(token: string, key: string, cartVersion: n
       actions: [
         {
           action: 'addLineItem',
-          productId: dataChosenProduct.id,
+          productId: product.id,
           variantId: 1,
           quantity: 1,
         },
@@ -135,7 +127,7 @@ export async function getProductByKey(token: string, key: string, cartVersion: n
       setTimeout(() => modalprogressIndicator.classList.remove('active'), 2000);
       addMyProduct(accessTokenLogedIn.access_token, myCartId as string, productToAdd);
     }
-    return dataChosenProduct;
+    return product;
   } catch (err) {
     return err;
   }

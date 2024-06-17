@@ -1,12 +1,21 @@
+import { Cart } from '@commercetools/platform-sdk';
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import CardImageModalWindow from './modal-windows/card-image'; //
-import createHtmlElement, { addEventHandler } from '../../utils/functions';
+import createHtmlElement, { addEventHandler, createButtonElement, createDivElement } from '../../utils/functions';
 import getToken from '../../server-requests/detailed-product-page-requests/detailed-product-page-requests';
+import createOrGetCart, {
+  addLineItemToCart,
+  editLineItemToCart,
+} from '../../server-requests/basket-requests/basket-request';
 
 const routes = ['#log-in-page', '#registration-page', '#main-page', '#catalog-product-page', '#profile-page'];
 
 export default class ProductCardPage extends Page {
+  UserCart!: Cart;
+
+  clickTimeout: ReturnType<typeof setTimeout> | undefined;
+
   productCardContainer: HTMLDivElement;
 
   imageElem: HTMLDivElement;
@@ -21,7 +30,9 @@ export default class ProductCardPage extends Page {
 
   productDescription: HTMLDivElement;
 
-  productCardSlider: HTMLDivElement; //
+  productEditBtnWrap: HTMLDivElement;
+
+  btnEditProductFromCart: HTMLButtonElement; //
 
   productPrices: HTMLDivElement;
 
@@ -44,14 +55,78 @@ export default class ProductCardPage extends Page {
     this.productDetails = createHtmlElement('div', 'product-card-details');
     this.productName = createHtmlElement('h3', 'product-card-name');
     this.productDescription = createHtmlElement('div', 'product-card-description');
-    this.productCardSlider = createHtmlElement('div', 'product-card-slider');
+    // this.productCardSlider = createHtmlElement('div', 'product-card-slider');
+    this.productEditBtnWrap = createDivElement('product__edit-btn-wrap');
+    this.btnEditProductFromCart = createButtonElement('product__edit-btn');
     this.productPrices = createHtmlElement('div', 'product-card-prices');
     this.price = createHtmlElement('span', 'product-card-price');
     this.discount = createHtmlElement('span', 'product-card-discount');
     this.discountPrice = createHtmlElement('span', 'product-card-discount-price');
   }
 
+  private getTextBtn() {
+    const { lineItems } = this.UserCart;
+
+    let itemIndex = 0;
+    let textBtn = 'Add to Cart';
+    for (let i = 0; i < lineItems.length; i += 1) {
+      const { productKey } = lineItems[i];
+      if (productKey === this.key) {
+        textBtn = 'Remove from Cart';
+        itemIndex = i;
+        break;
+      }
+    }
+    return { textBtn, itemIndex };
+  }
+
+  private EventHandlerAddRemoveProduct(event: Event) {
+    event.preventDefault();
+    const removeCart = 'Remove from Cart';
+    const addCart = 'Add to Cart';
+
+    const { textBtn, itemIndex } = this.getTextBtn();
+    if (textBtn === removeCart) {
+      editLineItemToCart(this.UserCart, 0, itemIndex)
+        .then((cart) => {
+          this.UserCart = cart;
+          this.btnEditProductFromCart.textContent = addCart;
+        })
+        .catch((err) => console.log('Выйди из консоли и попробуй нормально:', err));
+    } else if (textBtn === addCart) {
+      addLineItemToCart(this.UserCart, this.key, 1)
+        .then((cart) => {
+          this.UserCart = cart;
+          this.btnEditProductFromCart.textContent = removeCart;
+        })
+        .catch((err) => console.log('Выйди из консоли и попробуй нормально:', err));
+    }
+  }
+
+  private EventHandlerBtn(event: Event) {
+    event.preventDefault();
+
+    if (this.clickTimeout) {
+      clearTimeout(this.clickTimeout);
+    }
+
+    this.clickTimeout = setTimeout(() => {
+      this.EventHandlerAddRemoveProduct(event);
+    }, 200);
+  }
+
+  private async createBtnAddOrRemoveProduct() {
+    const cart = await createOrGetCart();
+    this.UserCart = cart.cart;
+    const { textBtn } = this.getTextBtn();
+
+    this.btnEditProductFromCart.textContent = textBtn;
+    this.btnEditProductFromCart.addEventListener('click', this.EventHandlerBtn.bind(this));
+    this.productEditBtnWrap.append(this.btnEditProductFromCart);
+  }
+
   renderPage() {
+    this.createBtnAddOrRemoveProduct();
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.header, this.main, this.footer);
     // header
@@ -108,8 +183,8 @@ export default class ProductCardPage extends Page {
     buttonContainer.append(closeModalWindowBtn);
 
     this.productCardContainer.append(this.imageElem, this.productCardContent, this.productPrices);
-    this.productCardContent.append(this.productDetails, this.productCardSlider);
-    this.productCardSlider.innerHTML = 'A slider should be here';
+    this.productCardContent.append(this.productDetails, this.productEditBtnWrap);
+    // this.productCardSlider.innerHTML = 'A slider should be here';
     this.imageElem.append(this.image);
     this.productDetails.append(this.productName, this.productDescription);
     this.productPrices.append(this.price, this.discount, this.discountPrice);

@@ -2,6 +2,14 @@ import { Cart, CartUpdateAction } from '@commercetools/platform-sdk';
 import { apiRoot } from '../registration-form-request/clients';
 import CustomerLoader from '../personal-info-request/getPersonalData';
 
+export const getOneProductByKey = async (productKey: string) => {
+  try {
+    const response = await apiRoot.products().withKey({ key: productKey }).get().execute();
+    return response.body;
+  } catch (err) {
+    throw new Error(`${err}`);
+  }
+};
 const getProductByKey = async (productKey: string) => {
   try {
     const response = await apiRoot.products().withKey({ key: productKey }).get().execute();
@@ -140,10 +148,10 @@ export const removeAllLineItemsFromCart = async (cart: Cart) => {
   }
 };
 
-export const addLineItemToCart = async (cart: Cart, quantity: number) => {
+export const addLineItemToCart = async (cart: Cart, productKey: string, quantity: number) => {
   try {
     const { version } = cart;
-    const productKey = 'staff-2';
+    // const productKey = 'staff-2';
     const productId = await getProductByKey(productKey);
     const response = await apiRoot
       .carts()
