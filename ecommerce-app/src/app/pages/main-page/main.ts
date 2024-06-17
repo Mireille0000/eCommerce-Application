@@ -1,15 +1,25 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import createHtmlElement from '../../utils/functions';
+import { createDivElement, createSpanElement } from '../../utils/functions';
 
-export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#profile-page']; // change profile page id if needed
+export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#profile-page', '#basket-page']; // change profile page id if needed
 export default class MainPage extends Page {
   info: HTMLDivElement;
 
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'main-page';
-    this.info = createHtmlElement('div', 'star', 'A shining star should be here');
+    this.info = this.createPromoCode();
+    // this.info = createHtmlElement('div', 'star', 'A shining star should be here');
+  }
+
+  private createPromoCode() {
+    const promoCodeWrap = createDivElement('main__promo-code-wrap');
+    const promoCodeTitle = createSpanElement('main__promo-code-title', 'Promo code');
+    const promoCodedescr = createSpanElement('main__promo-code-descr', '30% on everything!');
+    const promoCodeContent = createSpanElement('main__promo-code-content', '30ALL');
+    promoCodeWrap.append(promoCodeTitle, promoCodedescr, promoCodeContent);
+    return promoCodeWrap;
   }
 
   renderPage(): HTMLDivElement {
@@ -26,7 +36,7 @@ export default class MainPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Catalog', 'Profile'];
+    const linkName = [logLink, 'Register', 'Catalog', 'Profile', 'Basket'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
     for (let i = 0; i < 2; i += 1) {

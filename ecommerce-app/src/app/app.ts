@@ -6,6 +6,7 @@ import ErrorPage from './pages/error-page/error-page';
 import CatalogProductPage from './pages/catalog-product-page/catalog-product-page';
 import PersonalRender from './pages/personal-info-page/personal-info';
 import ProductCardPage from './pages/product-card-page/product-card-page';
+import Basket from './pages/basket-page/basket';
 // import { routes } from './pages/main-page/main';
 
 const enum Pages {
@@ -14,7 +15,8 @@ const enum Pages {
   RegisterPageId = 'registration-page',
   CatalogPageId = 'catalog-product-page',
   DetailedProductPageId = 'detailed-product-page',
-  ProfilePageId = 'profile-page', // change if needed
+  ProfilePageId = 'profile-page',
+  BasketPageId = 'basket-page', // change if needed
 }
 
 export default class App {
@@ -42,6 +44,8 @@ export default class App {
       page = new ProductCardPage(id, productKey);
     } else if (id === Pages.ProfilePageId && isUserLoggedIn) {
       page = new PersonalRender(id);
+    } else if (id === Pages.BasketPageId) {
+      page = new Basket(id);
     } else {
       page = new ErrorPage('error-page');
     }
