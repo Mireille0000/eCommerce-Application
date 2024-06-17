@@ -7,7 +7,7 @@ import CatalogProductPage from './pages/catalog-product-page/catalog-product-pag
 import PersonalRender from './pages/personal-info-page/personal-info';
 import ProductCardPage from './pages/product-card-page/product-card-page';
 import Basket from './pages/basket-page/basket';
-// import { routes } from './pages/main-page/main';
+import AboutUsPage from './pages/about-us-page/about-us';
 
 const enum Pages {
   LogInPageId = 'log-in-page',
@@ -16,7 +16,8 @@ const enum Pages {
   CatalogPageId = 'catalog-product-page',
   DetailedProductPageId = 'detailed-product-page',
   ProfilePageId = 'profile-page',
-  BasketPageId = 'basket-page', // change if needed
+  BasketPageId = 'basket-page',
+  AboutUsPageId = 'about-us-page',
 }
 
 export default class App {
@@ -46,6 +47,8 @@ export default class App {
       page = new PersonalRender(id);
     } else if (id === Pages.BasketPageId) {
       page = new Basket(id);
+    } else if (id === Pages.AboutUsPageId) {
+      page = new AboutUsPage(id);
     } else {
       page = new ErrorPage('error-page');
     }

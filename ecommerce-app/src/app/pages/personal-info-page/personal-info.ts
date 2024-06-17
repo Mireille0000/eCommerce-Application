@@ -54,7 +54,14 @@ import HeaderComponent from '../../components/header';
 import { Action, ActionEdit, ActionsEdit, AdrsEdit, AdrssEdit } from './constants/types';
 import { updateAdrssFields } from '../../server-requests/personal-info-request/updateAdrs';
 
-const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#main-page'];
+const routes = [
+  '#log-in-page',
+  '#registration-page',
+  '#catalog-product-page',
+  '#main-page',
+  '#basket-page',
+  '#about-us-page',
+];
 
 interface FieldUser {
   field: string;
@@ -1035,11 +1042,11 @@ class PersonalRender extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Catalog', 'Back to main'];
+    const linkName = [logLink, 'Register', 'Catalog', 'Back to main', 'Basket', 'About Us'];
 
     navigation.append(navItem);
     navItem.className = 'nav-item';
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < linkName.length - 2; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 

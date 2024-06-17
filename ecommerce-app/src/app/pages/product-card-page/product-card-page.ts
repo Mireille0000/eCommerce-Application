@@ -4,7 +4,15 @@ import CardImageModalWindow from './modal-windows/card-image'; //
 import createHtmlElement, { addEventHandler } from '../../utils/functions';
 import getToken from '../../server-requests/detailed-product-page-requests/detailed-product-page-requests';
 
-const routes = ['#log-in-page', '#registration-page', '#main-page', '#catalog-product-page', '#profile-page'];
+const routes = [
+  '#log-in-page',
+  '#registration-page',
+  '#main-page',
+  '#catalog-product-page',
+  '#profile-page',
+  '#basket-page',
+  '#about-us-page',
+];
 
 export default class ProductCardPage extends Page {
   productCardContainer: HTMLDivElement;
@@ -65,11 +73,11 @@ export default class ProductCardPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Back to main', 'Catalog'];
+    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'Basket', 'About Us'];
 
     navBar.className = 'nav-bar-catalog-page';
     navItem.className = 'nav-item';
-    headerComponents.createNavigation(navigation, navItem, 4, link);
+    headerComponents.createNavigation(navigation, navItem, 5, link);
 
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 

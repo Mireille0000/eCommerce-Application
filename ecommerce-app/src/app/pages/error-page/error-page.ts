@@ -26,6 +26,7 @@ export default class ErrorPage extends Page {
     navigation.append(navList);
     navList.append(navListItem);
     navListItem.append(link);
+    navListItem.className = 'nav-item';
 
     link.innerHTML = 'Back to main';
     title.innerHTML = 'Ultimate ScriptSmith';
