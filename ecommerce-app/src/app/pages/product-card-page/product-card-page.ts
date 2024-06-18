@@ -14,8 +14,8 @@ const routes = [
   '#registration-page',
   '#main-page',
   '#catalog-product-page',
-  '#basket-page',
   '#about-us-page',
+  '#basket-page',
   '#profile-page',
 ];
 
@@ -148,7 +148,8 @@ export default class ProductCardPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'Basket', 'About Us', 'Profile'];
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'About Us', `${basketIcon}`, 'Profile'];
 
     navBar.className = 'nav-bar-catalog-page';
     navItem.className = 'nav-item';
@@ -157,7 +158,12 @@ export default class ProductCardPage extends Page {
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = linkName[i];
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
       navLinksArr[i].setAttribute('href', routes[i]);
     }
 

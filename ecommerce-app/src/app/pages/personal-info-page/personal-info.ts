@@ -1,5 +1,5 @@
 import Page from '../../templates/page';
-import {
+import createHtmlElement, {
   createButtonElement,
   createDivElement,
   createImage,
@@ -59,8 +59,8 @@ const routes = [
   '#registration-page',
   '#catalog-product-page',
   '#main-page',
-  '#basket-page',
   '#about-us-page',
+  '#basket-page',
 ];
 
 interface FieldUser {
@@ -1042,7 +1042,8 @@ class PersonalRender extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Catalog', 'Back to main', 'Basket', 'About Us'];
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = [logLink, 'Register', 'Catalog', 'Back to main', 'About Us', `${basketIcon}`];
 
     navigation.append(navItem);
     navItem.className = 'nav-item';
@@ -1061,7 +1062,12 @@ class PersonalRender extends Page {
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = linkName[i];
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
       navLinksArr[i].setAttribute('href', routes[i]);
     }
 

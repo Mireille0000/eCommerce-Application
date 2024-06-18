@@ -12,6 +12,7 @@ input[type=number]::-webkit-outer-spin-button {
     flex-direction: row;
     gap: 30px;
     padding: 0 50px 50px;
+    font-family: 'The Hoca Font Family';
 }
 
 main:has(.bskt__empty-cart-container) {
@@ -38,15 +39,16 @@ main:has(.bskt__empty-cart-container) {
     color: rgba(0, 26, 52, 0.6);
 }
 .bskt__empty-go-catalog-btn {
-    cursor: pointer;
     padding: 10px 15px;
     width: max-content;
     border-radius: 10px;
     border: 0;
+    font-family: 'The Hoca Font Family';
+    font-weight: 700;
     background-color: rgba(0, 150, 255, 0.08);
     color: #005bff;
-    font-weight: 700;
     transition: all 0.2s;
+    cursor: pointer;
 }
 .bskt__empty-go-catalog-btn:hover {
     background-color: rgba(0, 150, 255, 0.2);
@@ -58,6 +60,7 @@ main:has(.bskt__empty-cart-container) {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    font-family: 'The Hoca Font Family';
 }
 .bskt__delete-products {
     background-color: rgb(255, 255, 255);
@@ -71,6 +74,7 @@ main:has(.bskt__empty-cart-container) {
     padding: 4px 8px;
     background-color: rgb(249, 17, 85);
     color: #fff;
+    font-family: 'The Hoca Font Family';
     font-size: 0.875rem;
     transition: all 0.2s;
 }
@@ -180,6 +184,7 @@ main:has(.bskt__empty-cart-container) {
     padding: 8px 16px;
     border: 0;
     border-radius: 6px;
+    font-family: 'The Hoca Font Family';
     color: #fff;
     background-color: #1677ff;
     transition: all 0.2s;

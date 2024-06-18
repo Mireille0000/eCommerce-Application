@@ -3,6 +3,13 @@
     justify-content: space-between;
 }
 
+.wrapper-header {
+    margin-bottom: 15px;
+    padding: 0 10px;
+    background-color: rgba(189, 152, 221, 0.3);
+    box-shadow: 10px 5px 5px 5px #aea1b6;
+}
+
 #main-page .wrapper-main {
     width: 100%;
     display: flex;

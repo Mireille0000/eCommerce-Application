@@ -55,8 +55,10 @@ header {
     flex-shrink: 1;
     margin: 24px 12px 0px;
     padding: 12px 0px 0px;
-    background-color: #fff;
+    /* background-color: #fff; */
+    background-color: #d8c5e6;
     box-shadow: 6px 6px 6px -2px rgba(156, 156, 156, 0.75);
+    font-family: 'The Hoca Font Family';
 }
 .PI__container-title-heading {
     font-size: 1.375rem;
@@ -111,6 +113,10 @@ header {
 .PI__container-save {
     padding: 14px 30px 14px 24px;
     display: flex;
+}
+
+.PI__container-save  button {
+    font-family: 'The Hoca Font Family';
 }
 
 .user-info__btn-save,

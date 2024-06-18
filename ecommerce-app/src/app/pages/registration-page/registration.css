@@ -33,11 +33,11 @@ body {
     align-items: center;
 }
 .registration-form {
-    background-color: #fff;
-    border-radius: 10px;
     padding: 10px;
     margin: 10px;
-    /* width: 0%; */
+    border-radius: 10px;
+    font-family: 'The Hoca Font Family';
+    background-color: #fff;
 }
 .registration-fieldset {
     display: flex;
@@ -127,6 +127,7 @@ body {
     border: 0px #fff;
     height: 32px;
     border-radius: 6px;
+    font-family: 'The Hoca Font Family';
     font-size: 14px;
     cursor: pointer;
     background-color: #1677ff;
