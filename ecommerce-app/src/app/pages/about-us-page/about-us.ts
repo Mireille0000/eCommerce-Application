@@ -10,8 +10,8 @@ export const routes = [
   '#registration-page',
   '#main-page',
   '#catalog-product-page',
-  '#profile-page',
   '#basket-page',
+  '#profile-page',
 ];
 
 export default class AboutUsPage extends Page {
@@ -49,8 +49,6 @@ export default class AboutUsPage extends Page {
 
   ghLead: HTMLParagraphElement;
 
-  footerRSSLink: HTMLDivElement;
-
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'about-us-page';
@@ -73,8 +71,6 @@ export default class AboutUsPage extends Page {
     this.bioLead = createHtmlElement('p', 'bio-lead');
     this.leadContribution = createHtmlElement('ul', 'contribution-lead');
     this.ghLead = createHtmlElement('p', 'gh-lead');
-
-    this.footerRSSLink = createDivElement('footer-rss-link-container');
   }
 
   renderPage() {
@@ -92,7 +88,7 @@ export default class AboutUsPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'Profile', 'Basket'];
+    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'Basket', 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
     for (let i = 0; i < linkName.length - 2; i += 1) {
@@ -149,10 +145,13 @@ export default class AboutUsPage extends Page {
     }
     const photoDev = createImage(devPhoto, 'Evgeny Kuptsov', 'dev-photo');
     this.photoDevContainer.append(photoDev);
-    this.ghDev.innerHTML = 'GitHub: ';
-    // const ghIcon = createImage(gitHubIcon, 'GitHub icon', 'gh-icon');
 
-    // this.ghDev.append(ghIcon);
+    this.ghDev.innerHTML = 'GitHub: ';
+    const githubIcon = createHtmlElement('i', 'fa-brands fa-github-alt fa-beat');
+    const ghLinkDev = createHtmlElement('a', 'gh-link') as HTMLLinkElement;
+    ghLinkDev.href = 'https://github.com/kupzov2000';
+    this.ghDev.append(ghLinkDev);
+    ghLinkDev.append(githubIcon);
 
     this.leadContainer.append(this.photoLeadContainer, this.leadInfo);
     this.leadInfo.append(this.leadHeader, this.bioLead, this.leadContribution, this.ghLead);
@@ -172,13 +171,24 @@ export default class AboutUsPage extends Page {
       liContribution.innerHTML = `${leadContribution[i]}`;
       this.leadContribution.appendChild(liContribution.cloneNode(true));
     }
+
+    this.ghLead.innerHTML = 'GitHub: ';
+    const ghLinkLead = createHtmlElement('a', 'gh-link') as HTMLLinkElement;
+    ghLinkLead.href = 'https://github.com/Mireille0000';
+    this.ghLead.append(ghLinkLead);
+    ghLinkLead.append(githubIcon.cloneNode(true));
     this.addElemsToMain(this.teamMembersContainer);
 
     // footer
-    this.addElemsToFooter(this.footerRSSLink);
     const linkRSS = createHtmlElement('a', 'rss-link') as HTMLLinkElement;
-    this.footerRSSLink.append(linkRSS);
-    linkRSS.href = '';
+    this.addElemsToFooter(linkRSS);
+    linkRSS.href = 'https://rs.school/';
+    const rssIcon = createImage(
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTrImqYFcE49SmOYUm5jaqXz4L8UC0QFBrbQ&s',
+      'RSShool icon',
+      'rss-icon'
+    );
+    linkRSS.append(rssIcon);
 
     return this.pageWrapper;
   }

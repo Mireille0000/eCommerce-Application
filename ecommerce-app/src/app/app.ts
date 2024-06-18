@@ -8,6 +8,7 @@ import PersonalRender from './pages/personal-info-page/personal-info';
 import ProductCardPage from './pages/product-card-page/product-card-page';
 import Basket from './pages/basket-page/basket';
 import AboutUsPage from './pages/about-us-page/about-us';
+import createHtmlElement from './utils/functions';
 
 const enum Pages {
   LogInPageId = 'log-in-page',
@@ -27,6 +28,11 @@ export default class App {
     document.body.innerHTML = '';
     let page: Page | null = null;
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    const iconsScript = createHtmlElement('script') as HTMLScriptElement;
+    document.head.append(iconsScript);
+    iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
+    iconsScript.crossOrigin = 'anonymous';
+
     if (id === Pages.LogInPageId && !isUserLoggedIn) {
       page = new LogInPage(id);
     } else if (id === Pages.LogInPageId && isUserLoggedIn) {

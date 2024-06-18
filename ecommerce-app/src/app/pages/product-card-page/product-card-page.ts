@@ -9,9 +9,9 @@ const routes = [
   '#registration-page',
   '#main-page',
   '#catalog-product-page',
-  '#profile-page',
   '#basket-page',
   '#about-us-page',
+  '#profile-page',
 ];
 
 export default class ProductCardPage extends Page {
@@ -73,11 +73,11 @@ export default class ProductCardPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'Basket', 'About Us'];
+    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'Basket', 'About Us', 'Profile'];
 
     navBar.className = 'nav-bar-catalog-page';
     navItem.className = 'nav-item';
-    headerComponents.createNavigation(navigation, navItem, 5, link);
+    headerComponents.createNavigation(navigation, navItem, 6, link);
 
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 

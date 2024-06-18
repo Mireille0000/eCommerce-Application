@@ -19,14 +19,14 @@ import deleteProduct from '../../../assets/images/delete_address_copy.svg';
 import { createMsgRegAcc } from '../registration-page/utils-registration/functions-registration';
 import promoCode from '../../../assets/images/promo_code.svg';
 import HeaderComponent from '../../components/header';
-// import { routes } from '../main-page/main';
+
 const routes = [
   '#log-in-page',
   '#registration-page',
   '#catalog-product-page',
-  '#profile-page',
   '#main-page',
   '#about-us-page',
+  '#profile-page',
 ];
 
 interface LineItemCustom {
@@ -546,7 +546,7 @@ class Basket extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Catalog', 'Profile', 'Back to main', 'About us'];
+    const linkName = [logLink, 'Register', 'Catalog', 'Back to main', 'About us', 'Profile'];
 
     navigation.append(navItem);
     navItem.className = 'nav-item';
