@@ -52,7 +52,7 @@ export default class AboutUsPage extends Page {
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'about-us-page';
-    this.pageTitle = createHtmlElement('h2', 'Our Team');
+    this.pageTitle = createHtmlElement('h2', 'about-us-title', 'Our Team');
     this.teamMembersContainer = createDivElement('team-members-container');
 
     this.developerContainer = createDivElement('dev-container');
@@ -79,7 +79,7 @@ export default class AboutUsPage extends Page {
     // header
     const catalogPageHeader = new HeaderComponent();
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
-    this.addElemsToHeader(appName, logoContainer, this.pageTitle, navBar);
+    this.addElemsToHeader(logoContainer, appName, this.pageTitle, navBar);
 
     logoContainer.append(logo);
 

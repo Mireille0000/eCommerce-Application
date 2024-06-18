@@ -59,9 +59,11 @@ export default class LogInPage extends Page {
     navigation.append(navItem);
     navItem.append(link);
     navItem.className = 'nav-item';
-    const linkText = ['Back to Main', 'Catalog'];
-    const linkHrefs = ['#main-page', '#catalog-product-page'];
-    navigation.appendChild(navItem.cloneNode(true));
+    const linkText = ['Back to Main', 'Catalog', 'About Us', 'Basket'];
+    const linkHrefs = ['#main-page', '#catalog-product-page', '#about-us-page', '#basket-page'];
+    for (let i = 0; i < linkText.length - 1; i += 1) {
+      navigation.appendChild(navItem.cloneNode(true));
+    }
 
     const links = Array.from(document.querySelectorAll('.nav-item a'));
     links.forEach((item, i) => {
