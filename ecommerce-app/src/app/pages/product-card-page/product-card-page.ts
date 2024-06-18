@@ -8,6 +8,8 @@ import createOrGetCart, {
   addLineItemToCart,
   editLineItemToCart,
 } from '../../server-requests/basket-requests/basket-request';
+import { getAnonymousSessionTokenFromProduct } from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
+// import { createAnonymousUserCartFromProduct } from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 
 const routes = [
   '#log-in-page',
@@ -124,8 +126,16 @@ export default class ProductCardPage extends Page {
   }
 
   private async createBtnAddOrRemoveProduct() {
-    const cart = await createOrGetCart();
-    this.UserCart = cart.cart;
+    if (localStorage.getItem('data')) {
+      const cart = await createOrGetCart();
+      this.UserCart = cart.cart;
+    } else if (sessionStorage.getItem('anonymousTokensData')) {
+      const cart = await createOrGetCart();
+      this.UserCart = cart.cart;
+    } else {
+      const cart = await getAnonymousSessionTokenFromProduct();
+      this.UserCart = cart;
+    }
     const { textBtn } = this.getTextBtn();
 
     this.btnEditProductFromCart.textContent = textBtn;

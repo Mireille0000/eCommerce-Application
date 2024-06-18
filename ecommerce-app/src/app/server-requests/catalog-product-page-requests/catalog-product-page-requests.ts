@@ -1,7 +1,12 @@
 import { /* ProductsListData */ Prices, ProductsListDataNew } from './interfaces-catalog-page';
 import { addEventHandler } from '../../utils/functions';
 import productContainerElem from '../../pages/catalog-product-page/product-list-manipulations/functions-catalog-page';
-import { getAnonymousSessionToken, getCartById, getMyCartInfo } from '../cart-catalog-requests/cart-catalog-requests';
+import {
+  ProcessEnvCartManipulationgs,
+  getAnonymousSessionToken,
+  getCartById,
+  getMyCartInfo,
+} from '../cart-catalog-requests/cart-catalog-requests';
 import getProductsPartly from './pagination-requests/pagination-requests';
 
 export const enum ProcessEnvCatalog {
@@ -718,5 +723,76 @@ export default async function getProductListByToken() {
     }
   } catch (err) {
     console.log(err);
+  }
+}
+
+async function createAnonymousUserCartFromProduct(tokenAnonymousSessions: string) {
+  try {
+    const responseAnonymousUserCart = await fetch(
+      `https://api.europe-west1.gcp.commercetools.com/${ProcessEnvCatalog.PROJECT_KEY}/carts`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+          Authorization: `Bearer ${tokenAnonymousSessions}`,
+        },
+        body: '{"currency" : "EUR"}',
+      }
+    );
+    const dataAnonymousUserCart = await responseAnonymousUserCart.json();
+
+    if (dataAnonymousUserCart.message === 401 || dataAnonymousUserCart.message === 400) {
+      const error = new Error(`${dataAnonymousUserCart.message}`);
+      throw error;
+    } else {
+      const cartData = {
+        version: dataAnonymousUserCart.version,
+        id: dataAnonymousUserCart.id,
+      };
+      if (!localStorage.getItem('data')) {
+        sessionStorage.setItem('cartDataAnon', JSON.stringify(cartData));
+      } else {
+        window.sessionStorage.clear();
+      }
+      return dataAnonymousUserCart;
+    }
+  } catch (err) {
+    return err;
+  }
+}
+
+export async function getAnonymousSessionTokenFromProduct() {
+  try {
+    const responseToken = await fetch(
+      `https://auth.europe-west1.gcp.commercetools.com/oauth/${ProcessEnvCartManipulationgs.PROJECT_KEY}/anonymous/token?grant_type=client_credentials`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8',
+          Authorization: `Basic ${btoa(`${ProcessEnvCartManipulationgs.CLIENT_ID}:${ProcessEnvCartManipulationgs.SECRET}`)}`,
+        },
+      }
+    );
+    const dataToken = await responseToken.json();
+    if (dataToken.message === 401 || dataToken.message === 400) {
+      const error = new Error(`${dataToken.message}`);
+      throw error;
+    } else {
+      const cartTest = await createAnonymousUserCartFromProduct(dataToken.access_token);
+      const anonymousTokensObj = {
+        access_token: dataToken.access_token,
+        refresh_token: dataToken.refresh_token,
+      };
+
+      if (!sessionStorage.getItem('anonymousTokensData')) {
+        sessionStorage.setItem('anonymousTokensData', JSON.stringify(anonymousTokensObj));
+      } else {
+        console.log(sessionStorage.getItem('anonymousTokensData'));
+      }
+
+      return cartTest;
+    }
+  } catch (err) {
+    return err;
   }
 }
