@@ -73,17 +73,14 @@ const createOrGetCart = async () => {
   try {
     if (localStorage.getItem('data')) {
       const data = await new CustomerLoader().getCustomerData();
-      // console.log('DATA_USER:', data);
       const { id: customerId }: { id: string } = data;
 
       const existingCart = await getCartByCustomerById(customerId);
       if (existingCart) {
-        // console.log('КОРЗИНА УЖЕ СУЩЕСТВУЕТ:', existingCart);
         return { cart: existingCart, customerId };
       }
 
       const newCart = await createCart(customerId);
-      // console.log('НОВАЯ КОРЗИНА СОЗДАНА', newCart);
       return { cart: newCart, customerId };
     }
     const dataCart = await getCartById();

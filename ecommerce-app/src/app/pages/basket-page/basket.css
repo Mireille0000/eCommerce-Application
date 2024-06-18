@@ -54,6 +54,7 @@ main:has(.bskt__empty-cart-container) {
 }
 
 .bskt__products-container {
+    align-self: flex-start;
     width: 100%;
     display: flex;
     flex-direction: column;
