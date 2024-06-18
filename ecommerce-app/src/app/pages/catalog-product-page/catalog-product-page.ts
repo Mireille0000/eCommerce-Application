@@ -10,7 +10,7 @@ import productContainerElem from './product-list-manipulations/functions-catalog
 import ModalWindowIndicator from './modal-window-indicator/modal-window-indicator';
 // import { getProductsPartByToken } from '../../server-requests/catalog-product-page-requests/pagination-requests/pagination-requests';
 
-const routes = ['#log-in-page', '#registration-page', '#main-page', '#profile-page']; // change profile page id if needed
+const routes = ['#log-in-page', '#registration-page', '#main-page', '#basket-page', '#about-us-page', '#profile-page']; // change profile page id if needed
 
 export default class CatalogProductPage extends Page {
   pageTitle: HTMLHeadingElement;
@@ -52,10 +52,6 @@ export default class CatalogProductPage extends Page {
     // header
     const catalogPageHeader = new HeaderComponent();
 
-    const iconsScript = createHtmlElement('script') as HTMLScriptElement;
-    document.head.append(iconsScript);
-    iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
-    iconsScript.crossOrigin = 'anonymous';
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = catalogPageHeader;
     this.addElemsToHeader(appName, logoContainer, this.pageTitle, navBar);
 
@@ -66,10 +62,10 @@ export default class CatalogProductPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Back to main', 'Profile'];
+    const linkName = [logLink, 'Register', 'Back to main', 'Basket', 'About Us', 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < linkName.length - 2; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 
@@ -216,7 +212,6 @@ export default class CatalogProductPage extends Page {
     const sparkles = createHtmlElement('i', 'fa-solid fa-wand-sparkles fa-shake');
     this.nextButton.prepend(sparkles);
     getProductListByToken();
-    // getProductsPartByToken();
 
     // fiter button
     addEventHandler('filter-button', 'click', () => {

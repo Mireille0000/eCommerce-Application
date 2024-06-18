@@ -1,8 +1,15 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import { createDivElement, createSpanElement } from '../../utils/functions';
+import { createDivElement, createImage, createSpanElement } from '../../utils/functions';
 
-export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#profile-page', '#basket-page']; // change profile page id if needed
+export const routes = [
+  '#log-in-page',
+  '#registration-page',
+  '#catalog-product-page',
+  '#basket-page',
+  '#about-us-page',
+  '#profile-page',
+]; //
 export default class MainPage extends Page {
   info: HTMLDivElement;
 
@@ -28,18 +35,16 @@ export default class MainPage extends Page {
     const headerCompInstance = new HeaderComponent();
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerCompInstance;
     this.addElemsToHeader(appName, logoContainer, navBar);
-    // logo.src = iconRobe;
-    // logo.alt = 'icon Mage Robe';
     logoContainer.append(logo);
     navBar.className = 'navigation-main-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Catalog', 'Profile', 'Basket'];
+    const linkName = [logLink, 'Register', 'Catalog', 'Basket', 'About Us', 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < linkName.length - 2; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 
@@ -73,7 +78,21 @@ export default class MainPage extends Page {
 
     appName.innerHTML = 'Ultimate ScriptSmith';
 
-    this.addElemsToMain(this.info);
+    const mage = createDivElement('mage');
+    const createImageMage = createImage(
+      'https://64.media.tumblr.com/d7901976056e69c382b78796f8f32ede/tumblr_mlljbc7M0A1rfjowdo1_500.gif',
+      'Mage',
+      'mage-image'
+    );
+
+    const createImageAnotherMage = createImage(
+      'https://miro.medium.com/v2/resize:fit:768/1*mUYZpTpdfHXKNwcOzw2JhA.gif',
+      'Another Mage',
+      'another-mage-image'
+    );
+
+    mage.append(createImageMage, createImageAnotherMage);
+    this.addElemsToMain(this.info, mage);
 
     return this.pageWrapper;
   }

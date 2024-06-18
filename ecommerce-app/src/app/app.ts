@@ -7,7 +7,8 @@ import CatalogProductPage from './pages/catalog-product-page/catalog-product-pag
 import PersonalRender from './pages/personal-info-page/personal-info';
 import ProductCardPage from './pages/product-card-page/product-card-page';
 import Basket from './pages/basket-page/basket';
-// import { routes } from './pages/main-page/main';
+import AboutUsPage from './pages/about-us-page/about-us';
+import createHtmlElement from './utils/functions';
 
 const enum Pages {
   LogInPageId = 'log-in-page',
@@ -16,7 +17,8 @@ const enum Pages {
   CatalogPageId = 'catalog-product-page',
   DetailedProductPageId = 'detailed-product-page',
   ProfilePageId = 'profile-page',
-  BasketPageId = 'basket-page', // change if needed
+  BasketPageId = 'basket-page',
+  AboutUsPageId = 'about-us-page',
 }
 
 export default class App {
@@ -26,6 +28,11 @@ export default class App {
     document.body.innerHTML = '';
     let page: Page | null = null;
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    const iconsScript = createHtmlElement('script') as HTMLScriptElement;
+    document.head.append(iconsScript);
+    iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
+    iconsScript.crossOrigin = 'anonymous';
+
     if (id === Pages.LogInPageId && !isUserLoggedIn) {
       page = new LogInPage(id);
     } else if (id === Pages.LogInPageId && isUserLoggedIn) {
@@ -46,6 +53,8 @@ export default class App {
       page = new PersonalRender(id);
     } else if (id === Pages.BasketPageId) {
       page = new Basket(id);
+    } else if (id === Pages.AboutUsPageId) {
+      page = new AboutUsPage(id);
     } else {
       page = new ErrorPage('error-page');
     }
