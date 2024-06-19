@@ -240,6 +240,9 @@ export default class CatalogProductPage extends Page {
       });
     });
 
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLLinkElement;
+    this.addElemsToFooter(complitionDate);
+
     return this.pageWrapper;
   }
 }

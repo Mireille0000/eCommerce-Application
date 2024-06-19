@@ -6,9 +6,9 @@ body {
     background-color: #9c9c9c83;
 }
 
-.wrapper {
+#registration-page.wrapper {
     max-width: 1980px;
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -23,8 +23,8 @@ body {
     justify-content: center;
     align-items: center;
     margin: 10px;
-    position: absolute;
-    top: 0;
+    /* position: absolute;
+    top: 0; */
 }
 .wrapper-main {
     width: 100%;

@@ -67,3 +67,13 @@
     width: 40px;
     border-radius: 50%;
 }
+
+@media screen and  (max-width: 770px) {
+    .team-members-container {
+        margin: 15px 20px;
+    }
+
+    .dev-container, .lead-container {
+        width: fit-content;
+    }
+}

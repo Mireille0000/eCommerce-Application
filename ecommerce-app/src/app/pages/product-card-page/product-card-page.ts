@@ -216,6 +216,10 @@ export default class ProductCardPage extends Page {
       pageBody.classList.add('active');
     });
 
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
+
     return this.pageWrapper;
   }
 }

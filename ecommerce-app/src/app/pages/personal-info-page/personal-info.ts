@@ -988,9 +988,12 @@ class PersonalRender extends Page {
   }
 
   render(allUserData: CustomerData) {
-    this.pageWrapper.append(this.header, this.main);
+    this.pageWrapper.append(this.header, this.main, this.footer);
     const { body } = document;
     body.appendChild(this.pageWrapper);
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
 
     window.location.hash = 'profile-page';
     this.UserData = getPersonalData(allUserData);

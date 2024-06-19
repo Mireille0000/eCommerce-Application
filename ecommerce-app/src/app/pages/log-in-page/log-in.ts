@@ -145,6 +145,10 @@ export default class LogInPage extends Page {
     emailInputEventHandler(this.email, 'email-input', 'email-hint');
 
     passwordInputEventHandler(this.password, 'password-input', 'password-hint');
+
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
     return this.pageWrapper;
   }
 }
