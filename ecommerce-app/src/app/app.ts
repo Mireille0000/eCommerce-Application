@@ -29,7 +29,11 @@ export default class App {
     let page: Page | null = null;
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const iconsScript = createHtmlElement('script') as HTMLScriptElement;
-    document.head.append(iconsScript);
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.type = 'image/x-icon';
+    favicon.href = 'https://cdn.iconscout.com/icon/premium/png-256-thumb/magic-wand-126-1078572.png';
+    document.head.append(favicon, iconsScript);
     iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
     iconsScript.crossOrigin = 'anonymous';
 

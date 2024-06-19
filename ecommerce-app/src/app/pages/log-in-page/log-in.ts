@@ -59,18 +59,23 @@ export default class LogInPage extends Page {
     navigation.append(navItem);
     navItem.append(link);
     navItem.className = 'nav-item';
-    const linkText = ['Back to Main', 'Catalog', 'About Us', 'Basket'];
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkText = ['Back to Main', 'Catalog', 'About Us', `${basketIcon}`];
     const linkHrefs = ['#main-page', '#catalog-product-page', '#about-us-page', '#basket-page'];
     for (let i = 0; i < linkText.length - 1; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 
     const links = Array.from(document.querySelectorAll('.nav-item a'));
-    links.forEach((item, i) => {
-      const linkItm = item;
-      linkItm.innerHTML = linkText[i];
-      linkItm.setAttribute('href', linkHrefs[i]);
-    });
+    for (let i = 0; i < links.length; i += 1) {
+      if (linkText[i] !== '[object HTMLElement]') {
+        links[i].innerHTML = linkText[i];
+        console.log(links[i]);
+      } else {
+        links[i].append(basketIcon);
+      }
+      links[i].setAttribute('href', linkHrefs[i]);
+    }
     appName.innerHTML = 'Ultimate ScriptSmith';
     // form
     this.addElemsToMain(this.form);
@@ -140,6 +145,10 @@ export default class LogInPage extends Page {
     emailInputEventHandler(this.email, 'email-input', 'email-hint');
 
     passwordInputEventHandler(this.password, 'password-input', 'password-hint');
+
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
     return this.pageWrapper;
   }
 }

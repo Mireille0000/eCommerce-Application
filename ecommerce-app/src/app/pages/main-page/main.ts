@@ -1,13 +1,13 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import { createDivElement, createImage, createSpanElement } from '../../utils/functions';
+import createHtmlElement, { createDivElement, createImage, createSpanElement } from '../../utils/functions';
 
 export const routes = [
   '#log-in-page',
   '#registration-page',
   '#catalog-product-page',
-  '#basket-page',
   '#about-us-page',
+  '#basket-page',
   '#profile-page',
 ]; //
 export default class MainPage extends Page {
@@ -17,7 +17,6 @@ export default class MainPage extends Page {
     super(id);
     this.pageWrapper.id = 'main-page';
     this.info = this.createPromoCode();
-    // this.info = createHtmlElement('div', 'star', 'A shining star should be here');
   }
 
   private createPromoCode() {
@@ -41,7 +40,8 @@ export default class MainPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    const linkName = [logLink, 'Register', 'Catalog', 'Basket', 'About Us', 'Profile'];
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = [logLink, 'Register', 'Catalog', 'About Us', `${basketIcon}`, 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
     for (let i = 0; i < linkName.length - 2; i += 1) {
@@ -59,7 +59,12 @@ export default class MainPage extends Page {
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = linkName[i];
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
       navLinksArr[i].setAttribute('href', routes[i]);
     }
 
@@ -78,6 +83,7 @@ export default class MainPage extends Page {
 
     appName.innerHTML = 'Ultimate ScriptSmith';
 
+    // main
     const mage = createDivElement('mage');
     const createImageMage = createImage(
       'https://64.media.tumblr.com/d7901976056e69c382b78796f8f32ede/tumblr_mlljbc7M0A1rfjowdo1_500.gif',
@@ -91,8 +97,20 @@ export default class MainPage extends Page {
       'another-mage-image'
     );
 
+    const aboutAppInfo = createHtmlElement(
+      'p',
+      'about-app-info',
+      'In "Ultimate ScriptSmith" store you will definitely find everything you need for creating reusable, secure, scalable and maintainable magic!'
+    );
+
     mage.append(createImageMage, createImageAnotherMage);
-    this.addElemsToMain(this.info, mage);
+    const promoMageContainer = createHtmlElement('div', 'promo-mage-container');
+    promoMageContainer.append(this.info, mage);
+    this.addElemsToMain(aboutAppInfo, promoMageContainer);
+
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
 
     return this.pageWrapper;
   }

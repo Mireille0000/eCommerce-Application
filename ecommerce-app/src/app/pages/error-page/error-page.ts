@@ -33,6 +33,10 @@ export default class ErrorPage extends Page {
     this.addElemsToMain(this.back);
     this.back.innerHTML = 'ERROR 404. PAGE IS NOT FOUND';
     link.setAttribute('href', '#main-page');
+
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLLinkElement;
+    this.addElemsToFooter(complitionDate);
+
     return this.pageWrapper;
   }
 }

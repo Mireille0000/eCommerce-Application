@@ -191,7 +191,12 @@ class Basket extends Page {
     const emptyGoCatalogBtn = createButtonElement('bskt__empty-go-catalog-btn', 'Start shopping');
     emptyGoCatalogBtn.addEventListener('click', this.GoCatalogBtn);
 
-    containerEmptyCart.append(emptyTitleWrap, emptyDescrWrap, emptyGoCatalogBtn);
+    const imageMageEmptyCart = createImage(
+      'https://i.pinimg.com/originals/73/69/6e/73696e022df7cd5cb3d999c6875361dd.gif',
+      'Magic book',
+      'magic-book-gif'
+    );
+    containerEmptyCart.append(emptyTitleWrap, emptyDescrWrap, emptyGoCatalogBtn, imageMageEmptyCart);
     return containerEmptyCart;
   }
 
@@ -504,7 +509,11 @@ class Basket extends Page {
       this.mainWrapper.appendChild(templateEmptycart);
       this.main.appendChild(this.mainWrapper);
     }
-    this.pageWrapper.append(this.header, this.main);
+    this.pageWrapper.append(this.header, this.main, this.footer);
+    // footer
+    const complitionDate = createDivElement('complition-date', '© 2024');
+    this.addElemsToFooter(complitionDate);
+
     this.createHeader();
     document.body.appendChild(this.pageWrapper);
   }
@@ -603,7 +612,10 @@ class Basket extends Page {
     }
 
     this.main.appendChild(this.mainWrapper);
-    this.pageWrapper.append(this.header, this.main);
+    this.pageWrapper.append(this.header, this.main, this.footer);
+    // footer
+    const complitionDate = createDivElement('complition-date', '© 2024');
+    this.addElemsToFooter(complitionDate);
     document.body.appendChild(this.pageWrapper);
     this.updateDiscountPrice(cart.cart);
     this.createHeader();

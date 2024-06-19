@@ -1,3 +1,4 @@
+import HeaderComponent from '../../components/header';
 import Page from '../../templates/page';
 import createHtmlElement from '../../utils/functions';
 import { StringArr, arrConditionFn } from '../../utils/types';
@@ -20,6 +21,8 @@ import {
   errorMsgsEmail,
   errorMsgsPassword,
 } from './validation/validationMsgs';
+
+export const routes = ['#catalog-product-page', '#about-us-page', '#basket-page'];
 
 export default class RegistrationPage extends Page {
   form: HTMLFormElement;
@@ -176,7 +179,62 @@ export default class RegistrationPage extends Page {
 
   public renderPage() {
     document.body.append(this.pageWrapper);
-    this.pageWrapper.append(this.main);
+    this.pageWrapper.append(this.header, this.main, this.footer);
+
+    // header
+    const headerCompInstance = new HeaderComponent();
+    const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerCompInstance;
+    this.addElemsToHeader(appName, logoContainer, navBar);
+    logoContainer.append(logo);
+    navBar.className = 'navigation-main-page';
+    navBar.append(navigation);
+    const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    // const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
+    const profileLink = isUserLoggedIn ? 'Profile' : false;
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = ['Catalog', 'About Us', `${basketIcon}`];
+    navigation.append(navItem);
+    navItem.className = 'nav-item';
+    for (let i = 0; i < linkName.length - 1; i += 1) {
+      navigation.appendChild(navItem.cloneNode(true));
+    }
+
+    if (profileLink) {
+      navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
+    }
+    const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
+
+    for (let i = 0; i < navListItemsArr.length; i += 1) {
+      navListItemsArr[i].appendChild(link.cloneNode(true));
+    }
+    const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
+
+    for (let i = 0; i < navLinksArr.length; i += 1) {
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
+      navLinksArr[i].setAttribute('href', routes[i]);
+    }
+
+    // const logInLink = navLinksArr[0];
+
+    // logInLink.addEventListener('click', (event) => {
+    //   event.preventDefault();
+    //   if (isUserLoggedIn) {
+    //     localStorage.clear();
+    //     window.location.hash = '';
+    //     window.location.hash = 'main-page';
+    //   } else {
+    //     window.location.hash = 'log-in-page';
+    //   }
+    // });
+
+    appName.innerHTML = 'Ultimate ScriptSmith';
+
+    // main
     this.main.classList.add('registration-main');
 
     const regTitle = createHtmlElement('legend', 'registration-title', 'Registration form');
@@ -258,6 +316,10 @@ export default class RegistrationPage extends Page {
     this.form.appendChild(registrFieldset);
 
     this.addElemsToMain(this.form);
+
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
 
     return this.pageWrapper;
   }
