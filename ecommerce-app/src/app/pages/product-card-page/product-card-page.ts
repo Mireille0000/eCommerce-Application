@@ -1,12 +1,31 @@
+import { Cart } from '@commercetools/platform-sdk';
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
 import CardImageModalWindow from './modal-windows/card-image'; //
-import createHtmlElement, { addEventHandler } from '../../utils/functions';
+import createHtmlElement, { addEventHandler, createButtonElement, createDivElement } from '../../utils/functions';
 import getToken from '../../server-requests/detailed-product-page-requests/detailed-product-page-requests';
+import createOrGetCart, {
+  addLineItemToCart,
+  editLineItemToCart,
+} from '../../server-requests/basket-requests/basket-request';
+import { getAnonymousSessionTokenFromProduct } from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
+// import { createAnonymousUserCartFromProduct } from '../../server-requests/catalog-product-page-requests/catalog-product-page-requests';
 
-const routes = ['#log-in-page', '#registration-page', '#main-page', '#catalog-product-page', '#profile-page'];
+const routes = [
+  '#log-in-page',
+  '#registration-page',
+  '#main-page',
+  '#catalog-product-page',
+  '#about-us-page',
+  '#basket-page',
+  '#profile-page',
+];
 
 export default class ProductCardPage extends Page {
+  UserCart!: Cart;
+
+  clickTimeout: ReturnType<typeof setTimeout> | undefined;
+
   productCardContainer: HTMLDivElement;
 
   imageElem: HTMLDivElement;
@@ -21,7 +40,9 @@ export default class ProductCardPage extends Page {
 
   productDescription: HTMLDivElement;
 
-  productCardSlider: HTMLDivElement; //
+  productEditBtnWrap: HTMLDivElement;
+
+  btnEditProductFromCart: HTMLButtonElement; //
 
   productPrices: HTMLDivElement;
 
@@ -44,14 +65,86 @@ export default class ProductCardPage extends Page {
     this.productDetails = createHtmlElement('div', 'product-card-details');
     this.productName = createHtmlElement('h3', 'product-card-name');
     this.productDescription = createHtmlElement('div', 'product-card-description');
-    this.productCardSlider = createHtmlElement('div', 'product-card-slider');
+    // this.productCardSlider = createHtmlElement('div', 'product-card-slider');
+    this.productEditBtnWrap = createDivElement('product__edit-btn-wrap');
+    this.btnEditProductFromCart = createButtonElement('product__edit-btn');
     this.productPrices = createHtmlElement('div', 'product-card-prices');
     this.price = createHtmlElement('span', 'product-card-price');
     this.discount = createHtmlElement('span', 'product-card-discount');
     this.discountPrice = createHtmlElement('span', 'product-card-discount-price');
   }
 
+  private getTextBtn() {
+    const { lineItems } = this.UserCart;
+
+    let itemIndex = 0;
+    let textBtn = 'Add to Cart';
+    for (let i = 0; i < lineItems.length; i += 1) {
+      const { productKey } = lineItems[i];
+      if (productKey === this.key) {
+        textBtn = 'Remove from Cart';
+        itemIndex = i;
+        break;
+      }
+    }
+    return { textBtn, itemIndex };
+  }
+
+  private EventHandlerAddRemoveProduct(event: Event) {
+    event.preventDefault();
+    const removeCart = 'Remove from Cart';
+    const addCart = 'Add to Cart';
+
+    const { textBtn, itemIndex } = this.getTextBtn();
+    if (textBtn === removeCart) {
+      editLineItemToCart(this.UserCart, 0, itemIndex)
+        .then((cart) => {
+          this.UserCart = cart;
+          this.btnEditProductFromCart.textContent = addCart;
+        })
+        .catch((err) => console.log('Выйди из консоли и попробуй нормально:', err));
+    } else if (textBtn === addCart) {
+      addLineItemToCart(this.UserCart, this.key, 1)
+        .then((cart) => {
+          this.UserCart = cart;
+          this.btnEditProductFromCart.textContent = removeCart;
+        })
+        .catch((err) => console.log('Выйди из консоли и попробуй нормально:', err));
+    }
+  }
+
+  private EventHandlerBtn(event: Event) {
+    event.preventDefault();
+
+    if (this.clickTimeout) {
+      clearTimeout(this.clickTimeout);
+    }
+
+    this.clickTimeout = setTimeout(() => {
+      this.EventHandlerAddRemoveProduct(event);
+    }, 200);
+  }
+
+  private async createBtnAddOrRemoveProduct() {
+    if (localStorage.getItem('data')) {
+      const cart = await createOrGetCart();
+      this.UserCart = cart.cart;
+    } else if (sessionStorage.getItem('anonymousTokensData')) {
+      const cart = await createOrGetCart();
+      this.UserCart = cart.cart;
+    } else {
+      const cart = await getAnonymousSessionTokenFromProduct();
+      this.UserCart = cart;
+    }
+    const { textBtn } = this.getTextBtn();
+
+    this.btnEditProductFromCart.textContent = textBtn;
+    this.btnEditProductFromCart.addEventListener('click', this.EventHandlerBtn.bind(this));
+    this.productEditBtnWrap.append(this.btnEditProductFromCart);
+  }
+
   renderPage() {
+    this.createBtnAddOrRemoveProduct();
     document.body.append(this.pageWrapper);
     this.pageWrapper.append(this.header, this.main, this.footer);
     // header
@@ -65,17 +158,22 @@ export default class ProductCardPage extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
-    const linkName = [logLink, 'Register', 'Back to main', 'Catalog'];
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = [logLink, 'Register', 'Back to main', 'Catalog', 'About Us', `${basketIcon}`, 'Profile'];
 
     navBar.className = 'nav-bar-catalog-page';
     navItem.className = 'nav-item';
-    headerComponents.createNavigation(navigation, navItem, 4, link);
+    headerComponents.createNavigation(navigation, navItem, 6, link);
 
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = linkName[i];
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
       navLinksArr[i].setAttribute('href', routes[i]);
     }
 
@@ -109,8 +207,8 @@ export default class ProductCardPage extends Page {
     buttonContainer.append(closeModalWindowBtn);
 
     this.productCardContainer.append(this.imageElem, this.productCardContent, this.productPrices);
-    this.productCardContent.append(this.productDetails, this.productCardSlider);
-    this.productCardSlider.innerHTML = 'A slider should be here';
+    this.productCardContent.append(this.productDetails, this.productEditBtnWrap);
+    // this.productCardSlider.innerHTML = 'A slider should be here';
     this.imageElem.append(this.image);
     this.productDetails.append(this.productName, this.productDescription);
     this.productPrices.append(this.price, this.discount, this.discountPrice);
@@ -127,6 +225,10 @@ export default class ProductCardPage extends Page {
       modalImageWrapper.classList.add('active');
       pageBody.classList.add('active');
     });
+
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
 
     return this.pageWrapper;
   }

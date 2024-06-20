@@ -27,7 +27,7 @@ export default abstract class Page {
     this.main = createHtmlElement('main'); //
     this.mainWrapper = createHtmlElement('div', 'wrapper-main');
     this.footer = createHtmlElement('footer');
-    this.footerWrapper = createHtmlElement('div');
+    this.footerWrapper = createHtmlElement('div', 'wrapper-footer');
   }
 
   addElemsToHeader(...elems: PageElements) {

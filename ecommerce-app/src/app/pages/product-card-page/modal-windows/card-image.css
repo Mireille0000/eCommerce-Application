@@ -35,14 +35,14 @@ body.active {
 }
 
 .image-container {
-    width: 250px;
+    width: 350px;
     display: flex;
     overflow: hidden;
     border-radius: 20px;
 }
 
 .image-container img {
-    width: 250px;
+    width: 350px;
     border-radius: 20px;
     transition: 2s;
     transform: scale(1);

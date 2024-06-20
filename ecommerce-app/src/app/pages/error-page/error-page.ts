@@ -26,12 +26,17 @@ export default class ErrorPage extends Page {
     navigation.append(navList);
     navList.append(navListItem);
     navListItem.append(link);
+    navListItem.className = 'nav-item';
 
     link.innerHTML = 'Back to main';
     title.innerHTML = 'Ultimate ScriptSmith';
     this.addElemsToMain(this.back);
     this.back.innerHTML = 'ERROR 404. PAGE IS NOT FOUND';
     link.setAttribute('href', '#main-page');
+
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLLinkElement;
+    this.addElemsToFooter(complitionDate);
+
     return this.pageWrapper;
   }
 }

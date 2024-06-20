@@ -1,0 +1,79 @@
+#about-us-page.wrapper {
+    height: 100vh;
+    justify-content: space-between;
+}
+
+.team-members-container {
+    margin: 15px 100px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    gap: 55px;
+    font-family: 'The Hoca Font Family'
+}
+
+.dev-container, .lead-container {
+    width: 500px;
+    display: flex;
+    margin-bottom: 10px;
+    padding: 20px 20px;
+    border-radius: 20px;
+    box-shadow: 10px 5px 5px #9d00ff;
+    background-color: rgba(189, 152, 221, 0.3);
+    box-shadow: 10px 5px 5px #9d00ff;
+}
+
+.dev-container h4, .lead-container h4 {
+    margin: auto;
+    text-align: center;
+    color: rgb(13, 171, 68);
+}
+
+.dev-info, .lead-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bio-dev, .bio-lead {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.contribution-dev, .contribution-lead {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    gap: 8px;
+}
+
+.dev-photo {
+    width: 70px;
+    border-radius: 20%;
+}
+
+.lead-photo {
+    width: 100px;
+    border-radius: 20%;
+}
+
+.li-contribution {
+    font-size: 13px;
+}
+
+.rss-icon {
+    width: 40px;
+    border-radius: 50%;
+}
+
+@media screen and  (max-width: 770px) {
+    .team-members-container {
+        margin: 15px 20px;
+    }
+
+    .dev-container, .lead-container {
+        width: fit-content;
+    }
+}

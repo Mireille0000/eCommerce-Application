@@ -6,7 +6,9 @@ import ErrorPage from './pages/error-page/error-page';
 import CatalogProductPage from './pages/catalog-product-page/catalog-product-page';
 import PersonalRender from './pages/personal-info-page/personal-info';
 import ProductCardPage from './pages/product-card-page/product-card-page';
-// import { routes } from './pages/main-page/main';
+import Basket from './pages/basket-page/basket';
+import AboutUsPage from './pages/about-us-page/about-us';
+import createHtmlElement from './utils/functions';
 
 const enum Pages {
   LogInPageId = 'log-in-page',
@@ -14,7 +16,9 @@ const enum Pages {
   RegisterPageId = 'registration-page',
   CatalogPageId = 'catalog-product-page',
   DetailedProductPageId = 'detailed-product-page',
-  ProfilePageId = 'profile-page', // change if needed
+  ProfilePageId = 'profile-page',
+  BasketPageId = 'basket-page',
+  AboutUsPageId = 'about-us-page',
 }
 
 export default class App {
@@ -24,6 +28,15 @@ export default class App {
     document.body.innerHTML = '';
     let page: Page | null = null;
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
+    const iconsScript = createHtmlElement('script') as HTMLScriptElement;
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.type = 'image/x-icon';
+    favicon.href = 'https://cdn.iconscout.com/icon/premium/png-256-thumb/magic-wand-126-1078572.png';
+    document.head.append(favicon, iconsScript);
+    iconsScript.src = 'https://kit.fontawesome.com/e98440a761.js';
+    iconsScript.crossOrigin = 'anonymous';
+
     if (id === Pages.LogInPageId && !isUserLoggedIn) {
       page = new LogInPage(id);
     } else if (id === Pages.LogInPageId && isUserLoggedIn) {
@@ -42,6 +55,10 @@ export default class App {
       page = new ProductCardPage(id, productKey);
     } else if (id === Pages.ProfilePageId && isUserLoggedIn) {
       page = new PersonalRender(id);
+    } else if (id === Pages.BasketPageId) {
+      page = new Basket(id);
+    } else if (id === Pages.AboutUsPageId) {
+      page = new AboutUsPage(id);
     } else {
       page = new ErrorPage('error-page');
     }
@@ -59,7 +76,6 @@ export default class App {
   changeRoute() {
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.slice(1);
-      console.log(hash);
       if (hash.includes('/')) {
         const [hashname, productKey] = hash.split('/');
         return App.renderAppPage(hashname, productKey);
@@ -70,7 +86,6 @@ export default class App {
   }
 
   renderPage() {
-    console.log('I got called');
     if (window.location.hash.slice(1) === 'main-page') {
       window.location.hash = '';
       window.location.hash = 'main-page';

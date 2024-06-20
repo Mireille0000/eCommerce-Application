@@ -1,5 +1,5 @@
 import Page from '../../templates/page';
-import {
+import createHtmlElement, {
   createButtonElement,
   createDivElement,
   createImage,
@@ -51,11 +51,17 @@ import { createMsgRegAcc } from '../registration-page/utils-registration/functio
 import checkCustomer from '../../server-requests/log-in-form-requests/login-form-requests';
 import HeaderComponent from '../../components/header';
 
-const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#main-page'];
-
 import { Action, ActionEdit, ActionsEdit, AdrsEdit, AdrssEdit } from './constants/types';
 import { updateAdrssFields } from '../../server-requests/personal-info-request/updateAdrs';
 
+const routes = [
+  '#log-in-page',
+  '#registration-page',
+  '#catalog-product-page',
+  '#main-page',
+  '#about-us-page',
+  '#basket-page',
+];
 
 interface FieldUser {
   field: string;
@@ -982,9 +988,12 @@ class PersonalRender extends Page {
   }
 
   render(allUserData: CustomerData) {
-    this.pageWrapper.append(this.header, this.main);
+    this.pageWrapper.append(this.header, this.main, this.footer);
     const { body } = document;
     body.appendChild(this.pageWrapper);
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
 
     window.location.hash = 'profile-page';
     this.UserData = getPersonalData(allUserData);
@@ -1036,12 +1045,12 @@ class PersonalRender extends Page {
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
-    const linkName = [logLink, 'Register', 'Catalog', 'Back to main'];
-   
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = [logLink, 'Register', 'Catalog', 'Back to main', 'About Us', `${basketIcon}`];
+
     navigation.append(navItem);
     navItem.className = 'nav-item';
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < linkName.length - 2; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 
@@ -1056,7 +1065,12 @@ class PersonalRender extends Page {
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = linkName[i];
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
       navLinksArr[i].setAttribute('href', routes[i]);
     }
 

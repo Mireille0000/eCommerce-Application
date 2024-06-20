@@ -1,15 +1,31 @@
 import Page from '../../templates/page';
 import HeaderComponent from '../../components/header';
-import createHtmlElement from '../../utils/functions';
+import createHtmlElement, { createDivElement, createImage, createSpanElement } from '../../utils/functions';
 
-export const routes = ['#log-in-page', '#registration-page', '#catalog-product-page', '#profile-page']; // change profile page id if needed
+export const routes = [
+  '#log-in-page',
+  '#registration-page',
+  '#catalog-product-page',
+  '#about-us-page',
+  '#basket-page',
+  '#profile-page',
+]; //
 export default class MainPage extends Page {
   info: HTMLDivElement;
 
   constructor(id: string) {
     super(id);
     this.pageWrapper.id = 'main-page';
-    this.info = createHtmlElement('div', 'star', 'A shining star should be here');
+    this.info = this.createPromoCode();
+  }
+
+  private createPromoCode() {
+    const promoCodeWrap = createDivElement('main__promo-code-wrap');
+    const promoCodeTitle = createSpanElement('main__promo-code-title', 'Promo code');
+    const promoCodedescr = createSpanElement('main__promo-code-descr', '30% on everything!');
+    const promoCodeContent = createSpanElement('main__promo-code-content', '30ALL');
+    promoCodeWrap.append(promoCodeTitle, promoCodedescr, promoCodeContent);
+    return promoCodeWrap;
   }
 
   renderPage(): HTMLDivElement {
@@ -18,25 +34,21 @@ export default class MainPage extends Page {
     const headerCompInstance = new HeaderComponent();
     const { appName, logoContainer, logo, navBar, navigation, navItem, link } = headerCompInstance;
     this.addElemsToHeader(appName, logoContainer, navBar);
-    // logo.src = iconRobe;
-    // logo.alt = 'icon Mage Robe';
-    console.log(logo);
     logoContainer.append(logo);
     navBar.className = 'navigation-main-page';
     navBar.append(navigation);
     const isUserLoggedIn = localStorage.getItem('data') && JSON.parse(localStorage.getItem('data') as string);
     const logLink = isUserLoggedIn ? 'Log out' : 'Log in';
     const profileLink = isUserLoggedIn ? 'Profile' : false;
-    console.log(isUserLoggedIn, logLink, profileLink);
-    const linkName = [logLink, 'Register', 'Catalog', 'Profile'];
+    const basketIcon = createHtmlElement('i', 'fa-solid fa-cart-shopping') as HTMLElement;
+    const linkName = [logLink, 'Register', 'Catalog', 'About Us', `${basketIcon}`, 'Profile'];
     navigation.append(navItem);
     navItem.className = 'nav-item';
-    for (let i = 0; i < 2; i += 1) {
+    for (let i = 0; i < linkName.length - 2; i += 1) {
       navigation.appendChild(navItem.cloneNode(true));
     }
 
     if (profileLink) {
-      console.log('appending');
       navigation.append(navItem.cloneNode(true)); // adding an additional link for profile page if user is loggged in
     }
     const navListItemsArr = Array.from(document.querySelectorAll('.nav-item'));
@@ -47,9 +59,13 @@ export default class MainPage extends Page {
     const navLinksArr = Array.from(document.querySelectorAll('.nav-item a'));
 
     for (let i = 0; i < navLinksArr.length; i += 1) {
-      navLinksArr[i].innerHTML = linkName[i];
+      if (linkName[i] !== '[object HTMLElement]') {
+        navLinksArr[i].innerHTML = linkName[i];
+        console.log(linkName[i]);
+      } else {
+        navLinksArr[i].append(basketIcon);
+      }
       navLinksArr[i].setAttribute('href', routes[i]);
-      console.log('I ran');
     }
 
     const logInLink = navLinksArr[0];
@@ -67,7 +83,34 @@ export default class MainPage extends Page {
 
     appName.innerHTML = 'Ultimate ScriptSmith';
 
-    this.addElemsToMain(this.info);
+    // main
+    const mage = createDivElement('mage');
+    const createImageMage = createImage(
+      'https://64.media.tumblr.com/d7901976056e69c382b78796f8f32ede/tumblr_mlljbc7M0A1rfjowdo1_500.gif',
+      'Mage',
+      'mage-image'
+    );
+
+    const createImageAnotherMage = createImage(
+      'https://miro.medium.com/v2/resize:fit:768/1*mUYZpTpdfHXKNwcOzw2JhA.gif',
+      'Another Mage',
+      'another-mage-image'
+    );
+
+    const aboutAppInfo = createHtmlElement(
+      'p',
+      'about-app-info',
+      'In "Ultimate ScriptSmith" store you will definitely find everything you need for creating reusable, secure, scalable and maintainable magic!'
+    );
+
+    mage.append(createImageMage, createImageAnotherMage);
+    const promoMageContainer = createHtmlElement('div', 'promo-mage-container');
+    promoMageContainer.append(this.info, mage);
+    this.addElemsToMain(aboutAppInfo, promoMageContainer);
+
+    // footer
+    const complitionDate = createHtmlElement('div', 'complition-date', '© 2024') as HTMLDivElement;
+    this.addElemsToFooter(complitionDate);
 
     return this.pageWrapper;
   }
